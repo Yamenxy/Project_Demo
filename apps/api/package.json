@@ -10,7 +10,7 @@
     "test": "vitest run",
     "db:migrate": "node --env-file-if-exists=.env --import tsx src/database/scripts/migrate.ts",
     "db:dev-setup": "node --env-file-if-exists=.env --import tsx src/database/scripts/dev-setup.ts",
-    "db:generate": "node --env-file-if-exists=.env node_modules/drizzle-kit/bin.cjs generate"
+    "db:new-migration": "drizzle-kit generate --custom --name"
   },
   "dependencies": {
     "@nestjs/common": "^12.1.0",
