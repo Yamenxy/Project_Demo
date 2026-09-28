@@ -32,6 +32,7 @@ CLAUDE.md requires a written justification for every new dependency. Add a row w
 | tsx (dev) | Runs TypeScript scripts (migrations, dev setup) without a build step | Phase 1, task 4 |
 | pino | Structured JSON logging; it's already Fastify's logger, so HTTP and application logs share one format and one scrubbing hook | Phase 1, task 5 |
 | fastify | Direct dependency for its types (it's already pulled in by @nestjs/platform-fastify; pinned to the same version) | Phase 1, task 5 |
+| pg-boss | Job queue on PostgreSQL: retries with backoff, dead-letter queue, cron schedules, and enqueueing inside a Drizzle transaction (architecture §4 Jobs). ESM-only; loaded through Node 24's `require(esm)` | Phase 1, task 7 |
 | zod | Validates configuration now, and request and response schemas later; shared with the web client through `packages/shared` (architecture §9) | Phase 1, task 2 |
 
 ## Web (`apps/web`)

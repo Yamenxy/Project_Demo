@@ -15,6 +15,13 @@
       "when": 1790629804899,
       "tag": "0001_audit_log",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1790630161416,
+      "tag": "0002_job_queue",
+      "breakpoints": true
     }
   ]
 }

@@ -38,7 +38,11 @@ module.exports = {
       severity: 'error',
       from: {
         path: '^apps/api/src/',
-        pathNot: ['^apps/api/src/database/', '^apps/api/src/modules/(tenancy|platform-admin)/'],
+        pathNot: [
+          '^apps/api/src/database/',
+          '^apps/api/src/jobs/',
+          '^apps/api/src/modules/(tenancy|platform-admin)/',
+        ],
       },
       to: { path: '^apps/api/src/database/platform-db[.]ts$' },
     },

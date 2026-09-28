@@ -5,6 +5,7 @@
   "scripts": {
     "build": "tsc -p tsconfig.build.json",
     "start": "node --env-file-if-exists=.env dist/main.js",
+    "start:worker": "node --env-file-if-exists=.env dist/worker.js",
     "dev": "node --env-file-if-exists=.env node_modules/@nestjs/cli/bin/nest.js start --watch",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "test": "vitest run",
@@ -19,6 +20,7 @@
     "drizzle-orm": "^0.45.3",
     "fastify": "5.12.5",
     "pg": "^8.23.0",
+    "pg-boss": "^12.35.0",
     "pino": "^10.3.1",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.2",

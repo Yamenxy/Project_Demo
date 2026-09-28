@@ -11,7 +11,7 @@ docker compose up -d                          # Postgres, S3-compatible storage,
 cp apps/api/.env.example apps/api/.env
 pnpm install
 pnpm --filter @lms/api db:dev-setup           # migrations + local database users
-pnpm --filter @lms/api dev                    # API on http://localhost:3001/api/health
+pnpm --filter @lms/api dev                    # API on http://localhost:3001/api/health (runs job workers inline)
 pnpm --filter @lms/web dev                    # Web on http://localhost:3000
 ```
 

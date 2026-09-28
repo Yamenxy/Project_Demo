@@ -14,13 +14,13 @@ The system is a **modular monolith**: one TypeScript codebase deployed as three 
 |---|---|
 | `web` | Next.js: UI, public pages, PWA |
 | `api` | NestJS: REST API with OpenAPI |
-| `worker` | pg-boss job and outbox consumer. On the free setup it runs **inside** the API process (`WORKER_MODE=inline`). |
+| `worker` | pg-boss job worker (`src/worker.ts`). On the free setup the API process runs the workers itself (`WORKER_MODE=inline`). |
 
 Rules that hold everywhere:
 - **Controllers contain no logic.** They parse input, call a policy, then call a service.
 - **The frontend contains no business rules.**
 - **Authorization happens on the server**, on every request, and is denied by default (REQ-RBAC-005).
-- **Invariants are kept inside the transaction.** Events go through the outbox and are used only for side effects: notifications, email, push, analytics.
+- **Invariants are kept inside the transaction.** Side effects (notifications, email, push, analytics) are jobs enqueued in the same transaction, which serves as the transactional outbox.
 - **Every external provider sits behind an adapter** selected by configuration (REQ-OPS-006).
 
 ## 2. Modules
@@ -54,8 +54,8 @@ A module owns its tables and exposes a public service API. Other modules may onl
 3. **Load the membership** (user, workspace): role, pause flag, permission grants with their class scopes, class-teacher assignments, and the workspace's suspension state. This is one indexed query, cached only within the request (or across requests for a few seconds, with a version number that permission changes increment).
 4. **Run the endpoint's declared policy function**, which checks the key, the class scope, object ownership and the suspension state. Any failure returns 404 for resources outside the actor's reach and 403 for insufficient permission on resources inside it.
 5. **Open a transaction**, `SET LOCAL app.workspace_id = …`, and call the service with the tenant-scoped database handle.
-6. **Write the audit record** and any outbox rows **in the same transaction**, then commit.
-7. The worker dispatches the outbox: notifications, email, push.
+6. **Write the audit record** and **enqueue any jobs in the same transaction** (`JobsRuntime.enqueue(tx, …)`), then commit. A job exists only if the change committed.
+7. Workers run the jobs: notifications, email, push.
 
 Mutating endpoints accept an `Idempotency-Key` header (REQ-DATA-003).
 
@@ -72,6 +72,7 @@ Mutating endpoints accept an `Idempotency-Key` header (REQ-DATA-003).
 - **Code:** `apps/api/src/database/`. `TenantDb.inWorkspace(id, fn)` gives a scoped transaction; `TenantDb.transaction(fn)` is unscoped and for global tables only. The mechanism is covered by `apps/api/test/database/tenant-isolation.int.spec.ts`.
 - **Migrations** are hand-written SQL in `apps/api/drizzle`, created with `pnpm --filter @lms/api db:new-migration <name>` (drizzle-kit `--custom`). drizzle-kit's schema diffing isn't used, because it can't express partitioned tables, row-level security, role grants or column privileges. The Drizzle tables in each module's `schema.ts` mirror the SQL for typed queries, and `test/database/schema-drift.int.spec.ts` fails if they disagree.
 - **Audit log** (`modules/audit`, migration `0001`): partitioned by month, with a default partition as a safety net. `app.ensure_audit_partitions(n)` (SECURITY DEFINER, platform role only) creates months ahead. The runtime role may insert events for its current workspace or platform-level events (`workspace_id` NULL) and read only its workspace's events. No role may UPDATE or DELETE, except that the platform role can clear `personal_context` for anonymization. Direct access to partitions is revoked. `AuditService.record(tx, event)` writes inside the caller's transaction.
+- **Jobs** (`src/jobs`, migration `0002`): pg-boss in schema `pgboss`, owned by the migrator. `runMigrations` installs and upgrades pg-boss and creates the queues listed in `src/jobs/queues.ts`; runtime instances never create or migrate the schema, and index rebuilds are off. The runtime role has data access to `pgboss` only. Job rows aren't tenant-isolated, so **payloads carry IDs only** and handlers scope their work with `TenantDb.inWorkspace(payload.workspaceId, …)`. Each queue sets its retries and backoff; exhausted jobs are copied to `system.failed_jobs` (kept 30 days). Handlers are registered in `onModuleInit` and must be safe to run twice. Platform maintenance jobs live in `src/jobs/maintenance.ts` (lint allows `src/jobs` to use the platform handle).
 - **Sessions** are server-side, with device registrations, a cooldown and a concurrent-stream counter.
 - **Passwords** are hashed with argon2id.
 - **2FA (TOTP)** is required for platform owners, owner teachers and class teachers.
@@ -161,8 +162,8 @@ The fields listed are the essential ones. Every tenant table also has `workspace
 - **AttendanceRecord**: unique on (session, student membership).
 
 **Cross-cutting**
-- **Notification**, **OutboxEvent**, **IdempotencyKey**, **AuditLog** (partitioned).
-- The job tables belong to pg-boss.
+- **Notification**, **IdempotencyKey**, **AuditLog** (partitioned).
+- The job tables belong to pg-boss (schema `pgboss`); pg-boss jobs enqueued in the business transaction replace a separate outbox table.
 
 ## 6. Money and time conventions
 
@@ -283,7 +284,7 @@ WORKER_MODE=inline|separate, DATA_CLASS=synthetic|real, PUSH_VAPID_*
 | i18n | next-intl with ICU messages | Arabic plural forms; Arabic is the default locale |
 | Database | PostgreSQL 16+ | Row-level security, partial unique indexes, row locks, partitioning |
 | Data access | Drizzle ORM with SQL migrations | Composite foreign keys, partial indexes and `SET LOCAL` without workarounds |
-| Jobs | pg-boss | Jobs are enqueued in the same transaction as the business write; the outbox needs no extra infrastructure |
+| Jobs | pg-boss 12 | Jobs are enqueued in the same transaction as the business write (its Drizzle adapter), so no separate outbox is needed |
 | Authentication | Better Auth (authentication only), version pinned | Sessions, argon2id, TOTP, phone OTP. Authorization is custom |
 | Maths | KaTeX | LaTeX in questions |
 | Player | hls.js | One player for both video adapters; draws the watermark |

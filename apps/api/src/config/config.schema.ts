@@ -16,6 +16,8 @@ const envSchema = z
     DATA_CLASS: z.enum(['synthetic', 'real']),
     PORT: z.coerce.number().int().min(1).max(65535).default(3001),
     LOG_LEVEL: z.enum(LOG_LEVELS).default('info'),
+    // inline: the API process also runs job workers (free setup). separate: a worker process does.
+    WORKER_MODE: z.enum(['inline', 'separate']).default('inline'),
     DATABASE_URL: z.url({ protocol: /^postgres(ql)?$/ }),
     DATABASE_PLATFORM_URL: z.url({ protocol: /^postgres(ql)?$/ }),
     DATABASE_POOL_MAX: z.coerce.number().int().min(1).max(100).default(10),
@@ -43,6 +45,7 @@ export interface AppConfig {
   dataClass: 'synthetic' | 'real';
   port: number;
   logLevel: LogLevel;
+  workerMode: 'inline' | 'separate';
   /** Runtime role (app_runtime): all normal application queries. */
   databaseUrl: string;
   /** Platform role (app_platform): the restricted cross-workspace handle. */
@@ -75,6 +78,7 @@ export function loadConfig(env: Record<string, string | undefined>): AppConfig {
     dataClass: e.DATA_CLASS,
     port: e.PORT,
     logLevel: e.LOG_LEVEL,
+    workerMode: e.WORKER_MODE,
     databaseUrl: e.DATABASE_URL,
     databasePlatformUrl: e.DATABASE_PLATFORM_URL,
     databasePoolMax: e.DATABASE_POOL_MAX,
