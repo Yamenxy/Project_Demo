@@ -259,7 +259,7 @@ Why not the obvious alternatives:
 
 Notes on setup C:
 - Staging stays on the free setup with synthetic data.
-- Setup C still needs the owner's legal work (REQ-PRIV-004). It is the minimum **technical** setup, not a legal clearance.
+- Setup C is the minimum technical setup for real data. Legal and accounting work is deferred (OD-08) and isn't a condition for moving to it.
 - Moving from setup A to setup C changes environment variables and infrastructure only (REQ-OPS-006):
 
 ```

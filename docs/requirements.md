@@ -4,7 +4,7 @@
 **Sources:**
 - the requirements prompt v3;
 - the three-part review (finding IDs such as SEC-01 and DB-04 refer to it);
-- the owner decisions OD-01 to OD-07 in [decisions.md](decisions.md).
+- the owner decisions OD-01 to OD-08 in [decisions.md](decisions.md).
 
 Read this together with [architecture.md](architecture.md). Anything unresolved is in [open-questions.md](open-questions.md).
 
@@ -17,6 +17,7 @@ Read this together with [architecture.md](architecture.md). Anything unresolved 
 | Effect | REQs |
 |---|---|
 | **Added** | AUTH-008, RBAC-006, USER-006, USER-007, CONTENT-005, CONTENT-006, CONTENT-007, CONTENT-008, CONTENT-009, CONTENT-010, CONTENT-011 (post-MVP), HW-002, EXAM-006, PAY-009, PAY-010, NOTIF-003, OPS-005, OPS-006, PRIV-006 |
+| **Changed by OD-08** | PRIV-004 (legal and accounting work deferred until teachers are paying; no longer a launch condition) |
 | **Changed** | AUTH-007, RBAC-001, RBAC-002, RBAC-004, USER-003, USER-005, CLASS-001, CONTENT-001, CONTENT-003, VIDEO-001, VIDEO-003, VIDEO-005, ATT-001, PAY-006, PAY-007, PAY-008, SUB-002, OPS-001, OPS-002, PRIV-004 |
 | **Removed** | AUTH-006 (student-code login), PAY-001 (entitlement periods), PAY-002 (renewal arithmetic), PAY-005 (suspension compensation) |
 | **Review findings dropped** | BIZ-01, BIZ-02, BIZ-04, EDGE-10, EDGE-12, the entitlement-stacking property tests in TEST-03, Flow B expiry reminders, the Flow B "Paid / Due / Overdue" billing status, and the permission keys `access.extend` and `payments.view_status` |
@@ -834,8 +835,8 @@ The spec states that this makes downloading harder but does not prevent it.
 - Deletion anonymizes the account and notifies the owner teachers.
 **Source:** PRIV-07
 
-### REQ-PRIV-004 | CHANGE | Tracked owner task
-**Requirement:** The owners obtain legal advice on:
+### REQ-PRIV-004 | CHANGE | Deferred (post-launch)
+**Requirement:** Legal and accounting advice is deferred until teachers are paying (OD-08). It covers:
 - controller and processor roles;
 - the licence from the PDPC;
 - appointing a data protection officer;
@@ -843,9 +844,9 @@ The spec states that this makes downloading harder but does not prevent it.
 - the consent method;
 - tax on Flow A revenue.
 
-This is tracked in open-questions.md and **doesn't block development**.
-**Acceptance criteria:** Each item has an owner and a status in open-questions.md.
-**Source:** PRIV-02, PRIV-03, PRIV-04, COMP-01, OD-07
+It doesn't block development, the pilot or launch. The privacy protections in REQ-PRIV-001, REQ-PRIV-002, REQ-PRIV-003, REQ-PRIV-005, REQ-PRIV-006 and REQ-VIDEO-002 are product requirements and are built regardless.
+**Acceptance criteria:** The items are listed in the "Later, once teachers are paying" section of open-questions.md.
+**Source:** PRIV-02, PRIV-03, PRIV-04, COMP-01, OD-07, OD-08
 
 ### REQ-PRIV-005 | ADD | MVP
 **Requirement:** Personal data is visible only as set out in the PRIV-09 matrix. Class teachers and helpers see phone numbers only for students in scope, and only with `enrollment.manage` or `students.edit`.
