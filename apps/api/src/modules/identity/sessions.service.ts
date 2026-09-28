@@ -40,7 +40,7 @@ export class SessionsService {
   async create(
     tx: DbTx,
     userId: string,
-    options: { remember: boolean; deviceLabel?: string },
+    options: { remember: boolean; deviceLabel?: string; deviceId?: string },
   ): Promise<CreatedSession> {
     const now = this.clock.now();
     const policy = options.remember ? REMEMBERED : NOT_REMEMBERED;
@@ -52,6 +52,7 @@ export class SessionsService {
       userId,
       tokenHash: hashToken(token),
       deviceLabel: options.deviceLabel?.slice(0, 120) ?? null,
+      deviceId: options.deviceId ?? null,
       createdAt: now,
       lastSeenAt: now,
       idleExpiresAt: new Date(now.getTime() + policy.idleMs),

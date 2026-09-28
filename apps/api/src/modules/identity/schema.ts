@@ -18,6 +18,7 @@ export const users = pgTable('users', {
   }).notNull(),
   passwordHash: text('password_hash').notNull(),
   passwordChangedAt: tstz('password_changed_at').notNull(),
+  devicesResetAt: tstz('devices_reset_at'),
   createdAt: tstz('created_at').notNull(),
   updatedAt: tstz('updated_at').notNull(),
 });
@@ -30,6 +31,7 @@ export const SESSION_REVOKE_REASONS = [
   'password_changed',
   'password_reset',
   'device_limit',
+  'device_revoked',
   'admin',
   'membership_removed',
 ] as const;
@@ -46,6 +48,18 @@ export const sessions = pgTable('sessions', {
   absoluteExpiresAt: tstz('absolute_expires_at').notNull(),
   revokedAt: tstz('revoked_at'),
   revokeReason: text('revoke_reason', { enum: SESSION_REVOKE_REASONS }),
+  deviceId: uuid('device_id'),
+});
+
+export const deviceRegistrations = pgTable('device_registrations', {
+  id: uuid('id').primaryKey(),
+  userId: uuid('user_id').notNull(),
+  tokenHash: text('token_hash').notNull(),
+  label: text('label'),
+  createdAt: tstz('created_at').notNull(),
+  lastSeenAt: tstz('last_seen_at').notNull(),
+  revokedAt: tstz('revoked_at'),
+  revokedByType: text('revoked_by_type', { enum: ['user', 'staff', 'support', 'system'] }),
 });
 
 export const otpChallenges = pgTable('otp_challenges', {

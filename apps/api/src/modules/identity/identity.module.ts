@@ -2,6 +2,8 @@ import { Module, type OnModuleInit } from '@nestjs/common';
 import { JobsRuntime } from '../../jobs';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
+import { DevicesController } from './devices/devices.controller';
+import { DevicesService } from './devices/devices.service';
 import { ConsoleOtpSender, OtpSender } from './otp/otp-sender';
 import { OtpService } from './otp/otp.service';
 import { RateLimiter } from './rate-limiter';
@@ -11,7 +13,7 @@ import { SessionGuard } from './session.guard';
 import { SessionsService } from './sessions.service';
 
 @Module({
-  controllers: [AuthController, RecoveryController],
+  controllers: [AuthController, RecoveryController, DevicesController],
   providers: [
     AuthService,
     SessionsService,
@@ -19,10 +21,11 @@ import { SessionsService } from './sessions.service';
     SessionGuard,
     OtpService,
     RecoveryService,
+    DevicesService,
     // Only the console sender exists until WhatsApp is set up; config forbids it in production.
     { provide: OtpSender, useClass: ConsoleOtpSender },
   ],
-  exports: [SessionsService, SessionGuard, RateLimiter],
+  exports: [SessionsService, SessionGuard, RateLimiter, DevicesService],
 })
 export class IdentityModule implements OnModuleInit {
   constructor(

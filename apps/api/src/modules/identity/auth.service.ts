@@ -6,6 +6,7 @@ import { isUniqueViolation, TenantDb, type DbTx } from '../../database';
 import { AuditService } from '../audit';
 import type { LoginBody, RegisterBody, UserSummary } from './auth.schemas';
 import { deviceLabelFrom } from './device-label';
+import { DevicesService, type AdmittedDevice } from './devices/devices.service';
 import { checkPassword, hashPassword, verifyAgainstDummy, verifyPassword } from './password';
 import { RateLimiter, type RateLimitRule } from './rate-limiter';
 import type { RequestMeta } from './request-meta';
@@ -25,6 +26,12 @@ export const RATE_LIMITS = {
 
 type UserRow = typeof users.$inferSelect;
 
+export interface SignedIn {
+  user: UserSummary;
+  session: CreatedSession;
+  device: AdmittedDevice;
+}
+
 const UNAVAILABLE_STATUSES = new Set(['suspended', 'archived', 'anonymized']);
 
 @Injectable()
@@ -34,6 +41,7 @@ export class AuthService {
   constructor(
     private readonly db: TenantDb,
     private readonly sessions: SessionsService,
+    private readonly devices: DevicesService,
     private readonly rateLimiter: RateLimiter,
     private readonly audit: AuditService,
     private readonly ids: IdGenerator,
@@ -45,10 +53,7 @@ export class AuthService {
    * verified (REQ-AUTH-001). A number already verified by someone else doesn't block this; the
    * conflict is resolved at verification, so registration never reveals which numbers exist.
    */
-  async register(
-    body: RegisterBody,
-    meta: RequestMeta,
-  ): Promise<{ user: UserSummary; session: CreatedSession }> {
+  async register(body: RegisterBody, meta: RequestMeta, deviceToken?: string): Promise<SignedIn> {
     const phone = normalizePhone(body.phone);
     if (!phone) throw new AppError(400, 'invalid_phone', 'Phone number is not valid');
     await this.enforce(RATE_LIMITS.registerIp, meta.ip);
@@ -71,10 +76,13 @@ export class AuthService {
         createdAt: now,
         updatedAt: now,
       });
-      const session = await this.sessions.create(tx, user.id, {
-        remember: body.rememberMe,
-        deviceLabel: deviceLabelFrom(meta.userAgent),
-      });
+      const { session, device } = await this.startSession(
+        tx,
+        user.id,
+        body.rememberMe,
+        meta,
+        deviceToken,
+      );
       await this.audit.record(tx, {
         action: 'auth.registered',
         workspaceId: null,
@@ -84,14 +92,11 @@ export class AuthService {
         requestId: meta.requestId,
         personalContext: { ip: meta.ip, userAgent: meta.userAgent },
       });
-      return { user: summarize(user), session };
+      return { user: summarize(user), session, device };
     });
   }
 
-  async login(
-    body: LoginBody,
-    meta: RequestMeta,
-  ): Promise<{ user: UserSummary; session: CreatedSession }> {
+  async login(body: LoginBody, meta: RequestMeta, deviceToken?: string): Promise<SignedIn> {
     const identifier = body.identifier.includes('@')
       ? `email:${body.identifier.toLowerCase()}`
       : `phone:${normalizePhone(body.identifier) ?? body.identifier}`;
@@ -126,10 +131,13 @@ export class AuthService {
 
     const user = matched;
     return this.db.transaction(async (tx) => {
-      const session = await this.sessions.create(tx, user.id, {
-        remember: body.rememberMe,
-        deviceLabel: deviceLabelFrom(meta.userAgent),
-      });
+      const { session, device } = await this.startSession(
+        tx,
+        user.id,
+        body.rememberMe,
+        meta,
+        deviceToken,
+      );
       await this.audit.record(tx, {
         action: 'auth.login',
         workspaceId: null,
@@ -138,7 +146,7 @@ export class AuthService {
         requestId: meta.requestId,
         personalContext: { ip: meta.ip, userAgent: meta.userAgent },
       });
-      return { user: summarize(user), session };
+      return { user: summarize(user), session, device };
     });
   }
 
@@ -168,6 +176,24 @@ export class AuthService {
       tx.select().from(users).where(eq(users.id, userId)),
     );
     return user ? summarize(user) : null;
+  }
+
+  /** Admits the device (REQ-AUTH-005), then opens a session bound to it. */
+  private async startSession(
+    tx: DbTx,
+    userId: string,
+    remember: boolean,
+    meta: RequestMeta,
+    deviceToken: string | undefined,
+  ): Promise<{ session: CreatedSession; device: AdmittedDevice }> {
+    const label = deviceLabelFrom(meta.userAgent);
+    const device = await this.devices.admit(tx, userId, deviceToken, label);
+    const session = await this.sessions.create(tx, userId, {
+      remember,
+      deviceLabel: label,
+      deviceId: device.deviceId,
+    });
+    return { session, device };
   }
 
   private async enforce(rule: RateLimitRule, subject: string): Promise<void> {

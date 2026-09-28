@@ -1,6 +1,6 @@
 import { Body, Controller, Get, HttpCode, Inject, Post, Req, Res, UseGuards } from '@nestjs/common';
 import type { FastifyReply, FastifyRequest } from 'fastify';
-import { AppError } from '../../common';
+import { AppError, Clock } from '../../common';
 import { ZodPipe } from '../../common/http/zod.pipe';
 import { APP_CONFIG, type AppConfig } from '../../config';
 import {
@@ -10,9 +10,15 @@ import {
   type RegisterBody,
   type UserSummary,
 } from './auth.schemas';
-import { AuthService } from './auth.service';
+import { AuthService, type SignedIn } from './auth.service';
 import { metaOf } from './request-meta';
-import { clearSessionCookie, setSessionCookie, type CookieSettings } from './session-cookie';
+import {
+  clearSessionCookie,
+  DEVICE_COOKIE,
+  setDeviceCookie,
+  setSessionCookie,
+  type CookieSettings,
+} from './session-cookie';
 import { CurrentSession, SessionGuard } from './session.guard';
 import type { ResolvedSession } from './sessions.service';
 
@@ -22,6 +28,7 @@ export class AuthController {
 
   constructor(
     private readonly auth: AuthService,
+    private readonly clock: Clock,
     @Inject(APP_CONFIG) config: AppConfig,
   ) {
     this.cookies = { secure: config.cookieSecure };
@@ -34,9 +41,8 @@ export class AuthController {
     @Req() request: FastifyRequest,
     @Res({ passthrough: true }) reply: FastifyReply,
   ): Promise<{ user: UserSummary }> {
-    const { user, session } = await this.auth.register(body, metaOf(request));
-    setSessionCookie(reply, session, this.cookies);
-    return { user };
+    const result = await this.auth.register(body, metaOf(request), request.cookies[DEVICE_COOKIE]);
+    return this.signedIn(reply, result);
   }
 
   @Post('login')
@@ -46,9 +52,8 @@ export class AuthController {
     @Req() request: FastifyRequest,
     @Res({ passthrough: true }) reply: FastifyReply,
   ): Promise<{ user: UserSummary }> {
-    const { user, session } = await this.auth.login(body, metaOf(request));
-    setSessionCookie(reply, session, this.cookies);
-    return { user };
+    const result = await this.auth.login(body, metaOf(request), request.cookies[DEVICE_COOKIE]);
+    return this.signedIn(reply, result);
   }
 
   @Post('logout')
@@ -72,6 +77,14 @@ export class AuthController {
   ): Promise<void> {
     await this.auth.logoutAll(session.userId, metaOf(request));
     clearSessionCookie(reply, this.cookies);
+  }
+
+  private signedIn(reply: FastifyReply, result: SignedIn): { user: UserSummary } {
+    setSessionCookie(reply, result.session, this.cookies);
+    if (result.device.newToken) {
+      setDeviceCookie(reply, result.device.newToken, this.cookies, this.clock.now());
+    }
+    return { user: result.user };
   }
 
   @Get('me')

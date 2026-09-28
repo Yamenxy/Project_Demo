@@ -43,6 +43,13 @@
       "when": 1790635681358,
       "tag": "0005_tenancy",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1790635928918,
+      "tag": "0006_devices",
+      "breakpoints": true
     }
   ]
 }

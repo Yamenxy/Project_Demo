@@ -45,7 +45,7 @@ function login(
   target: NestFastifyApplication,
   identifier: string,
   password = PASSWORD,
-  extra: { ip?: string; origin?: string; rememberMe?: boolean } = {},
+  extra: { ip?: string; origin?: string; rememberMe?: boolean; device?: string | null } = {},
 ) {
   return target.inject({
     method: 'POST',
@@ -53,8 +53,12 @@ function login(
     payload: { identifier, password, rememberMe: extra.rememberMe ?? false },
     remoteAddress: extra.ip ?? randomIp(),
     headers: extra.origin ? { origin: extra.origin } : {},
+    cookies: extra.device ? { lms_device: extra.device } : {},
   });
 }
+
+const deviceOf = (res: { headers: Record<string, unknown> }) =>
+  cookieValue(res.headers['set-cookie'] as string[] | undefined, 'lms_device');
 
 function me(target: NestFastifyApplication, token: string | null) {
   return target.inject({
@@ -80,10 +84,12 @@ describe('registration', () => {
     expect(user).toMatchObject({ status: 'pending', phoneVerified: false });
     expect(user.platformCode).toMatch(/^[A-Z2-9]{8}$/);
 
-    const setCookie = String(res.headers['set-cookie']);
-    expect(setCookie).toContain('HttpOnly');
-    expect(setCookie).toContain('SameSite=Lax');
-    expect(setCookie).not.toContain('Expires'); // browser-session cookie without "remember me"
+    const cookies = ([] as string[]).concat(res.headers['set-cookie'] ?? []);
+    const sessionCookie = cookies.find((c) => c.startsWith(`${COOKIE}=`)) ?? '';
+    expect(sessionCookie).toContain('HttpOnly');
+    expect(sessionCookie).toContain('SameSite=Lax');
+    expect(sessionCookie).not.toContain('Expires'); // browser-session cookie without "remember me"
+    expect(cookies.find((c) => c.startsWith('lms_device='))).toContain('HttpOnly');
 
     const token = cookieValue(res.headers['set-cookie'], COOKIE);
     expect(token).toBeTruthy();
@@ -170,9 +176,16 @@ describe('login and sessions', () => {
 
   it('logs out the current session only', async () => {
     const phone = randomPhone();
-    await register(app, { phone });
-    const a = cookieValue((await login(app, phone)).headers['set-cookie'], COOKIE);
-    const b = cookieValue((await login(app, phone)).headers['set-cookie'], COOKIE);
+    const device = deviceOf(await register(app, { phone }));
+    const a = cookieValue(
+      (await login(app, phone, PASSWORD, { device })).headers['set-cookie'],
+      COOKIE,
+    );
+    const b = cookieValue(
+      (await login(app, phone, PASSWORD, { device })).headers['set-cookie'],
+      COOKIE,
+    );
+    expect(a && b).toBeTruthy();
     const res = await app.inject({
       method: 'POST',
       url: '/api/v1/auth/logout',
@@ -185,9 +198,14 @@ describe('login and sessions', () => {
 
   it('logs out every device', async () => {
     const phone = randomPhone();
-    await register(app, { phone });
-    const a = cookieValue((await login(app, phone)).headers['set-cookie'], COOKIE);
+    const firstDevice = deviceOf(await register(app, { phone }));
+    const a = cookieValue(
+      (await login(app, phone, PASSWORD, { device: firstDevice })).headers['set-cookie'],
+      COOKIE,
+    );
+    // A second browser: the account's second and last allowed device.
     const b = cookieValue((await login(app, phone)).headers['set-cookie'], COOKIE);
+    expect(a && b).toBeTruthy();
     const res = await app.inject({
       method: 'POST',
       url: '/api/v1/auth/logout-all',
