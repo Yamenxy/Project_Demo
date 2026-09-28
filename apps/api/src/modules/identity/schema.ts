@@ -48,6 +48,18 @@ export const sessions = pgTable('sessions', {
   revokeReason: text('revoke_reason', { enum: SESSION_REVOKE_REASONS }),
 });
 
+export const otpChallenges = pgTable('otp_challenges', {
+  id: uuid('id').primaryKey(),
+  userId: uuid('user_id').notNull(),
+  phoneE164: text('phone_e164').notNull(),
+  purpose: text('purpose', { enum: ['verify_phone', 'password_reset'] }).notNull(),
+  codeHash: text('code_hash').notNull(),
+  createdAt: tstz('created_at').notNull(),
+  expiresAt: tstz('expires_at').notNull(),
+  attempts: integer('attempts').notNull(),
+  consumedAt: tstz('consumed_at'),
+});
+
 export const rateLimitCounters = pgTable(
   'rate_limit_counters',
   {

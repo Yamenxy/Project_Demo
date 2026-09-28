@@ -37,12 +37,15 @@ describe('loadConfig', () => {
   });
 
   it('requires production to declare real data explicitly', () => {
-    expect(issuesOf({ ...base, DEPLOY_TIER: 'production', DATA_CLASS: 'synthetic' })).toEqual([
+    expect(issuesOf({ ...base, DEPLOY_TIER: 'production', DATA_CLASS: 'synthetic' })).toContain(
       'DATA_CLASS: production must declare DATA_CLASS=real',
-    ]);
-    expect(loadConfig({ ...base, DEPLOY_TIER: 'production', DATA_CLASS: 'real' }).dataClass).toBe(
-      'real',
     );
+  });
+
+  it('refuses the console OTP sender in production', () => {
+    expect(issuesOf({ ...base, DEPLOY_TIER: 'production', DATA_CLASS: 'real' })).toEqual([
+      'OTP_PROVIDER: production needs a real OTP provider (WhatsApp or SMS)',
+    ]);
   });
 
   it('refuses to start when DATA_CLASS or DEPLOY_TIER is missing', () => {

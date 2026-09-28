@@ -18,6 +18,8 @@ const envSchema = z
     LOG_LEVEL: z.enum(LOG_LEVELS).default('info'),
     // inline: the API process also runs job workers (free setup). separate: a worker process does.
     WORKER_MODE: z.enum(['inline', 'separate']).default('inline'),
+    // One-time code delivery. Only 'console' (development) exists until WhatsApp is set up (OQ-19).
+    OTP_PROVIDER: z.enum(['console']).default('console'),
     // Comma-separated origins of the web app, allowed to make state-changing requests.
     WEB_ORIGINS: z
       .string()
@@ -40,6 +42,13 @@ const envSchema = z
         message: `tier "${env.DEPLOY_TIER}" may only run with DATA_CLASS=synthetic`,
       });
     }
+    if (env.DEPLOY_TIER === 'production' && env.OTP_PROVIDER === 'console') {
+      ctx.addIssue({
+        code: 'custom',
+        path: ['OTP_PROVIDER'],
+        message: 'production needs a real OTP provider (WhatsApp or SMS)',
+      });
+    }
     if (env.DEPLOY_TIER === 'production' && env.DATA_CLASS !== 'real') {
       ctx.addIssue({
         code: 'custom',
@@ -56,6 +65,7 @@ export interface AppConfig {
   port: number;
   logLevel: LogLevel;
   workerMode: 'inline' | 'separate';
+  otpProvider: 'console';
   webOrigins: string[];
   /** Secure cookies everywhere except plain-http local development. */
   cookieSecure: boolean;
@@ -92,6 +102,7 @@ export function loadConfig(env: Record<string, string | undefined>): AppConfig {
     port: e.PORT,
     logLevel: e.LOG_LEVEL,
     workerMode: e.WORKER_MODE,
+    otpProvider: e.OTP_PROVIDER,
     webOrigins: e.WEB_ORIGINS,
     cookieSecure: e.DEPLOY_TIER !== 'local',
     databaseUrl: e.DATABASE_URL,

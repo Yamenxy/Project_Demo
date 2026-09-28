@@ -2,21 +2,18 @@ import { Injectable, Logger } from '@nestjs/common';
 import { and, desc, eq, isNotNull, isNull } from 'drizzle-orm';
 import { AppError, Clock, IdGenerator } from '../../common';
 import { normalizePhone } from '../../common/phone';
-import { TenantDb, type DbTx } from '../../database';
+import { isUniqueViolation, TenantDb, type DbTx } from '../../database';
 import { AuditService } from '../audit';
 import type { LoginBody, RegisterBody, UserSummary } from './auth.schemas';
 import { deviceLabelFrom } from './device-label';
 import { checkPassword, hashPassword, verifyAgainstDummy, verifyPassword } from './password';
 import { RateLimiter, type RateLimitRule } from './rate-limiter';
+import type { RequestMeta } from './request-meta';
 import { users } from './schema';
 import { SessionsService, type CreatedSession } from './sessions.service';
 import { generatePlatformCode } from './tokens';
 
-export interface RequestMeta {
-  ip: string;
-  userAgent?: string;
-  requestId: string;
-}
+export type { RequestMeta } from './request-meta';
 
 // Limits for login, registration and (later) OTP endpoints (review §3.3).
 export const RATE_LIMITS = {
@@ -238,10 +235,4 @@ function summarize(user: UserRow): UserSummary {
 
 function rateLimited(retryAfterSeconds: number): AppError {
   return new AppError(429, 'rate_limited', 'Too many attempts', { retryAfterSeconds });
-}
-
-function isUniqueViolation(err: unknown, constraint: string): boolean {
-  const cause = (err as { cause?: { code?: string; constraint?: string } }).cause ?? err;
-  const pg = cause as { code?: string; constraint?: string };
-  return pg.code === '23505' && pg.constraint === constraint;
 }

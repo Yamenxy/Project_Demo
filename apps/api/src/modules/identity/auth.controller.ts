@@ -10,18 +10,11 @@ import {
   type RegisterBody,
   type UserSummary,
 } from './auth.schemas';
-import { AuthService, type RequestMeta } from './auth.service';
+import { AuthService } from './auth.service';
+import { metaOf } from './request-meta';
 import { clearSessionCookie, setSessionCookie, type CookieSettings } from './session-cookie';
 import { CurrentSession, SessionGuard } from './session.guard';
 import type { ResolvedSession } from './sessions.service';
-
-function metaOf(request: FastifyRequest): RequestMeta {
-  return {
-    ip: request.ip,
-    userAgent: request.headers['user-agent'],
-    requestId: String(request.id),
-  };
-}
 
 @Controller('v1/auth')
 export class AuthController {
