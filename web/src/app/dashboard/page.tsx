@@ -18,6 +18,12 @@ const records: Record<string, string[][]> = {
 };
 const labels = { totalStudents: "Total students", activeStudents: "Active students", totalTeachers: "Teachers", totalClasses: "Classes", pendingPayments: "Pending payments", upcomingExams: "Upcoming exams" };
 const titles: Record<Exclude<Section, "overview">, string> = { students: "Students", teachers: "Teachers", classes: "Classes & schedule", courses: "Courses & lessons", homework: "Homework", exams: "Exams", attendance: "Attendance", grades: "Grades", payments: "Payments", reports: "Reports" };
+const roleSections: Record<string, Section[]> = {
+  SuperAdmin: ["overview", "students", "teachers", "classes", "courses", "homework", "exams", "attendance", "grades", "payments", "reports"],
+  Teacher: ["overview", "classes", "courses", "homework", "exams", "attendance", "grades", "reports"],
+  Student: ["overview", "courses", "homework", "exams", "attendance", "grades"],
+  Parent: ["overview", "attendance", "grades", "reports"],
+};
 
 export default function DashboardPage() {
   const router = useRouter();
@@ -32,8 +38,11 @@ export default function DashboardPage() {
     const token = localStorage.getItem("eduflow.token");
     const storedUser = localStorage.getItem("eduflow.user");
     if (!token || !storedUser) { router.replace("/login"); return; }
-    setUser(JSON.parse(storedUser) as AuthenticatedUser);
-    getDashboardSummary(token).then(setSummary).catch(() => setError("Unable to load live dashboard data."));
+    const parsedUser = JSON.parse(storedUser) as AuthenticatedUser;
+    setUser(parsedUser);
+    if (parsedUser.role === "SuperAdmin" || parsedUser.role === "Teacher") {
+      getDashboardSummary(token).then(setSummary).catch(() => setError("Unable to load live dashboard data."));
+    }
   }, [router]);
 
   const select = (next: Section) => { setSection(next); setQuery(""); setMobileOpen(false); };
@@ -45,7 +54,7 @@ export default function DashboardPage() {
     <aside className={`fixed inset-y-0 left-0 z-30 flex w-72 flex-col border-r border-slate-200 bg-white transition-transform lg:translate-x-0 ${mobileOpen ? "translate-x-0" : "-translate-x-full"}`}>
       <div className="flex h-20 items-center justify-between border-b border-slate-100 px-6"><button onClick={() => select("overview")} className="flex items-center gap-3"><span className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#171c38] text-lg font-black text-white">E</span><span><strong className="block text-sm tracking-[0.18em] text-[#171c38] uppercase">EduFlow</strong><small className="text-xs text-slate-400">Education OS</small></span></button><button onClick={() => setMobileOpen(false)} className="lg:hidden" aria-label="Close navigation"><X size={18} /></button></div>
       <div className="border-b border-slate-100 p-5"><div className="flex items-center gap-3 rounded-xl bg-[#f6f8fb] p-3"><span className="flex h-10 w-10 items-center justify-center rounded-full bg-[#e8e7ff] font-bold text-[#5551b7]">{user.name[0]}</span><span><strong className="block text-sm">{user.name}</strong><small className="text-xs text-slate-400">{user.role}</small></span></div></div>
-      <nav className="flex-1 overflow-y-auto px-4 py-5"><p className="mb-3 px-3 text-[10px] font-bold tracking-[0.18em] text-slate-400 uppercase">Workspace</p>{navigation.map(([key, label, Icon]) => <button key={key} onClick={() => select(key)} className={`mb-1 flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm font-medium ${section === key ? "bg-[#171c38] text-white" : "text-slate-500 hover:bg-slate-50"}`}><Icon size={17} />{label}</button>)}<p className="mb-3 mt-8 px-3 text-[10px] font-bold tracking-[0.18em] text-slate-400 uppercase">System</p><button className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm text-slate-500 hover:bg-slate-50"><Settings size={17} />Settings</button></nav>
+      <nav className="flex-1 overflow-y-auto px-4 py-5"><p className="mb-3 px-3 text-[10px] font-bold tracking-[0.18em] text-slate-400 uppercase">Workspace</p>{navigation.filter(([key]) => (roleSections[user.role] ?? roleSections.Student).includes(key)).map(([key, label, Icon]) => <button key={key} onClick={() => select(key)} className={`mb-1 flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm font-medium ${section === key ? "bg-[#171c38] text-white" : "text-slate-500 hover:bg-slate-50"}`}><Icon size={17} />{label}</button>)}<p className="mb-3 mt-8 px-3 text-[10px] font-bold tracking-[0.18em] text-slate-400 uppercase">System</p><button className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm text-slate-500 hover:bg-slate-50"><Settings size={17} />Settings</button></nav>
       <div className="border-t border-slate-100 p-5"><div className="rounded-xl bg-[#f1f0ff] p-4"><p className="text-xs font-semibold text-[#5551b7]">Need help?</p><p className="mt-1 text-xs text-slate-500">Review workspace setup and permissions.</p></div></div>
     </aside>
     {mobileOpen && <button className="fixed inset-0 z-20 bg-slate-900/30 lg:hidden" aria-label="Close navigation overlay" onClick={() => setMobileOpen(false)} />}
