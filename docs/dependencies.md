@@ -30,6 +30,8 @@ CLAUDE.md requires a written justification for every new dependency. Add a row w
 | @types/pg (dev) | Type definitions | Phase 1, task 4 |
 | testcontainers, @testcontainers/postgresql (dev) | Integration tests against a real PostgreSQL with production migrations (review TEST-02) | Phase 1, task 4 |
 | tsx (dev) | Runs TypeScript scripts (migrations, dev setup) without a build step | Phase 1, task 4 |
+| pino | Structured JSON logging; it's already Fastify's logger, so HTTP and application logs share one format and one scrubbing hook | Phase 1, task 5 |
+| fastify | Direct dependency for its types (it's already pulled in by @nestjs/platform-fastify; pinned to the same version) | Phase 1, task 5 |
 | zod | Validates configuration now, and request and response schemas later; shared with the web client through `packages/shared` (architecture §9) | Phase 1, task 2 |
 
 ## Web (`apps/web`)

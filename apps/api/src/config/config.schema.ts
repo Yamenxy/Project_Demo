@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { LOG_LEVELS, type LogLevel } from '../common/logging/logger';
 
 /**
  * Environment tiers (REQ-OPS-005):
@@ -14,6 +15,7 @@ const envSchema = z
     DEPLOY_TIER: z.enum(DEPLOY_TIERS),
     DATA_CLASS: z.enum(['synthetic', 'real']),
     PORT: z.coerce.number().int().min(1).max(65535).default(3001),
+    LOG_LEVEL: z.enum(LOG_LEVELS).default('info'),
     DATABASE_URL: z.url({ protocol: /^postgres(ql)?$/ }),
     DATABASE_PLATFORM_URL: z.url({ protocol: /^postgres(ql)?$/ }),
     DATABASE_POOL_MAX: z.coerce.number().int().min(1).max(100).default(10),
@@ -40,6 +42,7 @@ export interface AppConfig {
   deployTier: DeployTier;
   dataClass: 'synthetic' | 'real';
   port: number;
+  logLevel: LogLevel;
   /** Runtime role (app_runtime): all normal application queries. */
   databaseUrl: string;
   /** Platform role (app_platform): the restricted cross-workspace handle. */
@@ -71,6 +74,7 @@ export function loadConfig(env: Record<string, string | undefined>): AppConfig {
     deployTier: e.DEPLOY_TIER,
     dataClass: e.DATA_CLASS,
     port: e.PORT,
+    logLevel: e.LOG_LEVEL,
     databaseUrl: e.DATABASE_URL,
     databasePlatformUrl: e.DATABASE_PLATFORM_URL,
     databasePoolMax: e.DATABASE_POOL_MAX,
