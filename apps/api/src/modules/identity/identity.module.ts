@@ -11,7 +11,6 @@ import { RecoveryController } from './recovery.controller';
 import { RecoveryService } from './recovery.service';
 import { TwoFactorController } from './two-factor/two-factor.controller';
 import { TwoFactorService } from './two-factor/two-factor.service';
-import { SessionGuard } from './session.guard';
 import { SessionsService } from './sessions.service';
 
 @Module({
@@ -20,7 +19,6 @@ import { SessionsService } from './sessions.service';
     AuthService,
     SessionsService,
     RateLimiter,
-    SessionGuard,
     OtpService,
     RecoveryService,
     DevicesService,
@@ -28,7 +26,7 @@ import { SessionsService } from './sessions.service';
     // Only the console sender exists until WhatsApp is set up; config forbids it in production.
     { provide: OtpSender, useClass: ConsoleOtpSender },
   ],
-  exports: [SessionsService, SessionGuard, RateLimiter, DevicesService],
+  exports: [SessionsService, RateLimiter, DevicesService],
 })
 export class IdentityModule implements OnModuleInit {
   constructor(

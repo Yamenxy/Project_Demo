@@ -12,6 +12,7 @@ export {
 } from '../modules/identity/schema';
 export {
   memberships,
+  permissionGrants,
   platformOwners,
   workspaceInvitations,
   workspaces,

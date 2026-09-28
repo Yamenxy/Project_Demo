@@ -1,17 +1,28 @@
 import { Global, Module } from '@nestjs/common';
-import { DeviceLimitPolicy } from '../identity';
+import { APP_GUARD } from '@nestjs/core';
+import { DeviceLimitPolicy, IdentityModule } from '../identity';
+import { AccessGuard } from './access.guard';
 import { MembershipDeviceLimitPolicy } from './device-limit.policy';
 import { MembershipsService } from './memberships.service';
+import { PermissionsService } from './permissions.service';
+import { WorkspaceController } from './workspace.controller';
 import { WorkspacesService } from './workspaces.service';
 
-/** Global so identity can use the role-aware device-limit policy without importing tenancy. */
+/**
+ * Global: provides the access guard for every route (REQ-RBAC-005) and the role-aware
+ * device-limit policy that identity uses without importing tenancy.
+ */
 @Global()
 @Module({
+  imports: [IdentityModule],
+  controllers: [WorkspaceController],
   providers: [
     MembershipsService,
     WorkspacesService,
+    PermissionsService,
     { provide: DeviceLimitPolicy, useClass: MembershipDeviceLimitPolicy },
+    { provide: APP_GUARD, useClass: AccessGuard },
   ],
-  exports: [MembershipsService, WorkspacesService, DeviceLimitPolicy],
+  exports: [MembershipsService, WorkspacesService, PermissionsService, DeviceLimitPolicy],
 })
 export class TenancyModule {}

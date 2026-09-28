@@ -1,11 +1,12 @@
-import { Body, Controller, HttpCode, Post, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, HttpCode, Post, Req } from '@nestjs/common';
 import type { FastifyRequest } from 'fastify';
 import { z } from 'zod';
 import { ZodPipe } from '../../common/http/zod.pipe';
+import { Authenticated, Public } from '../../common/policy';
 import type { UserSummary } from './auth.schemas';
 import { metaOf } from './request-meta';
 import { RecoveryService } from './recovery.service';
-import { CurrentSession, SessionGuard } from './session.guard';
+import { CurrentSession } from './current-session';
 import type { ResolvedSession } from './sessions.service';
 
 const codeField = z.string().trim().min(4).max(12);
@@ -23,7 +24,7 @@ export class RecoveryController {
 
   @Post('phone/send-code')
   @HttpCode(202)
-  @UseGuards(SessionGuard)
+  @Authenticated()
   async sendCode(
     @CurrentSession() session: ResolvedSession,
     @Req() request: FastifyRequest,
@@ -37,7 +38,7 @@ export class RecoveryController {
 
   @Post('phone/verify')
   @HttpCode(200)
-  @UseGuards(SessionGuard)
+  @Authenticated()
   async verify(
     @CurrentSession() session: ResolvedSession,
     @Body(new ZodPipe(verifyBody)) body: z.infer<typeof verifyBody>,
@@ -50,6 +51,7 @@ export class RecoveryController {
   /** Always 202, whether or not the number has an account. */
   @Post('password/forgot')
   @HttpCode(202)
+  @Public()
   async forgot(
     @Body(new ZodPipe(forgotBody)) body: z.infer<typeof forgotBody>,
     @Req() request: FastifyRequest,
@@ -60,6 +62,7 @@ export class RecoveryController {
 
   @Post('password/reset')
   @HttpCode(204)
+  @Public()
   async reset(
     @Body(new ZodPipe(resetBody)) body: z.infer<typeof resetBody>,
     @Req() request: FastifyRequest,

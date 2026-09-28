@@ -1,7 +1,8 @@
-import { Body, Controller, Get, HttpCode, Inject, Post, Req, Res, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, Inject, Post, Req, Res } from '@nestjs/common';
 import type { FastifyReply, FastifyRequest } from 'fastify';
 import { AppError, Clock } from '../../common';
 import { ZodPipe } from '../../common/http/zod.pipe';
+import { Authenticated, Public } from '../../common/policy';
 import { APP_CONFIG, type AppConfig } from '../../config';
 import {
   loginBody,
@@ -19,7 +20,7 @@ import {
   setSessionCookie,
   type CookieSettings,
 } from './session-cookie';
-import { AllowPendingSecondFactor, CurrentSession, SessionGuard } from './session.guard';
+import { CurrentSession } from './current-session';
 import type { ResolvedSession } from './sessions.service';
 
 @Controller('v1/auth')
@@ -36,6 +37,7 @@ export class AuthController {
 
   @Post('register')
   @HttpCode(201)
+  @Public()
   async register(
     @Body(new ZodPipe(registerBody)) body: RegisterBody,
     @Req() request: FastifyRequest,
@@ -47,6 +49,7 @@ export class AuthController {
 
   @Post('login')
   @HttpCode(200)
+  @Public()
   async login(
     @Body(new ZodPipe(loginBody)) body: LoginBody,
     @Req() request: FastifyRequest,
@@ -58,8 +61,7 @@ export class AuthController {
 
   @Post('logout')
   @HttpCode(204)
-  @UseGuards(SessionGuard)
-  @AllowPendingSecondFactor()
+  @Authenticated({ allowPendingSecondFactor: true })
   async logout(
     @CurrentSession() session: ResolvedSession,
     @Res({ passthrough: true }) reply: FastifyReply,
@@ -70,7 +72,7 @@ export class AuthController {
 
   @Post('logout-all')
   @HttpCode(204)
-  @UseGuards(SessionGuard)
+  @Authenticated()
   async logoutAll(
     @CurrentSession() session: ResolvedSession,
     @Req() request: FastifyRequest,
@@ -92,8 +94,7 @@ export class AuthController {
   }
 
   @Get('me')
-  @UseGuards(SessionGuard)
-  @AllowPendingSecondFactor()
+  @Authenticated({ allowPendingSecondFactor: true })
   async me(
     @CurrentSession() session: ResolvedSession,
   ): Promise<{ user: UserSummary; secondFactorPending: boolean }> {

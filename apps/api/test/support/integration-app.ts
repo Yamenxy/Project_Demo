@@ -1,18 +1,23 @@
 import { randomInt } from 'node:crypto';
+import type { Type } from '@nestjs/common';
 import type { NestFastifyApplication } from '@nestjs/platform-fastify';
 import type { TestingModuleBuilder } from '@nestjs/testing';
 import { inject } from 'vitest';
 import { AppModule } from '../../src/app.module';
 import { createHttpTestApp } from './http-app';
 
-/** The full application against the Testcontainers database, as the runtime and platform roles. */
+/**
+ * The full application against the Testcontainers database, as the runtime and platform roles.
+ * `extraControllers` mounts test-only probe routes next to the real ones.
+ */
 export async function createIntegrationApp(
   configure?: (builder: TestingModuleBuilder) => TestingModuleBuilder,
+  extraControllers: Type[] = [],
 ): Promise<NestFastifyApplication> {
   const urls = inject('databaseUrls');
   process.env.DATABASE_URL = urls.runtime;
   process.env.DATABASE_PLATFORM_URL = urls.platform;
-  return createHttpTestApp({ imports: [AppModule] }, configure);
+  return createHttpTestApp({ imports: [AppModule], controllers: extraControllers }, configure);
 }
 
 /** A random, valid Egyptian mobile number in local format. */

@@ -1,3 +1,6 @@
+export { AccessGuard, type WorkspaceContext } from './access.guard';
+export { PermissionSet, PermissionsService } from './permissions.service';
+export { CurrentWorkspace } from './workspace.controller';
 export {
   MembershipsService,
   type MembershipContext,
@@ -5,6 +8,7 @@ export {
 } from './memberships.service';
 export {
   memberships,
+  permissionGrants,
   platformOwners,
   workspaceInvitations,
   workspaces,

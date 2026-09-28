@@ -56,3 +56,12 @@ export const workspaceInvitations = pgTable('workspace_invitations', {
   acceptedBy: uuid('accepted_by'),
   revokedAt: tstz('revoked_at'),
 });
+
+export const permissionGrants = pgTable('permission_grants', {
+  workspaceId: uuid('workspace_id').notNull(),
+  id: uuid('id').primaryKey(),
+  membershipId: uuid('membership_id').notNull(),
+  permission: text('permission').notNull(),
+  grantedBy: uuid('granted_by').notNull(),
+  createdAt: tstz('created_at').notNull(),
+});
