@@ -18,6 +18,10 @@ pnpm --filter @lms/web dev                    # Web on http://localhost:3000
 
 Local and demo environments only ever hold synthetic data. The API refuses to start otherwise (REQ-OPS-005).
 
+## Demo data
+
+`pnpm --filter @lms/api db:seed` loads synthetic Arabic demo accounts (local, demo and staging only) and prints their logins. The free cloud demo is described in [docs/deploy-demo.md](docs/deploy-demo.md).
+
 ## Tests
 
 `pnpm test` runs unit tests and integration tests. Integration tests start their own PostgreSQL container, so Docker must be running.

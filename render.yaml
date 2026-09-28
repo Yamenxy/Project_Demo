@@ -1,0 +1,64 @@
+# Free demo setup A (docs/architecture.md §8.1, runbook: docs/deploy-demo.md).
+# Synthetic data only: the API refuses to start on this tier with DATA_CLASS=real.
+# Values marked `sync: false` are entered in the Render dashboard, never committed.
+services:
+  - type: web
+    name: lms-api
+    runtime: node
+    plan: free
+    region: frankfurt
+    buildCommand: >-
+      corepack enable pnpm && pnpm install --frozen-lockfile &&
+      pnpm --filter @lms/shared build && pnpm --filter @lms/api build
+    startCommand: node apps/api/dist/main.js
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_VERSION
+        value: '24'
+      - key: NODE_ENV
+        value: production
+      - key: DEPLOY_TIER
+        value: demo
+      - key: DATA_CLASS
+        value: synthetic
+      - key: WORKER_MODE
+        value: inline
+      - key: LOG_LEVEL
+        value: info
+      # Codes appear in the Render log stream (demo only; production refuses this sender).
+      - key: OTP_PROVIDER
+        value: console
+      - key: EMAIL_PROVIDER
+        value: none
+      # Render's load balancer and the web app's /api proxy; verify with the runbook's check.
+      - key: TRUST_PROXY_HOPS
+        value: '2'
+      - key: DATABASE_URL
+        sync: false
+      - key: DATABASE_PLATFORM_URL
+        sync: false
+      - key: SECRET_ENCRYPTION_KEY
+        sync: false
+      # The web service's public URL, for example https://lms-web.onrender.com
+      - key: WEB_ORIGINS
+        sync: false
+
+  - type: web
+    name: lms-web
+    runtime: node
+    plan: free
+    region: frankfurt
+    buildCommand: >-
+      corepack enable pnpm && pnpm install --frozen-lockfile &&
+      pnpm --filter @lms/shared build && pnpm --filter @lms/web build
+    startCommand: cd apps/web && pnpm exec next start --port $PORT
+    healthCheckPath: /ar
+    envVars:
+      - key: NODE_VERSION
+        value: '24'
+      - key: NEXT_TELEMETRY_DISABLED
+        value: '1'
+      # The API service's public URL, for example https://lms-api.onrender.com
+      # Used at build time for the /api proxy: redeploy the web service after changing it.
+      - key: API_ORIGIN
+        sync: false

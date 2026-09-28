@@ -19,6 +19,9 @@ const envSchema = z
     DATA_CLASS: z.enum(['synthetic', 'real']),
     PORT: z.coerce.number().int().min(1).max(65535).default(3001),
     LOG_LEVEL: z.enum(LOG_LEVELS).default('info'),
+    // Proxies in front of the API (hosting load balancer, the web app's /api proxy). The client IP
+    // for rate limits is read that many hops back in X-Forwarded-For; 0 trusts no header.
+    TRUST_PROXY_HOPS: z.coerce.number().int().min(0).max(5).default(0),
     // inline: the API process also runs job workers (free setup). separate: a worker process does.
     WORKER_MODE: z.enum(['inline', 'separate']).default('inline'),
     // One-time code delivery. Only development senders exist until WhatsApp is set up (OQ-19):
@@ -91,6 +94,7 @@ export interface AppConfig {
   dataClass: 'synthetic' | 'real';
   port: number;
   logLevel: LogLevel;
+  trustProxyHops: number;
   workerMode: 'inline' | 'separate';
   otpProvider: 'console' | 'file';
   otpOutboxFile?: string;
@@ -131,6 +135,7 @@ export function loadConfig(env: Record<string, string | undefined>): AppConfig {
     dataClass: e.DATA_CLASS,
     port: e.PORT,
     logLevel: e.LOG_LEVEL,
+    trustProxyHops: e.TRUST_PROXY_HOPS,
     workerMode: e.WORKER_MODE,
     otpProvider: e.OTP_PROVIDER,
     ...(e.OTP_OUTBOX_FILE ? { otpOutboxFile: e.OTP_OUTBOX_FILE } : {}),

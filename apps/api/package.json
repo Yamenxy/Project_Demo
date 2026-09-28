@@ -11,7 +11,8 @@
     "test": "vitest run",
     "db:migrate": "node --env-file-if-exists=.env --import tsx src/database/scripts/migrate.ts",
     "db:dev-setup": "node --env-file-if-exists=.env --import tsx src/database/scripts/dev-setup.ts",
-    "db:new-migration": "drizzle-kit generate --custom --name"
+    "db:new-migration": "drizzle-kit generate --custom --name",
+    "db:seed": "node --env-file-if-exists=.env --import tsx src/database/scripts/seed.ts"
   },
   "dependencies": {
     "@fastify/cookie": "^11.1.2",

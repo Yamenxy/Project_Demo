@@ -17,6 +17,11 @@ async function bootstrap(): Promise<void> {
       loggerInstance: rootLogger,
       genReqId: generateRequestId,
       requestIdHeader: false,
+      // Trust exactly the configured number of proxy hops (never any X-Forwarded-For).
+      trustProxy:
+        config.trustProxyHops > 0
+          ? (_address: string, hop: number) => hop < config.trustProxyHops
+          : false,
     }),
     { logger: new AppLogger(rootLogger) },
   );

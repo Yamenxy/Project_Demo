@@ -245,6 +245,8 @@ Why not the obvious alternatives:
 - **Vercel Hobby** is excluded because its terms restrict commercial use, and a demo to prospective paying teachers is commercial.
 - **Unlisted YouTube** is excluded by OD-06.
 
+Deployment files: `render.yaml` (Render blueprint for `lms-api` and `lms-web`) and the runbook [deploy-demo.md](deploy-demo.md). Demo data comes from `pnpm --filter @lms/api db:seed`. The accounts use the `0100000xxxx` block and include 2FA keys for the staff accounts. `TRUST_PROXY_HOPS` sets how many proxy hops the API trusts in `X-Forwarded-For` for client IPs (rate limits); the runbook explains how to check it.
+
 ### 8.2 (b) What the free tiers lack
 
 | Gap | Where | Consequence | Mitigation |
