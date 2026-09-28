@@ -757,7 +757,7 @@ The spec states that this makes downloading harder but does not prevent it.
 ## SEC
 
 ### REQ-SEC-001 | ADD | MVP
-**Requirement:** Accessing a resource in another workspace, or outside the actor's class scope, returns 404. An automated cross-tenant and cross-scope suite, generated from the OpenAPI specification, runs on every pull request.
+**Requirement:** Accessing a resource in another workspace, or outside the actor's class scope, returns 404. An automated cross-tenant and cross-scope suite, generated from the application's route table (AD-08), runs on every pull request.
 **Acceptance criteria:** The suite covers 100% of endpoints, including class-teacher and helper scopes, and CI fails on any gap.
 **Source:** TEST-01, OD-01
 

@@ -17,6 +17,12 @@ export const QUEUES = {
     retentionSeconds: 30 * 24 * 3600,
     deleteAfterSeconds: 30 * 24 * 3600,
   },
+  'maintenance.idempotency_purge': {
+    retryLimit: 3,
+    retryDelay: 60,
+    retryBackoff: true,
+    deadLetter: FAILED_JOBS_QUEUE,
+  },
   'maintenance.rate_limit_purge': {
     retryLimit: 3,
     retryDelay: 60,
