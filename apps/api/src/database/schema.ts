@@ -6,6 +6,7 @@ export {
   deviceRegistrations,
   otpChallenges,
   rateLimitCounters,
+  recoveryCodes,
   sessions,
   users,
 } from '../modules/identity/schema';

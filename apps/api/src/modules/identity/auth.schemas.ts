@@ -33,4 +33,5 @@ export interface UserSummary {
   platformCode: string;
   status: string;
   phoneVerified: boolean;
+  twoFactorEnabled: boolean;
 }

@@ -12,6 +12,8 @@ export default defineConfig({
       DATA_CLASS: 'synthetic',
       LOG_LEVEL: 'silent',
       WEB_ORIGINS: 'http://localhost:3000',
+      // Test-only key.
+      SECRET_ENCRYPTION_KEY: 'bHUi9RJpLGyXJBsx54GiqCJNN7W72cshb2sYwWcIFDE=',
       DATABASE_URL: 'postgres://lms_test:lms_test@localhost:5432/lms_test',
       DATABASE_PLATFORM_URL: 'postgres://lms_test_platform:lms_test@localhost:5432/lms_test',
     },

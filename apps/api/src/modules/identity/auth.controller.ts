@@ -19,7 +19,7 @@ import {
   setSessionCookie,
   type CookieSettings,
 } from './session-cookie';
-import { CurrentSession, SessionGuard } from './session.guard';
+import { AllowPendingSecondFactor, CurrentSession, SessionGuard } from './session.guard';
 import type { ResolvedSession } from './sessions.service';
 
 @Controller('v1/auth')
@@ -40,7 +40,7 @@ export class AuthController {
     @Body(new ZodPipe(registerBody)) body: RegisterBody,
     @Req() request: FastifyRequest,
     @Res({ passthrough: true }) reply: FastifyReply,
-  ): Promise<{ user: UserSummary }> {
+  ): Promise<{ user: UserSummary; secondFactorRequired: boolean }> {
     const result = await this.auth.register(body, metaOf(request), request.cookies[DEVICE_COOKIE]);
     return this.signedIn(reply, result);
   }
@@ -51,7 +51,7 @@ export class AuthController {
     @Body(new ZodPipe(loginBody)) body: LoginBody,
     @Req() request: FastifyRequest,
     @Res({ passthrough: true }) reply: FastifyReply,
-  ): Promise<{ user: UserSummary }> {
+  ): Promise<{ user: UserSummary; secondFactorRequired: boolean }> {
     const result = await this.auth.login(body, metaOf(request), request.cookies[DEVICE_COOKIE]);
     return this.signedIn(reply, result);
   }
@@ -59,6 +59,7 @@ export class AuthController {
   @Post('logout')
   @HttpCode(204)
   @UseGuards(SessionGuard)
+  @AllowPendingSecondFactor()
   async logout(
     @CurrentSession() session: ResolvedSession,
     @Res({ passthrough: true }) reply: FastifyReply,
@@ -79,19 +80,25 @@ export class AuthController {
     clearSessionCookie(reply, this.cookies);
   }
 
-  private signedIn(reply: FastifyReply, result: SignedIn): { user: UserSummary } {
+  private signedIn(
+    reply: FastifyReply,
+    result: SignedIn,
+  ): { user: UserSummary; secondFactorRequired: boolean } {
     setSessionCookie(reply, result.session, this.cookies);
     if (result.device.newToken) {
       setDeviceCookie(reply, result.device.newToken, this.cookies, this.clock.now());
     }
-    return { user: result.user };
+    return { user: result.user, secondFactorRequired: result.user.twoFactorEnabled };
   }
 
   @Get('me')
   @UseGuards(SessionGuard)
-  async me(@CurrentSession() session: ResolvedSession): Promise<{ user: UserSummary }> {
+  @AllowPendingSecondFactor()
+  async me(
+    @CurrentSession() session: ResolvedSession,
+  ): Promise<{ user: UserSummary; secondFactorPending: boolean }> {
     const user = await this.auth.getSummary(session.userId);
     if (!user) throw new AppError(401, 'unauthenticated', 'Authentication required');
-    return { user };
+    return { user, secondFactorPending: session.secondFactorPending };
   }
 }

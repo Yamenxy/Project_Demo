@@ -9,11 +9,13 @@ import { OtpService } from './otp/otp.service';
 import { RateLimiter } from './rate-limiter';
 import { RecoveryController } from './recovery.controller';
 import { RecoveryService } from './recovery.service';
+import { TwoFactorController } from './two-factor/two-factor.controller';
+import { TwoFactorService } from './two-factor/two-factor.service';
 import { SessionGuard } from './session.guard';
 import { SessionsService } from './sessions.service';
 
 @Module({
-  controllers: [AuthController, RecoveryController, DevicesController],
+  controllers: [AuthController, RecoveryController, DevicesController, TwoFactorController],
   providers: [
     AuthService,
     SessionsService,
@@ -22,6 +24,7 @@ import { SessionsService } from './sessions.service';
     OtpService,
     RecoveryService,
     DevicesService,
+    TwoFactorService,
     // Only the console sender exists until WhatsApp is set up; config forbids it in production.
     { provide: OtpSender, useClass: ConsoleOtpSender },
   ],

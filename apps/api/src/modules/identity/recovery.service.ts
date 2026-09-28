@@ -135,6 +135,7 @@ export class RecoveryService {
       platformCode: user.platformCode,
       status: user.status,
       phoneVerified: true,
+      twoFactorEnabled: user.totpEnabledAt !== null,
     };
   }
 

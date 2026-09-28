@@ -1,4 +1,13 @@
-import { date, integer, pgTable, primaryKey, text, timestamp, uuid } from 'drizzle-orm/pg-core';
+import {
+  bigint,
+  date,
+  integer,
+  pgTable,
+  primaryKey,
+  text,
+  timestamp,
+  uuid,
+} from 'drizzle-orm/pg-core';
 
 const tstz = (name: string) => timestamp(name, { withTimezone: true });
 
@@ -19,6 +28,9 @@ export const users = pgTable('users', {
   passwordHash: text('password_hash').notNull(),
   passwordChangedAt: tstz('password_changed_at').notNull(),
   devicesResetAt: tstz('devices_reset_at'),
+  totpSecretEncrypted: text('totp_secret_encrypted'),
+  totpEnabledAt: tstz('totp_enabled_at'),
+  totpLastStep: bigint('totp_last_step', { mode: 'number' }),
   createdAt: tstz('created_at').notNull(),
   updatedAt: tstz('updated_at').notNull(),
 });
@@ -49,6 +61,15 @@ export const sessions = pgTable('sessions', {
   revokedAt: tstz('revoked_at'),
   revokeReason: text('revoke_reason', { enum: SESSION_REVOKE_REASONS }),
   deviceId: uuid('device_id'),
+  secondFactorAt: tstz('second_factor_at'),
+});
+
+export const recoveryCodes = pgTable('recovery_codes', {
+  id: uuid('id').primaryKey(),
+  userId: uuid('user_id').notNull(),
+  codeHash: text('code_hash').notNull(),
+  createdAt: tstz('created_at').notNull(),
+  usedAt: tstz('used_at'),
 });
 
 export const deviceRegistrations = pgTable('device_registrations', {

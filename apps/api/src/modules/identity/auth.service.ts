@@ -78,7 +78,7 @@ export class AuthService {
       });
       const { session, device } = await this.startSession(
         tx,
-        user.id,
+        user,
         body.rememberMe,
         meta,
         deviceToken,
@@ -133,7 +133,7 @@ export class AuthService {
     return this.db.transaction(async (tx) => {
       const { session, device } = await this.startSession(
         tx,
-        user.id,
+        user,
         body.rememberMe,
         meta,
         deviceToken,
@@ -181,17 +181,18 @@ export class AuthService {
   /** Admits the device (REQ-AUTH-005), then opens a session bound to it. */
   private async startSession(
     tx: DbTx,
-    userId: string,
+    user: UserRow,
     remember: boolean,
     meta: RequestMeta,
     deviceToken: string | undefined,
   ): Promise<{ session: CreatedSession; device: AdmittedDevice }> {
     const label = deviceLabelFrom(meta.userAgent);
-    const device = await this.devices.admit(tx, userId, deviceToken, label);
-    const session = await this.sessions.create(tx, userId, {
+    const device = await this.devices.admit(tx, user.id, deviceToken, label);
+    const session = await this.sessions.create(tx, user.id, {
       remember,
       deviceLabel: label,
       deviceId: device.deviceId,
+      secondFactorSatisfied: user.totpEnabledAt === null,
     });
     return { session, device };
   }
@@ -256,6 +257,7 @@ function summarize(user: UserRow): UserSummary {
     platformCode: user.platformCode,
     status: user.status,
     phoneVerified: user.phoneVerifiedAt !== null,
+    twoFactorEnabled: user.totpEnabledAt !== null,
   };
 }
 

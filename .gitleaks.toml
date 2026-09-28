@@ -1,5 +1,5 @@
-# Local-only development credentials for Docker services. They grant access to nothing outside
-# a developer's own machine and are documented in docker-compose.yml.
+# Local-only development credentials and test-only keys. They grant access to nothing outside a
+# developer's own machine or a throwaway test container.
 [extend]
 useDefault = true
 
@@ -8,5 +8,7 @@ description = "Local development service credentials"
 paths = [
   '''infra/dev/seaweedfs-s3\.json''',
   '''apps/api/\.env\.example''',
+  '''apps/api/vitest\.config\.mts''',
+  '''apps/api/src/config/config\.schema\.spec\.ts''',
   '''docker-compose\.yml''',
 ]

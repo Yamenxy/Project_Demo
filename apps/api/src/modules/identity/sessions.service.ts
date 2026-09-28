@@ -26,6 +26,9 @@ export interface ResolvedSession {
   sessionId: string;
   userId: string;
   userStatus: UserStatus;
+  twoFactorEnabled: boolean;
+  /** Signed in with a password but the second factor isn't checked yet (REQ-AUTH-007). */
+  secondFactorPending: boolean;
 }
 
 /** Opaque server-side sessions (REQ-AUTH-004). */
@@ -40,7 +43,13 @@ export class SessionsService {
   async create(
     tx: DbTx,
     userId: string,
-    options: { remember: boolean; deviceLabel?: string; deviceId?: string },
+    options: {
+      remember: boolean;
+      deviceLabel?: string;
+      deviceId?: string;
+      /** False when the account has 2FA: the session stays pending until the code is checked. */
+      secondFactorSatisfied?: boolean;
+    },
   ): Promise<CreatedSession> {
     const now = this.clock.now();
     const policy = options.remember ? REMEMBERED : NOT_REMEMBERED;
@@ -53,6 +62,7 @@ export class SessionsService {
       tokenHash: hashToken(token),
       deviceLabel: options.deviceLabel?.slice(0, 120) ?? null,
       deviceId: options.deviceId ?? null,
+      secondFactorAt: options.secondFactorSatisfied === false ? null : now,
       createdAt: now,
       lastSeenAt: now,
       idleExpiresAt: new Date(now.getTime() + policy.idleMs),
@@ -78,6 +88,8 @@ export class SessionsService {
           idleExpiresAt: sessions.idleExpiresAt,
           absoluteExpiresAt: sessions.absoluteExpiresAt,
           createdAt: sessions.createdAt,
+          secondFactorAt: sessions.secondFactorAt,
+          totpEnabledAt: users.totpEnabledAt,
         })
         .from(sessions)
         .innerJoin(users, eq(users.id, sessions.userId))
@@ -93,7 +105,14 @@ export class SessionsService {
           .set({ lastSeenAt: now, idleExpiresAt: new Date(nextIdle) })
           .where(eq(sessions.id, row.sessionId));
       }
-      return { sessionId: row.sessionId, userId: row.userId, userStatus: row.userStatus };
+      const twoFactorEnabled = row.totpEnabledAt !== null;
+      return {
+        sessionId: row.sessionId,
+        userId: row.userId,
+        userStatus: row.userStatus,
+        twoFactorEnabled,
+        secondFactorPending: twoFactorEnabled && row.secondFactorAt === null,
+      };
     });
   }
 

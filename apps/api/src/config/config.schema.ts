@@ -20,6 +20,10 @@ const envSchema = z
     WORKER_MODE: z.enum(['inline', 'separate']).default('inline'),
     // One-time code delivery. Only 'console' (development) exists until WhatsApp is set up (OQ-19).
     OTP_PROVIDER: z.enum(['console']).default('console'),
+    // 32 random bytes, base64. Encrypts secrets at rest (TOTP). Each environment has its own.
+    SECRET_ENCRYPTION_KEY: z
+      .string()
+      .refine((value) => Buffer.from(value, 'base64').length === 32, 'must be 32 bytes, base64'),
     // Comma-separated origins of the web app, allowed to make state-changing requests.
     WEB_ORIGINS: z
       .string()
@@ -66,6 +70,7 @@ export interface AppConfig {
   logLevel: LogLevel;
   workerMode: 'inline' | 'separate';
   otpProvider: 'console';
+  secretEncryptionKey: string;
   webOrigins: string[];
   /** Secure cookies everywhere except plain-http local development. */
   cookieSecure: boolean;
@@ -103,6 +108,7 @@ export function loadConfig(env: Record<string, string | undefined>): AppConfig {
     logLevel: e.LOG_LEVEL,
     workerMode: e.WORKER_MODE,
     otpProvider: e.OTP_PROVIDER,
+    secretEncryptionKey: e.SECRET_ENCRYPTION_KEY,
     webOrigins: e.WEB_ORIGINS,
     cookieSecure: e.DEPLOY_TIER !== 'local',
     databaseUrl: e.DATABASE_URL,

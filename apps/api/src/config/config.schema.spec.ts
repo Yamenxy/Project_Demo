@@ -7,6 +7,7 @@ const base = {
   DATABASE_URL: 'postgres://user:secret-password@localhost:5432/lms_dev',
   DATABASE_PLATFORM_URL: 'postgres://platform:secret-password@localhost:5432/lms_dev',
   WEB_ORIGINS: 'http://localhost:3000',
+  SECRET_ENCRYPTION_KEY: 'bHUi9RJpLGyXJBsx54GiqCJNN7W72cshb2sYwWcIFDE=',
 };
 
 function issuesOf(env: Record<string, string | undefined>): string[] {
@@ -53,6 +54,7 @@ describe('loadConfig', () => {
       DATABASE_URL: base.DATABASE_URL,
       DATABASE_PLATFORM_URL: base.DATABASE_PLATFORM_URL,
       WEB_ORIGINS: base.WEB_ORIGINS,
+      SECRET_ENCRYPTION_KEY: base.SECRET_ENCRYPTION_KEY,
     });
     expect(issues.some((i) => i.startsWith('DEPLOY_TIER'))).toBe(true);
     expect(issues.some((i) => i.startsWith('DATA_CLASS'))).toBe(true);
