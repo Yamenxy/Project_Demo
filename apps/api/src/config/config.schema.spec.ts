@@ -6,6 +6,7 @@ const base = {
   DATA_CLASS: 'synthetic',
   DATABASE_URL: 'postgres://user:secret-password@localhost:5432/lms_dev',
   DATABASE_PLATFORM_URL: 'postgres://platform:secret-password@localhost:5432/lms_dev',
+  WEB_ORIGINS: 'http://localhost:3000',
 };
 
 function issuesOf(env: Record<string, string | undefined>): string[] {
@@ -48,6 +49,7 @@ describe('loadConfig', () => {
     const issues = issuesOf({
       DATABASE_URL: base.DATABASE_URL,
       DATABASE_PLATFORM_URL: base.DATABASE_PLATFORM_URL,
+      WEB_ORIGINS: base.WEB_ORIGINS,
     });
     expect(issues.some((i) => i.startsWith('DEPLOY_TIER'))).toBe(true);
     expect(issues.some((i) => i.startsWith('DATA_CLASS'))).toBe(true);

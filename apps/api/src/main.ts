@@ -22,7 +22,7 @@ async function bootstrap(): Promise<void> {
   );
   // Refuse to serve with database users that could bypass row-level security (REQ-DATA-001).
   await app.get(DatabaseModule).verifyRoles();
-  configureHttp(app);
+  await configureHttp(app, { allowedOrigins: config.webOrigins });
   app.enableShutdownHooks();
   // Initialise modules first: they register their job handlers in onModuleInit.
   await app.init();

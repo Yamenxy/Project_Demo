@@ -285,7 +285,7 @@ WORKER_MODE=inline|separate, DATA_CLASS=synthetic|real, PUSH_VAPID_*
 | Database | PostgreSQL 16+ | Row-level security, partial unique indexes, row locks, partitioning |
 | Data access | Drizzle ORM with SQL migrations | Composite foreign keys, partial indexes and `SET LOCAL` without workarounds |
 | Jobs | pg-boss 12 | Jobs are enqueued in the same transaction as the business write (its Drizzle adapter), so no separate outbox is needed |
-| Authentication | Better Auth (authentication only), version pinned | Sessions, argon2id, TOTP, phone OTP. Authorization is custom |
+| Authentication | Hand-written (`modules/identity`): argon2id (`@node-rs/argon2`), opaque session tokens hashed with SHA-256, Postgres rate-limit counters (AD-07) | Rules are custom (phone-first, device caps, recycled numbers). Authorization is custom too |
 | Maths | KaTeX | LaTeX in questions |
 | Player | hls.js | One player for both video adapters; draws the watermark |
 | Testing | Vitest, Testcontainers (Postgres), Playwright, axe-core, k6 | Covers the needs in the review's §18 |

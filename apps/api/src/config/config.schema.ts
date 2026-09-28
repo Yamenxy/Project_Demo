@@ -18,6 +18,16 @@ const envSchema = z
     LOG_LEVEL: z.enum(LOG_LEVELS).default('info'),
     // inline: the API process also runs job workers (free setup). separate: a worker process does.
     WORKER_MODE: z.enum(['inline', 'separate']).default('inline'),
+    // Comma-separated origins of the web app, allowed to make state-changing requests.
+    WEB_ORIGINS: z
+      .string()
+      .transform((value) =>
+        value
+          .split(',')
+          .map((origin) => origin.trim())
+          .filter(Boolean),
+      )
+      .pipe(z.array(z.url()).min(1)),
     DATABASE_URL: z.url({ protocol: /^postgres(ql)?$/ }),
     DATABASE_PLATFORM_URL: z.url({ protocol: /^postgres(ql)?$/ }),
     DATABASE_POOL_MAX: z.coerce.number().int().min(1).max(100).default(10),
@@ -46,6 +56,9 @@ export interface AppConfig {
   port: number;
   logLevel: LogLevel;
   workerMode: 'inline' | 'separate';
+  webOrigins: string[];
+  /** Secure cookies everywhere except plain-http local development. */
+  cookieSecure: boolean;
   /** Runtime role (app_runtime): all normal application queries. */
   databaseUrl: string;
   /** Platform role (app_platform): the restricted cross-workspace handle. */
@@ -79,6 +92,8 @@ export function loadConfig(env: Record<string, string | undefined>): AppConfig {
     port: e.PORT,
     logLevel: e.LOG_LEVEL,
     workerMode: e.WORKER_MODE,
+    webOrigins: e.WEB_ORIGINS,
+    cookieSecure: e.DEPLOY_TIER !== 'local',
     databaseUrl: e.DATABASE_URL,
     databasePlatformUrl: e.DATABASE_PLATFORM_URL,
     databasePoolMax: e.DATABASE_POOL_MAX,

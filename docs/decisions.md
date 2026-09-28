@@ -35,6 +35,7 @@ These were made after the three-part requirements review. Where they conflict wi
 | AD-03 | The **controller and processor** split (platform is controller for global accounts, teacher is controller for workspace data) is the working assumption. Legal review is deferred (OD-08). | Q8 |
 | AD-04 | **Tenancy:** shared database and shared schema, `workspace_id` on every tenant row, composite foreign keys, row-level security as a backstop. | Review §7.1 |
 | AD-05 | **Stack:** TypeScript, NestJS API, Next.js web, PostgreSQL with Drizzle, pg-boss, Better Auth (authentication only). | Review §15.4 |
+| AD-07 | **Authentication is a small hand-written module, not Better Auth** (2026-09-29, Phase 1 task 8). It uses argon2id password hashing (`@node-rs/argon2`, OWASP parameters) and 256-bit random session tokens stored only as SHA-256 hashes. Reason: the rules are custom (phone-first accounts, unverified numbers that never block the real owner, a device cap with a cooldown, managed-account resets, recycled-number recovery, an audit event on every step), so Better Auth would be bypassed for most flows while adding its own schema and routes. | Review §15.4, AD-05 |
 | AD-06 | **Release plan:** Release 1 (foundation, students, classes, attendance, Flow B records, content and access) goes to a pilot teacher at about month 3. Release 2 (assessments, gradebook, reports) goes to general launch at about months 5–6. Flow A is simplified until there are about 30 teachers. | Review §16 |
 
 ## Original decisions D1–D34 (recorded 2026-09-28, from requirements prompt v3)

@@ -33,6 +33,8 @@ CLAUDE.md requires a written justification for every new dependency. Add a row w
 | pino | Structured JSON logging; it's already Fastify's logger, so HTTP and application logs share one format and one scrubbing hook | Phase 1, task 5 |
 | fastify | Direct dependency for its types (it's already pulled in by @nestjs/platform-fastify; pinned to the same version) | Phase 1, task 5 |
 | pg-boss | Job queue on PostgreSQL: retries with backoff, dead-letter queue, cron schedules, and enqueueing inside a Drizzle transaction (architecture §4 Jobs). ESM-only; loaded through Node 24's `require(esm)` | Phase 1, task 7 |
+| @node-rs/argon2 | argon2id password hashing with prebuilt binaries (no install scripts); defaults match OWASP parameters (AD-07) | Phase 1, task 8 |
+| @fastify/cookie | Reads and sets the HttpOnly session cookie | Phase 1, task 8 |
 | zod | Validates configuration now, and request and response schemas later; shared with the web client through `packages/shared` (architecture §9) | Phase 1, task 2 |
 
 ## Web (`apps/web`)
