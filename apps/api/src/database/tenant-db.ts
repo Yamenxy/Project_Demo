@@ -9,6 +9,8 @@ import { isUuid, RUNTIME_POOL, type DbTx } from './types';
  *
  * - `inWorkspace` scopes a transaction to one workspace. Tenant tables show and accept only that
  *   workspace's rows.
+ * - `forUser` scopes a transaction to one user, across workspaces, for the few policies that allow
+ *   it (a user reading their own memberships). Nothing else in tenant tables is visible.
  * - `transaction` is unscoped: use it for global tables (users, sessions). Tenant tables are
  *   invisible inside it, so forgetting to scope fails closed.
  */
@@ -25,13 +27,26 @@ export class TenantDb {
   }
 
   inWorkspace<T>(workspaceId: string, fn: (tx: DbTx) => Promise<T>): Promise<T> {
-    if (!isUuid(workspaceId)) {
-      return Promise.reject(new TypeError('workspaceId must be a UUID'));
+    return this.scoped({ 'app.workspace_id': workspaceId }, fn);
+  }
+
+  forUser<T>(userId: string, fn: (tx: DbTx) => Promise<T>): Promise<T> {
+    return this.scoped({ 'app.user_id': userId }, fn);
+  }
+
+  private scoped<T>(settings: Record<string, string>, fn: (tx: DbTx) => Promise<T>): Promise<T> {
+    for (const [name, value] of Object.entries(settings)) {
+      if (!isUuid(value)) {
+        const field = name === 'app.workspace_id' ? 'workspaceId' : 'userId';
+        return Promise.reject(new TypeError(`${field} must be a UUID`));
+      }
     }
     return this.db.transaction(async (tx) => {
       // is_local = true: the setting ends with the transaction (SET LOCAL semantics), which keeps
       // it safe on pooled connections (REQ-DATA-001, review SCALE-05).
-      await tx.execute(sql`select set_config('app.workspace_id', ${workspaceId}, true)`);
+      for (const [name, value] of Object.entries(settings)) {
+        await tx.execute(sql`select set_config(${name}, ${value}, true)`);
+      }
       return fn(tx);
     });
   }

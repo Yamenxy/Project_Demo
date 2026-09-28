@@ -36,6 +36,13 @@
       "when": 1790635316355,
       "tag": "0004_otp",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1790635681358,
+      "tag": "0005_tenancy",
+      "breakpoints": true
     }
   ]
 }
