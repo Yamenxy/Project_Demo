@@ -16,7 +16,7 @@ export interface RouteInfo {
 function joinPath(...parts: unknown[]): string {
   const segments = parts
     .flatMap((part): unknown[] => (Array.isArray(part) ? (part as unknown[]) : [part]))
-    .map((part) => String(part ?? '').replace(/^\/+|\/+$/g, ''))
+    .map((part) => (typeof part === 'string' ? part : '').replace(/^\/+|\/+$/g, ''))
     .filter(Boolean);
   return `/${segments.join('/')}`;
 }

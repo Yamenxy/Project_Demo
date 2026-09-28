@@ -153,14 +153,19 @@ describe('audit log is append-only', () => {
 
 describe('monthly partitions', () => {
   it('stores current events in the month partition, not the default one', async () => {
+    // Other test files write events at fixed clock dates, so check this test's own event only.
+    const id = await tenantDb.inWorkspace(A, (tx) =>
+      audit.record(tx, { action: 'grade.changed', workspaceId: A, actor }),
+    );
     const client = new Client({ connectionString: urls.admin });
     await client.connect();
     try {
-      const { rows } = await client.query<{ partition: string; n: string }>(
-        `select tableoid::regclass::text as partition, count(*) as n from audit_log group by 1`,
+      const { rows } = await client.query<{ partition: string }>(
+        `select tableoid::regclass::text as partition from audit_log where id = $1`,
+        [id],
       );
-      const month = new Date().toISOString().slice(0, 7).replace('-', '_');
-      expect(rows.map((r) => r.partition)).toEqual([`audit_log_${month}`]);
+      const month = clock.now().toISOString().slice(0, 7).replace('-', '_');
+      expect(rows).toEqual([{ partition: `audit_log_${month}` }]);
     } finally {
       await client.end();
     }
