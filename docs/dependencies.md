@@ -24,6 +24,12 @@ CLAUDE.md requires a written justification for every new dependency. Add a row w
 | vitest (dev) | Test runner (architecture §9) | Phase 1, task 1 |
 | unplugin-swc, @swc/core (dev) | Vitest's default transform (esbuild) doesn't emit decorator metadata, which NestJS dependency injection needs. SWC does | Phase 1, task 1 |
 | @types/node (dev) | Node type definitions | Phase 1, task 1 |
+| drizzle-orm | Query builder and migrator (architecture §9) | Phase 1, task 4 |
+| pg | PostgreSQL driver used by Drizzle; supports the per-transaction `set_config` the tenancy design needs | Phase 1, task 4 |
+| drizzle-kit (dev) | Generates migrations from the schema | Phase 1, task 4 |
+| @types/pg (dev) | Type definitions | Phase 1, task 4 |
+| testcontainers, @testcontainers/postgresql (dev) | Integration tests against a real PostgreSQL with production migrations (review TEST-02) | Phase 1, task 4 |
+| tsx (dev) | Runs TypeScript scripts (migrations, dev setup) without a build step | Phase 1, task 4 |
 | zod | Validates configuration now, and request and response schemas later; shared with the web client through `packages/shared` (architecture §9) | Phase 1, task 2 |
 
 ## Web (`apps/web`)

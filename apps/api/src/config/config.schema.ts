@@ -15,6 +15,8 @@ const envSchema = z
     DATA_CLASS: z.enum(['synthetic', 'real']),
     PORT: z.coerce.number().int().min(1).max(65535).default(3001),
     DATABASE_URL: z.url({ protocol: /^postgres(ql)?$/ }),
+    DATABASE_PLATFORM_URL: z.url({ protocol: /^postgres(ql)?$/ }),
+    DATABASE_POOL_MAX: z.coerce.number().int().min(1).max(100).default(10),
   })
   .superRefine((env, ctx) => {
     if (env.DEPLOY_TIER !== 'production' && env.DATA_CLASS !== 'synthetic') {
@@ -38,7 +40,11 @@ export interface AppConfig {
   deployTier: DeployTier;
   dataClass: 'synthetic' | 'real';
   port: number;
+  /** Runtime role (app_runtime): all normal application queries. */
   databaseUrl: string;
+  /** Platform role (app_platform): the restricted cross-workspace handle. */
+  databasePlatformUrl: string;
+  databasePoolMax: number;
 }
 
 export class ConfigError extends Error {
@@ -66,5 +72,7 @@ export function loadConfig(env: Record<string, string | undefined>): AppConfig {
     dataClass: e.DATA_CLASS,
     port: e.PORT,
     databaseUrl: e.DATABASE_URL,
+    databasePlatformUrl: e.DATABASE_PLATFORM_URL,
+    databasePoolMax: e.DATABASE_POOL_MAX,
   };
 }

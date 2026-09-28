@@ -5,6 +5,7 @@ const base = {
   DEPLOY_TIER: 'local',
   DATA_CLASS: 'synthetic',
   DATABASE_URL: 'postgres://user:secret-password@localhost:5432/lms_dev',
+  DATABASE_PLATFORM_URL: 'postgres://platform:secret-password@localhost:5432/lms_dev',
 };
 
 function issuesOf(env: Record<string, string | undefined>): string[] {
@@ -44,7 +45,10 @@ describe('loadConfig', () => {
   });
 
   it('refuses to start when DATA_CLASS or DEPLOY_TIER is missing', () => {
-    const issues = issuesOf({ DATABASE_URL: base.DATABASE_URL });
+    const issues = issuesOf({
+      DATABASE_URL: base.DATABASE_URL,
+      DATABASE_PLATFORM_URL: base.DATABASE_PLATFORM_URL,
+    });
     expect(issues.some((i) => i.startsWith('DEPLOY_TIER'))).toBe(true);
     expect(issues.some((i) => i.startsWith('DATA_CLASS'))).toBe(true);
   });

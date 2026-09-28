@@ -32,6 +32,27 @@ module.exports = {
       },
     },
     {
+      name: 'platform-db-restricted',
+      comment:
+        'Cross-workspace database access is limited to the tenancy and platform-admin modules (architecture �4).',
+      severity: 'error',
+      from: {
+        path: '^apps/api/src/',
+        pathNot: ['^apps/api/src/database/', '^apps/api/src/modules/(tenancy|platform-admin)/'],
+      },
+      to: { path: '^apps/api/src/database/platform-db[.]ts$' },
+    },
+    {
+      name: 'database-public-api-only',
+      comment: 'Modules use the database layer through src/database/index.ts.',
+      severity: 'error',
+      from: { path: '^apps/api/src/modules/' },
+      to: {
+        path: '^apps/api/src/database/',
+        pathNot: ['^apps/api/src/database/index[.]ts$', '^apps/api/src/database/platform-db[.]ts$'],
+      },
+    },
+    {
       name: 'no-unresolvable',
       severity: 'error',
       from: {},
