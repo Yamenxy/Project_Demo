@@ -1,0 +1,24 @@
+# .NET
+**/bin/
+**/obj/
+*.user
+*.suo
+*.db
+*.db-shm
+*.db-wal
+
+# Node / Next.js
+**/node_modules/
+**/.next/
+**/out/
+
+# Environment and secrets
+.env
+.env.*
+!.env.example
+
+# Local tooling
+.vscode/
+
+# Preserved metadata from the generated frontend repository
+web/.git.nested-backup/
