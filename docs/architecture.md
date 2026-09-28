@@ -91,7 +91,8 @@ Mutating endpoints accept an `Idempotency-Key` header (REQ-DATA-003).
 - Styling is Tailwind 4 using logical utilities only. One self-hosted Arabic font (IBM Plex Sans Arabic, 2 weights, subset).
 - `lib/bidi.tsx` provides `<Ltr>`/`<Auto>` for mixed-direction text; `lib/format.ts` formats numbers with Western digits by default and Arabic-Indic as a preference.
 - Lint forbids string literals in JSX.
-- Playwright checks direction, locale switching, and that there's no horizontal scroll on a Pixel 7 viewport. **Not yet built:** pixel-snapshot baselines, which need to be generated on Linux in CI so they match the runner.
+- **Account screens** (`components/auth`): register, confirm phone, sign in, two-step verification, and my account (2FA setup with recovery codes, devices, sign out, sign out everywhere). They're client components calling `/api/v1` through `lib/api.ts`. Errors are shown by their API code through `errors.<code>` messages.
+- Playwright checks direction, locale switching, and that there's no horizontal scroll on a Pixel 7 viewport. It also runs the full account flow in Arabic against the built API (CI job `browser`, with a Postgres service). The OTP comes from the development `file` sender (`OTP_PROVIDER=file`), which production config refuses. **Not yet built:** pixel-snapshot baselines, which need to be generated on Linux in CI so they match the runner.
 
 ### 4.1 AccessPolicy
 

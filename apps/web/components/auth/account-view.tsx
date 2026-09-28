@@ -1,0 +1,225 @@
+'use client';
+
+import { toWesternDigits } from '@lms/shared';
+import { useFormatter, useTranslations } from 'next-intl';
+import { useCallback, useEffect, useState, type FormEvent } from 'react';
+import { Link, useRouter } from '../../i18n/navigation';
+import { api, ApiError, type DeviceSummary, type UserSummary } from '../../lib/api';
+import { Ltr } from '../../lib/bidi';
+import { ErrorMessage, Field, SubmitButton } from '../form';
+
+interface Me {
+  user: UserSummary;
+  secondFactorPending: boolean;
+}
+
+export function AccountView() {
+  const t = useTranslations('account');
+  const format = useFormatter();
+  const router = useRouter();
+  const [me, setMe] = useState<Me | null>(null);
+  const [devices, setDevices] = useState<DeviceSummary[]>([]);
+  const [error, setError] = useState<unknown>(null);
+
+  const load = useCallback(async () => {
+    try {
+      const current = await api<Me>('/auth/me');
+      if (current.secondFactorPending) {
+        router.replace('/two-factor');
+        return;
+      }
+      setMe(current);
+      setDevices((await api<{ devices: DeviceSummary[] }>('/auth/devices')).devices);
+    } catch (err) {
+      if (err instanceof ApiError && err.status === 401) router.replace('/login');
+      else setError(err);
+    }
+  }, [router]);
+
+  useEffect(() => {
+    void load();
+  }, [load]);
+
+  const removeDevice = async (id: string) => {
+    try {
+      await api(`/auth/devices/${id}`, { method: 'DELETE' });
+      await load();
+    } catch (err) {
+      setError(err);
+    }
+  };
+
+  const signOut = async (everywhere: boolean) => {
+    await api(everywhere ? '/auth/logout-all' : '/auth/logout', { method: 'POST' }).catch(
+      () => undefined,
+    );
+    router.replace('/login');
+  };
+
+  if (!me) {
+    return (
+      <main className="mx-auto max-w-md px-4 py-10">
+        <ErrorMessage error={error} />
+      </main>
+    );
+  }
+
+  return (
+    <main className="mx-auto flex max-w-md flex-col gap-6 px-4 py-10">
+      <ErrorMessage error={error} />
+      <section className="rounded-2xl bg-surface p-6 shadow-sm">
+        <h1 className="mb-2 text-xl font-semibold">{me.user.nameAr}</h1>
+        <p className="text-muted">
+          {t('platformCode')} <Ltr>{me.user.platformCode}</Ltr>
+        </p>
+        {me.user.phoneVerified ? (
+          <p className="mt-2 text-sm text-brand">{t('phoneVerified')}</p>
+        ) : (
+          <Link href="/verify-phone" className="mt-2 block text-sm font-semibold underline">
+            {t('verifyPhoneNow')}
+          </Link>
+        )}
+      </section>
+
+      <TwoFactorSection enabled={me.user.twoFactorEnabled} onChange={load} />
+
+      <section className="rounded-2xl bg-surface p-6 shadow-sm">
+        <h2 className="mb-4 font-semibold">{t('devicesTitle')}</h2>
+        <ul className="flex flex-col gap-3">
+          {devices.map((device) => (
+            <li key={device.id} className="flex items-center justify-between gap-3">
+              <div>
+                <p>{device.label ?? t('unknownDevice')}</p>
+                <p className="text-sm text-muted">
+                  {device.current
+                    ? t('thisDevice')
+                    : t('lastSeen', {
+                        when: format.dateTime(new Date(device.lastSeenAt), {
+                          dateStyle: 'medium',
+                          timeStyle: 'short',
+                        }),
+                      })}
+                </p>
+              </div>
+              {device.current ? null : (
+                <button
+                  type="button"
+                  onClick={() => void removeDevice(device.id)}
+                  className="rounded-lg border px-3 py-2 text-sm"
+                >
+                  {t('removeDevice')}
+                </button>
+              )}
+            </li>
+          ))}
+        </ul>
+      </section>
+
+      <div className="flex flex-col gap-3">
+        <button
+          type="button"
+          onClick={() => void signOut(false)}
+          className="rounded-lg border px-4 py-3"
+        >
+          {t('signOut')}
+        </button>
+        <button
+          type="button"
+          onClick={() => void signOut(true)}
+          className="rounded-lg border px-4 py-3 text-red-700"
+        >
+          {t('signOutEverywhere')}
+        </button>
+      </div>
+    </main>
+  );
+}
+
+function TwoFactorSection({
+  enabled,
+  onChange,
+}: {
+  enabled: boolean;
+  onChange: () => Promise<void>;
+}) {
+  const t = useTranslations('account');
+  const [setup, setSetup] = useState<{ secret: string } | null>(null);
+  const [codes, setCodes] = useState<string[] | null>(null);
+  const [error, setError] = useState<unknown>(null);
+  const [busy, setBusy] = useState(false);
+
+  const start = async () => {
+    setError(null);
+    try {
+      setSetup(await api<{ secret: string }>('/auth/2fa/setup', { method: 'POST' }));
+    } catch (err) {
+      setError(err);
+    }
+  };
+
+  const confirm = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const field = event.currentTarget.elements.namedItem('code');
+    const code = field instanceof HTMLInputElement ? toWesternDigits(field.value) : '';
+    setBusy(true);
+    setError(null);
+    try {
+      const result = await api<{ recoveryCodes: string[] }>('/auth/2fa/enable', {
+        method: 'POST',
+        body: { code },
+      });
+      setCodes(result.recoveryCodes);
+      setSetup(null);
+    } catch (err) {
+      setError(err);
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  return (
+    <section className="rounded-2xl bg-surface p-6 shadow-sm">
+      <h2 className="mb-2 font-semibold">{t('twoFactorTitle')}</h2>
+      <ErrorMessage error={error} />
+      {codes ? (
+        <div>
+          <p className="mb-3 text-sm">{t('recoveryCodesExplain')}</p>
+          <ul className="grid grid-cols-2 gap-2 font-mono text-sm" dir="ltr">
+            {codes.map((code) => (
+              <li key={code}>{code}</li>
+            ))}
+          </ul>
+          <button
+            type="button"
+            onClick={() => {
+              setCodes(null);
+              void onChange();
+            }}
+            className="mt-4 w-full rounded-lg border px-4 py-3"
+          >
+            {t('recoveryCodesSaved')}
+          </button>
+        </div>
+      ) : enabled ? (
+        <p className="text-sm text-brand">{t('twoFactorOn')}</p>
+      ) : setup ? (
+        <form onSubmit={(event) => void confirm(event)} noValidate>
+          <p className="mb-2 text-sm">{t('twoFactorSetupExplain')}</p>
+          <p className="mb-4 break-all rounded-lg bg-gray-100 p-3 font-mono text-sm" dir="ltr">
+            {setup.secret}
+          </p>
+          <Field label={t('twoFactorCode')} name="code" inputMode="numeric" dir="ltr" required />
+          <SubmitButton busy={busy}>{t('twoFactorConfirm')}</SubmitButton>
+        </form>
+      ) : (
+        <button
+          type="button"
+          onClick={() => void start()}
+          className="w-full rounded-lg border px-4 py-3"
+        >
+          {t('twoFactorStart')}
+        </button>
+      )}
+    </section>
+  );
+}

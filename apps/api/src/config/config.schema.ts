@@ -9,6 +9,9 @@ import { LOG_LEVELS, type LogLevel } from '../common/logging/logger';
 export const DEPLOY_TIERS = ['local', 'demo', 'staging', 'production'] as const;
 export type DeployTier = (typeof DEPLOY_TIERS)[number];
 
+/** OTP senders that don't reach real phones; never allowed in production. */
+const DEVELOPMENT_OTP_PROVIDERS = new Set(['console', 'file']);
+
 const envSchema = z
   .object({
     NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
@@ -18,8 +21,10 @@ const envSchema = z
     LOG_LEVEL: z.enum(LOG_LEVELS).default('info'),
     // inline: the API process also runs job workers (free setup). separate: a worker process does.
     WORKER_MODE: z.enum(['inline', 'separate']).default('inline'),
-    // One-time code delivery. Only 'console' (development) exists until WhatsApp is set up (OQ-19).
-    OTP_PROVIDER: z.enum(['console']).default('console'),
+    // One-time code delivery. Only development senders exist until WhatsApp is set up (OQ-19):
+    // 'console' prints codes; 'file' appends them to OTP_OUTBOX_FILE (browser tests, demos).
+    OTP_PROVIDER: z.enum(['console', 'file']).default('console'),
+    OTP_OUTBOX_FILE: z.string().min(1).optional(),
     // 32 random bytes, base64. Encrypts secrets at rest (TOTP). Each environment has its own.
     SECRET_ENCRYPTION_KEY: z
       .string()
@@ -46,7 +51,14 @@ const envSchema = z
         message: `tier "${env.DEPLOY_TIER}" may only run with DATA_CLASS=synthetic`,
       });
     }
-    if (env.DEPLOY_TIER === 'production' && env.OTP_PROVIDER === 'console') {
+    if (env.OTP_PROVIDER === 'file' && !env.OTP_OUTBOX_FILE) {
+      ctx.addIssue({
+        code: 'custom',
+        path: ['OTP_OUTBOX_FILE'],
+        message: 'required when OTP_PROVIDER=file',
+      });
+    }
+    if (env.DEPLOY_TIER === 'production' && DEVELOPMENT_OTP_PROVIDERS.has(env.OTP_PROVIDER)) {
       ctx.addIssue({
         code: 'custom',
         path: ['OTP_PROVIDER'],
@@ -69,7 +81,8 @@ export interface AppConfig {
   port: number;
   logLevel: LogLevel;
   workerMode: 'inline' | 'separate';
-  otpProvider: 'console';
+  otpProvider: 'console' | 'file';
+  otpOutboxFile?: string;
   secretEncryptionKey: string;
   webOrigins: string[];
   /** Secure cookies everywhere except plain-http local development. */
@@ -108,6 +121,7 @@ export function loadConfig(env: Record<string, string | undefined>): AppConfig {
     logLevel: e.LOG_LEVEL,
     workerMode: e.WORKER_MODE,
     otpProvider: e.OTP_PROVIDER,
+    ...(e.OTP_OUTBOX_FILE ? { otpOutboxFile: e.OTP_OUTBOX_FILE } : {}),
     secretEncryptionKey: e.SECRET_ENCRYPTION_KEY,
     webOrigins: e.WEB_ORIGINS,
     cookieSecure: e.DEPLOY_TIER !== 'local',

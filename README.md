@@ -22,6 +22,16 @@ Local and demo environments only ever hold synthetic data. The API refuses to st
 
 `pnpm test` runs unit tests and integration tests. Integration tests start their own PostgreSQL container, so Docker must be running.
 
+## Browser tests
+
+```bash
+pnpm build
+pnpm --filter @lms/web exec playwright install chromium   # once
+pnpm --filter @lms/web test:e2e
+```
+
+They start the built API (against the local Docker database, with the development `file` OTP sender) and the built web app. Then they check the RTL layout and walk through registration, phone confirmation, two-step verification, and signing out, in Arabic.
+
 ## Checks
 
 ```bash

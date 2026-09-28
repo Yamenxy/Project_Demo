@@ -39,9 +39,44 @@ jobs:
         run: pnpm build
         env:
           NEXT_TELEMETRY_DISABLED: '1'
-      - name: Install browser for web checks
+
+  browser:
+    # The built web app and API in a real browser: RTL and locales, and the account flow.
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_USER: lms_admin
+          POSTGRES_PASSWORD: lms_admin_ci_only
+          POSTGRES_DB: lms_e2e
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U lms_admin -d lms_e2e"
+          --health-interval 5s --health-timeout 3s --health-retries 20
+    env:
+      DEPLOY_TIER: local
+      DATABASE_MIGRATOR_URL: postgres://lms_admin:lms_admin_ci_only@localhost:5432/lms_e2e
+      DATABASE_URL: postgres://lms_app:lms_app_ci_only@localhost:5432/lms_e2e
+      DATABASE_PLATFORM_URL: postgres://lms_platform:lms_platform_ci_only@localhost:5432/lms_e2e
+      E2E_DATABASE_URL: postgres://lms_app:lms_app_ci_only@localhost:5432/lms_e2e
+      E2E_DATABASE_PLATFORM_URL: postgres://lms_platform:lms_platform_ci_only@localhost:5432/lms_e2e
+      NEXT_TELEMETRY_DISABLED: '1'
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version-file: .nvmrc
+      - run: corepack enable pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm build
+      - name: Database (migrations and local users)
+        run: pnpm --filter @lms/api db:dev-setup
+      - name: Install browser
         run: pnpm --filter @lms/web exec playwright install --with-deps chromium
-      - name: Web browser checks (RTL, locales, mobile layout)
+      - name: Browser tests
         run: pnpm --filter @lms/web test:e2e
 
   dependency-audit:

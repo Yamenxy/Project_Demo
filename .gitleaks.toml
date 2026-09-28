@@ -11,4 +11,6 @@ paths = [
   '''apps/api/vitest\.config\.mts''',
   '''apps/api/src/config/config\.schema\.spec\.ts''',
   '''docker-compose\.yml''',
+  '''apps/web/playwright\.config\.ts''',
+  '''\.github/workflows/ci\.yml''',
 ]

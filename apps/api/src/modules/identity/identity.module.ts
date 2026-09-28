@@ -4,6 +4,8 @@ import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { DevicesController } from './devices/devices.controller';
 import { DevicesService } from './devices/devices.service';
+import { APP_CONFIG, type AppConfig } from '../../config';
+import { FileOtpSender } from './otp/file-otp-sender';
 import { ConsoleOtpSender, OtpSender } from './otp/otp-sender';
 import { OtpService } from './otp/otp.service';
 import { RateLimiter } from './rate-limiter';
@@ -23,8 +25,13 @@ import { SessionsService } from './sessions.service';
     RecoveryService,
     DevicesService,
     TwoFactorService,
-    // Only the console sender exists until WhatsApp is set up; config forbids it in production.
-    { provide: OtpSender, useClass: ConsoleOtpSender },
+    // Only development senders exist until WhatsApp is set up; config forbids them in production.
+    {
+      provide: OtpSender,
+      inject: [APP_CONFIG],
+      useFactory: (config: AppConfig): OtpSender =>
+        config.otpProvider === 'file' ? new FileOtpSender(config) : new ConsoleOtpSender(),
+    },
   ],
   exports: [SessionsService, RateLimiter, DevicesService],
 })
