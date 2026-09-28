@@ -10,7 +10,14 @@ CLAUDE.md requires a written justification for every new dependency. Add a row w
 | typescript **6.x** | Strict typing everywhere. **Pinned to 6.x on purpose**: TypeScript 7 (the native compiler) has no stable JS API yet, and typescript-eslint and dependency-cruiser refuse to run with it. Revisit when they support 7. | Phase 1, task 1 |
 | eslint, @eslint/js, typescript-eslint, globals | Linting with type-aware rules | Phase 1, task 1 |
 | prettier | Consistent formatting | Phase 1, task 1 |
+| eslint-plugin-react | `react/jsx-no-literals`: no hard-coded user-facing text in the web app (REQ-I18N-002) | Phase 1, task 15 |
 | dependency-cruiser | Enforces module boundaries (a module is used only through its `index.ts`), web/API separation and no cycles (architecture §2) | Phase 1, task 1 |
+
+## Shared (`packages/shared`)
+
+| Package | Why | Added in |
+|---|---|---|
+| (none at runtime) | Phone and digit normalization used by both API and web. Built to `dist` by `pnpm build:shared`, which the root lint, typecheck and test scripts run first | Phase 1, task 15 |
 
 ## API (`apps/api`)
 
@@ -41,6 +48,9 @@ CLAUDE.md requires a written justification for every new dependency. Add a row w
 
 | Package | Why | Added in |
 |---|---|---|
+| next-intl | Locale routing, ICU messages with Arabic plural rules, and the Cairo time zone (architecture §9) | Phase 1, task 15 |
+| tailwindcss, @tailwindcss/postcss (dev) | Styling with logical properties that mirror for RTL (architecture §9) | Phase 1, task 15 |
+| @playwright/test (dev) | Browser checks on a phone viewport: direction, locales, no horizontal scroll (review TEST-07) | Phase 1, task 15 |
 | next, react, react-dom | The web client chosen in architecture §9 | Phase 1, task 1 |
 | @types/react, @types/react-dom, @types/node (dev) | Type definitions | Phase 1, task 1 |
 | vitest (dev) | Unit tests for web utilities | Phase 1, task 1 |

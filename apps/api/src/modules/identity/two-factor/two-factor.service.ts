@@ -3,7 +3,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import { and, eq, isNull } from 'drizzle-orm';
 import { AppError, Clock, IdGenerator } from '../../../common';
 import { SecretBox } from '../../../common/secret-box';
-import { toWesternDigits } from '../../../common/phone';
+import { toWesternDigits } from '@lms/shared';
 import { APP_CONFIG, type AppConfig } from '../../../config';
 import { TenantDb, type DbTx } from '../../../database';
 import { AuditService } from '../../audit';

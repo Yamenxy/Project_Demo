@@ -83,6 +83,16 @@ Mutating endpoints accept an `Idempotency-Key` header (REQ-DATA-003).
 - **The isolation suite** (REQ-SEC-001, `test/access/cross-tenant.int.spec.ts`) enumerates every workspace route from the application's route table (AD-08). Each route is called by another workspace's owner, pointed both at the victim workspace and at the attacker's own workspace with the victim's resource IDs, and must answer 404. A route parameter without a fixture fails the suite. Out-of-scope (class-level) checks join when classes exist (Phase 4).
 - **Idempotency** (`src/idempotency`, migration `0009`): a global interceptor. A signed-in mutating request with an `Idempotency-Key` header runs once; repeats within 24 hours replay the first successful response (header `Idempotent-Replayed: true`). The same key with a different body gives 422, and a repeat that arrives while the first is still running gives 409. Failures aren't stored, so they can be retried. Anonymous requests ignore the header. Expired keys are purged hourly.
 
+### 4.0 Web client foundation
+
+- `apps/web`: Next.js App Router under `app/[locale]/`, with locales `ar` (default, RTL) and `en`. Browser-language detection is off, so the user switches explicitly (D32).
+- next-intl provides ICU messages in `messages/{ar,en}.json` (a test checks key parity and every Arabic plural category) and displays times in `Africa/Cairo`.
+- `proxy.ts` (Next 16's middleware) adds the locale prefix. `/api/*` is rewritten to the API origin (`API_ORIGIN`), so cookies are first-party.
+- Styling is Tailwind 4 using logical utilities only. One self-hosted Arabic font (IBM Plex Sans Arabic, 2 weights, subset).
+- `lib/bidi.tsx` provides `<Ltr>`/`<Auto>` for mixed-direction text; `lib/format.ts` formats numbers with Western digits by default and Arabic-Indic as a preference.
+- Lint forbids string literals in JSX.
+- Playwright checks direction, locale switching, and that there's no horizontal scroll on a Pixel 7 viewport. **Not yet built:** pixel-snapshot baselines, which need to be generated on Linux in CI so they match the runner.
+
 ### 4.1 AccessPolicy
 
 `AccessPolicy.canAccessLesson(membership, lessonId)` is one SQL existence check:

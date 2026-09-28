@@ -1,0 +1,17 @@
+{
+  "meta": {
+    "title": "Teacher Platform",
+    "description": "Lessons, students and attendance for private teachers"
+  },
+  "common": {
+    "appName": "Teacher Platform",
+    "language": "Language",
+    "switchLanguage": "العربية",
+    "studentsCount": "{count, plural, =0 {No students} one {# student} other {# students}}"
+  },
+  "home": {
+    "headline": "Everything a teacher needs, in one place",
+    "signIn": "Sign in",
+    "register": "Create an account"
+  }
+}

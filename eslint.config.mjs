@@ -1,5 +1,6 @@
 import js from '@eslint/js';
 import globals from 'globals';
+import react from 'eslint-plugin-react';
 import tseslint from 'typescript-eslint';
 
 export default tseslint.config(
@@ -35,6 +36,15 @@ export default tseslint.config(
   {
     files: ['**/*.{js,mjs,cjs}'],
     ...tseslint.configs.disableTypeChecked,
+  },
+  {
+    // All user-facing text comes from translation files (REQ-I18N-002, CLAUDE.md).
+    files: ['apps/web/**/*.tsx'],
+    plugins: { react },
+    settings: { react: { version: 'detect' } },
+    rules: {
+      'react/jsx-no-literals': ['error', { noStrings: true, ignoreProps: true }],
+    },
   },
   {
     // Server code logs through the structured logger, never console (logs must not leak personal data).

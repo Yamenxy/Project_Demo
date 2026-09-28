@@ -1,7 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { and, desc, eq, isNotNull, isNull } from 'drizzle-orm';
 import { AppError, Clock, IdGenerator } from '../../common';
-import { normalizePhone } from '../../common/phone';
+import { normalizePhone } from '@lms/shared';
 import { isUniqueViolation, TenantDb, type DbTx } from '../../database';
 import { AuditService } from '../audit';
 import type { LoginBody, RegisterBody, UserSummary } from './auth.schemas';

@@ -39,6 +39,10 @@ jobs:
         run: pnpm build
         env:
           NEXT_TELEMETRY_DISABLED: '1'
+      - name: Install browser for web checks
+        run: pnpm --filter @lms/web exec playwright install --with-deps chromium
+      - name: Web browser checks (RTL, locales, mobile layout)
+        run: pnpm --filter @lms/web test:e2e
 
   dependency-audit:
     runs-on: ubuntu-latest

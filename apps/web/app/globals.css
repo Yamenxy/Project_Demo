@@ -1,0 +1,26 @@
+@import 'tailwindcss';
+
+/*
+ * Design tokens. Use logical utilities (ms-, me-, ps-, pe-, start-, end-, text-start) so layouts
+ * mirror correctly between Arabic (RTL) and English (LTR) (REQ-I18N-002, review UX-03).
+ */
+@theme {
+  --font-sans: var(--font-arabic), system-ui, sans-serif;
+  --color-brand: #0f766e;
+  --color-brand-contrast: #ffffff;
+  --color-ink: #1f2937;
+  --color-muted: #6b7280;
+  --color-surface: #ffffff;
+  --color-canvas: #f8fafc;
+}
+
+html {
+  /* Arabic reads better slightly larger with generous line height (review UX-14). */
+  font-size: 16.5px;
+  line-height: 1.65;
+}
+
+body {
+  background: var(--color-canvas);
+  color: var(--color-ink);
+}
