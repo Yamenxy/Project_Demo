@@ -1,0 +1,40 @@
+# Local development services only. Never used for real data (REQ-OPS-005).
+name: lms
+
+services:
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_USER: lms_admin
+      POSTGRES_PASSWORD: lms_admin_local_only
+      POSTGRES_DB: lms_dev
+    ports:
+      - '5432:5432'
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U lms_admin -d lms_dev']
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  # S3-compatible object storage (stands in for Cloudflare R2 / DigitalOcean Spaces locally).
+  storage:
+    image: chrislusf/seaweedfs:latest
+    command: 'server -dir=/data -s3 -s3.port=8333 -s3.config=/etc/seaweedfs/s3.json'
+    ports:
+      - '8333:8333'
+    volumes:
+      - storagedata:/data
+      - ./infra/dev/seaweedfs-s3.json:/etc/seaweedfs/s3.json:ro
+
+  # Catches all outgoing email; web UI at http://localhost:8025
+  mail:
+    image: axllent/mailpit:latest
+    ports:
+      - '1025:1025'
+      - '8025:8025'
+
+volumes:
+  pgdata:
+  storagedata:

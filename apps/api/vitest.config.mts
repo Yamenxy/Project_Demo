@@ -7,5 +7,11 @@ export default defineConfig({
   test: {
     include: ['src/**/*.spec.ts', 'test/**/*.spec.ts'],
     environment: 'node',
+    env: {
+      NODE_ENV: 'test',
+      DEPLOY_TIER: 'local',
+      DATA_CLASS: 'synthetic',
+      DATABASE_URL: 'postgres://lms_test:lms_test@localhost:5432/lms_test',
+    },
   },
 });

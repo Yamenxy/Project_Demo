@@ -9,3 +9,4 @@ coverage/
 .turbo/
 *.log
 .DS_Store
+apps/web/next-env.d.ts

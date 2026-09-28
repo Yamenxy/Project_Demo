@@ -24,6 +24,7 @@ CLAUDE.md requires a written justification for every new dependency. Add a row w
 | vitest (dev) | Test runner (architecture §9) | Phase 1, task 1 |
 | unplugin-swc, @swc/core (dev) | Vitest's default transform (esbuild) doesn't emit decorator metadata, which NestJS dependency injection needs. SWC does | Phase 1, task 1 |
 | @types/node (dev) | Node type definitions | Phase 1, task 1 |
+| zod | Validates configuration now, and request and response schemas later; shared with the web client through `packages/shared` (architecture §9) | Phase 1, task 2 |
 
 ## Web (`apps/web`)
 
@@ -32,3 +33,11 @@ CLAUDE.md requires a written justification for every new dependency. Add a row w
 | next, react, react-dom | The web client chosen in architecture §9 | Phase 1, task 1 |
 | @types/react, @types/react-dom, @types/node (dev) | Type definitions | Phase 1, task 1 |
 | vitest (dev) | Unit tests for web utilities | Phase 1, task 1 |
+
+## Local development services (`docker-compose.yml`, not shipped)
+
+| Image | Why | Added in |
+|---|---|---|
+| postgres:17-alpine | Local database (production uses managed PostgreSQL 16+) | Phase 1, task 2 |
+| chrislusf/seaweedfs | Local S3-compatible storage standing in for R2 or Spaces. MinIO was the first choice, but its Docker image is no longer published | Phase 1, task 2 |
+| axllent/mailpit | Catches outgoing email locally | Phase 1, task 2 |
