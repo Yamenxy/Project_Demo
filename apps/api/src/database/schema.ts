@@ -3,6 +3,7 @@
 // queries, and test/database/schema-drift.int.spec.ts checks that they match.
 export { idempotencyKeys } from '../idempotency/schema';
 export { auditLog } from '../modules/audit/schema';
+export { notifications } from '../modules/notify/schema';
 export {
   deviceRegistrations,
   otpChallenges,

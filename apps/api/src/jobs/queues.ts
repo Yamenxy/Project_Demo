@@ -17,6 +17,12 @@ export const QUEUES = {
     retentionSeconds: 30 * 24 * 3600,
     deleteAfterSeconds: 30 * 24 * 3600,
   },
+  'notify.email': {
+    retryLimit: 5,
+    retryDelay: 30,
+    retryBackoff: true,
+    deadLetter: FAILED_JOBS_QUEUE,
+  },
   'maintenance.idempotency_purge': {
     retryLimit: 3,
     retryDelay: 60,

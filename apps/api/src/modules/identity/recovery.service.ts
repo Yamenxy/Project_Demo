@@ -4,6 +4,7 @@ import { AppError, Clock } from '../../common';
 import { normalizePhone, toWesternDigits } from '@lms/shared';
 import { isUniqueViolation, TenantDb, type DbTx } from '../../database';
 import { AuditService } from '../audit';
+import { NotificationsService } from '../notify';
 import type { UserSummary } from './auth.schemas';
 import type { RequestMeta } from './request-meta';
 import { OtpSender } from './otp/otp-sender';
@@ -35,6 +36,7 @@ export class RecoveryService {
     private readonly sessions: SessionsService,
     private readonly rateLimiter: RateLimiter,
     private readonly audit: AuditService,
+    private readonly notifications: NotificationsService,
     private readonly clock: Clock,
   ) {}
 
@@ -201,6 +203,13 @@ export class RecoveryService {
         .set({ passwordHash, passwordChangedAt: now, updatedAt: now })
         .where(eq(users.id, holder.id));
       const revoked = await this.sessions.revokeAllForUser(tx, holder.id, 'password_reset');
+      await this.notifications.notify(tx, {
+        recipientUserId: holder.id,
+        workspaceId: null,
+        type: 'account.password_reset',
+        link: '/account',
+        email: true,
+      });
       await this.audit.record(tx, {
         action: 'auth.password_reset',
         workspaceId: null,

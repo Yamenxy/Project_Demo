@@ -4,6 +4,7 @@ import type { NestFastifyApplication } from '@nestjs/platform-fastify';
 import type { TestingModuleBuilder } from '@nestjs/testing';
 import { inject } from 'vitest';
 import { AppModule } from '../../src/app.module';
+import { JobsRuntime } from '../../src/jobs';
 import { createHttpTestApp } from './http-app';
 
 /**
@@ -17,7 +18,14 @@ export async function createIntegrationApp(
   const urls = inject('databaseUrls');
   process.env.DATABASE_URL = urls.runtime;
   process.env.DATABASE_PLATFORM_URL = urls.platform;
-  return createHttpTestApp({ imports: [AppModule], controllers: extraControllers }, configure);
+  const app = await createHttpTestApp(
+    { imports: [AppModule], controllers: extraControllers },
+    configure,
+  );
+  // As in main.ts: services enqueue jobs in their transactions. Workers are started by tests
+  // that need them.
+  await app.get(JobsRuntime).start();
+  return app;
 }
 
 /** A random, valid Egyptian mobile number in local format. */

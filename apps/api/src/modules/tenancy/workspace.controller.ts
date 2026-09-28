@@ -14,9 +14,13 @@ import { eq } from 'drizzle-orm';
 import { z } from 'zod';
 import { AppError, notFound } from '../../common';
 import { ZodPipe } from '../../common/http/zod.pipe';
-import { WorkspaceRoles, type PermissionKey } from '../../common/policy';
+import {
+  CurrentSession,
+  WorkspaceRoles,
+  type PermissionKey,
+  type SessionContext,
+} from '../../common/policy';
 import { TenantDb } from '../../database';
-import { CurrentSession, type ResolvedSession } from '../identity';
 import type { WorkspaceContext } from './access.guard';
 import { PermissionsService } from './permissions.service';
 import { workspaces, type MembershipRole } from './schema';
@@ -72,7 +76,7 @@ export class WorkspaceController {
   @WorkspaceRoles(['owner'])
   async grant(
     @CurrentWorkspace() ctx: WorkspaceContext,
-    @CurrentSession() session: ResolvedSession,
+    @CurrentSession() session: SessionContext,
     @Param('membershipId', new ZodPipe(z.uuid())) membershipId: string,
     @Param('permission') permission: string,
     @Req() request: FastifyRequest,
@@ -90,7 +94,7 @@ export class WorkspaceController {
   @WorkspaceRoles(['owner'])
   async revoke(
     @CurrentWorkspace() ctx: WorkspaceContext,
-    @CurrentSession() session: ResolvedSession,
+    @CurrentSession() session: SessionContext,
     @Param('membershipId', new ZodPipe(z.uuid())) membershipId: string,
     @Param('permission') permission: string,
     @Req() request: FastifyRequest,

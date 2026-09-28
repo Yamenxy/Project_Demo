@@ -2,12 +2,10 @@ import { Body, Controller, HttpCode, Post, Req } from '@nestjs/common';
 import type { FastifyRequest } from 'fastify';
 import { z } from 'zod';
 import { ZodPipe } from '../../common/http/zod.pipe';
-import { Authenticated, Public } from '../../common/policy';
+import { Authenticated, Public, CurrentSession, type SessionContext } from '../../common/policy';
 import type { UserSummary } from './auth.schemas';
 import { metaOf } from './request-meta';
 import { RecoveryService } from './recovery.service';
-import { CurrentSession } from './current-session';
-import type { ResolvedSession } from './sessions.service';
 
 const codeField = z.string().trim().min(4).max(12);
 const verifyBody = z.object({ code: codeField });
@@ -26,7 +24,7 @@ export class RecoveryController {
   @HttpCode(202)
   @Authenticated()
   async sendCode(
-    @CurrentSession() session: ResolvedSession,
+    @CurrentSession() session: SessionContext,
     @Req() request: FastifyRequest,
   ): Promise<{ expiresInSeconds: number }> {
     const expiresInSeconds = await this.recovery.sendVerificationCode(
@@ -40,7 +38,7 @@ export class RecoveryController {
   @HttpCode(200)
   @Authenticated()
   async verify(
-    @CurrentSession() session: ResolvedSession,
+    @CurrentSession() session: SessionContext,
     @Body(new ZodPipe(verifyBody)) body: z.infer<typeof verifyBody>,
     @Req() request: FastifyRequest,
   ): Promise<{ user: UserSummary }> {

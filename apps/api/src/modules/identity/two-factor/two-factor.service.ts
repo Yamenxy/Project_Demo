@@ -7,6 +7,7 @@ import { toWesternDigits } from '@lms/shared';
 import { APP_CONFIG, type AppConfig } from '../../../config';
 import { TenantDb, type DbTx } from '../../../database';
 import { AuditService } from '../../audit';
+import { NotificationsService } from '../../notify';
 import { RateLimiter } from '../rate-limiter';
 import { OTP_RATE_LIMITS } from '../recovery.service';
 import type { RequestMeta } from '../request-meta';
@@ -31,6 +32,7 @@ export class TwoFactorService {
     private readonly db: TenantDb,
     private readonly rateLimiter: RateLimiter,
     private readonly audit: AuditService,
+    private readonly notifications: NotificationsService,
     private readonly ids: IdGenerator,
     private readonly clock: Clock,
     @Inject(APP_CONFIG) config: Pick<AppConfig, 'secretEncryptionKey'>,
@@ -95,6 +97,13 @@ export class TwoFactorService {
         })),
       );
       await this.markSessionVerified(tx, sessionId, userId);
+      await this.notifications.notify(tx, {
+        recipientUserId: userId,
+        workspaceId: null,
+        type: 'account.two_factor_enabled',
+        link: '/account',
+        email: true,
+      });
       await this.audit.record(tx, {
         action: 'auth.two_factor_enabled',
         workspaceId: null,

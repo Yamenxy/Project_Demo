@@ -7,6 +7,7 @@ import { IdempotencyModule } from './idempotency';
 import { JobsModule } from './jobs';
 import { AuditModule } from './modules/audit';
 import { IdentityModule } from './modules/identity';
+import { NotifyModule } from './modules/notify';
 import { TenancyModule } from './modules/tenancy';
 
 @Module({
@@ -16,6 +17,7 @@ import { TenancyModule } from './modules/tenancy';
     DatabaseModule,
     AuditModule,
     JobsModule,
+    NotifyModule,
     IdentityModule,
     TenancyModule,
     IdempotencyModule,

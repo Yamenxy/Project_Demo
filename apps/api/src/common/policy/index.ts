@@ -7,6 +7,7 @@ export {
   type PermissionKey,
   type StaffRole,
 } from './permissions';
+export { CurrentSession, type SessionContext } from './current-session';
 export {
   Authenticated,
   PlatformOwnerOnly,

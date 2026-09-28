@@ -2,7 +2,7 @@ import { Body, Controller, Get, HttpCode, Inject, Post, Req, Res } from '@nestjs
 import type { FastifyReply, FastifyRequest } from 'fastify';
 import { AppError, Clock } from '../../common';
 import { ZodPipe } from '../../common/http/zod.pipe';
-import { Authenticated, Public } from '../../common/policy';
+import { Authenticated, Public, CurrentSession, type SessionContext } from '../../common/policy';
 import { APP_CONFIG, type AppConfig } from '../../config';
 import {
   loginBody,
@@ -20,8 +20,6 @@ import {
   setSessionCookie,
   type CookieSettings,
 } from './session-cookie';
-import { CurrentSession } from './current-session';
-import type { ResolvedSession } from './sessions.service';
 
 @Controller('v1/auth')
 export class AuthController {
@@ -63,7 +61,7 @@ export class AuthController {
   @HttpCode(204)
   @Authenticated({ allowPendingSecondFactor: true })
   async logout(
-    @CurrentSession() session: ResolvedSession,
+    @CurrentSession() session: SessionContext,
     @Res({ passthrough: true }) reply: FastifyReply,
   ): Promise<void> {
     await this.auth.logout(session.sessionId);
@@ -74,7 +72,7 @@ export class AuthController {
   @HttpCode(204)
   @Authenticated()
   async logoutAll(
-    @CurrentSession() session: ResolvedSession,
+    @CurrentSession() session: SessionContext,
     @Req() request: FastifyRequest,
     @Res({ passthrough: true }) reply: FastifyReply,
   ): Promise<void> {
@@ -96,7 +94,7 @@ export class AuthController {
   @Get('me')
   @Authenticated({ allowPendingSecondFactor: true })
   async me(
-    @CurrentSession() session: ResolvedSession,
+    @CurrentSession() session: SessionContext,
   ): Promise<{ user: UserSummary; secondFactorPending: boolean }> {
     const user = await this.auth.getSummary(session.userId);
     if (!user) throw new AppError(401, 'unauthenticated', 'Authentication required');

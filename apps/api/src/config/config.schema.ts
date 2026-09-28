@@ -26,6 +26,10 @@ const envSchema = z
     OTP_PROVIDER: z.enum(['console', 'file']).default('console'),
     OTP_OUTBOX_FILE: z.string().min(1).optional(),
     // 32 random bytes, base64. Encrypts secrets at rest (TOTP). Each environment has its own.
+    // Email for teachers and owners. 'smtp' covers Mailpit locally and any SMTP relay.
+    EMAIL_PROVIDER: z.enum(['none', 'smtp']).default('none'),
+    SMTP_URL: z.url({ protocol: /^smtps?$/ }).optional(),
+    EMAIL_FROM: z.string().min(3).default('LMS <no-reply@localhost>'),
     SECRET_ENCRYPTION_KEY: z
       .string()
       .refine((value) => Buffer.from(value, 'base64').length === 32, 'must be 32 bytes, base64'),
@@ -49,6 +53,13 @@ const envSchema = z
         code: 'custom',
         path: ['DATA_CLASS'],
         message: `tier "${env.DEPLOY_TIER}" may only run with DATA_CLASS=synthetic`,
+      });
+    }
+    if (env.EMAIL_PROVIDER === 'smtp' && !env.SMTP_URL) {
+      ctx.addIssue({
+        code: 'custom',
+        path: ['SMTP_URL'],
+        message: 'required when EMAIL_PROVIDER=smtp',
       });
     }
     if (env.OTP_PROVIDER === 'file' && !env.OTP_OUTBOX_FILE) {
@@ -84,6 +95,7 @@ export interface AppConfig {
   otpProvider: 'console' | 'file';
   otpOutboxFile?: string;
   secretEncryptionKey: string;
+  email: { provider: 'none' } | { provider: 'smtp'; smtpUrl: string; from: string };
   webOrigins: string[];
   /** Secure cookies everywhere except plain-http local development. */
   cookieSecure: boolean;
@@ -123,6 +135,10 @@ export function loadConfig(env: Record<string, string | undefined>): AppConfig {
     otpProvider: e.OTP_PROVIDER,
     ...(e.OTP_OUTBOX_FILE ? { otpOutboxFile: e.OTP_OUTBOX_FILE } : {}),
     secretEncryptionKey: e.SECRET_ENCRYPTION_KEY,
+    email:
+      e.EMAIL_PROVIDER === 'smtp' && e.SMTP_URL
+        ? { provider: 'smtp', smtpUrl: e.SMTP_URL, from: e.EMAIL_FROM }
+        : { provider: 'none' },
     webOrigins: e.WEB_ORIGINS,
     cookieSecure: e.DEPLOY_TIER !== 'local',
     databaseUrl: e.DATABASE_URL,

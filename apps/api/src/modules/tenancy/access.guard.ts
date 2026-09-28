@@ -4,7 +4,7 @@ import type { FastifyRequest } from 'fastify';
 import { AppError, notFound } from '../../common';
 import { ROUTE_POLICY, type RoutePolicy } from '../../common/policy';
 import { isUuid, TenantDb } from '../../database';
-import { SESSION_COOKIE, SessionsService, type ResolvedSession } from '../identity';
+import { SESSION_COOKIE, SessionsService } from '../identity';
 import { MembershipsService, type MembershipContext } from './memberships.service';
 import { PermissionsService, type PermissionSet } from './permissions.service';
 
@@ -14,7 +14,6 @@ export interface WorkspaceContext extends MembershipContext {
 
 declare module 'fastify' {
   interface FastifyRequest {
-    auth?: ResolvedSession;
     workspace?: WorkspaceContext;
   }
 }

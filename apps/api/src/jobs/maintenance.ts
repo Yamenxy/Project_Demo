@@ -23,9 +23,11 @@ export class MaintenanceJobs implements OnModuleInit {
     );
   }
 
+  /** Keeps three months of partitions ready for every partitioned table. */
   async ensureAuditPartitions(): Promise<void> {
-    await this.platformDb.run('audit partition maintenance', (tx) =>
-      tx.execute(sql`select app.ensure_audit_partitions(3)`),
-    );
+    await this.platformDb.run('monthly partition maintenance', async (tx) => {
+      await tx.execute(sql`select app.ensure_monthly_partitions('audit_log', 3)`);
+      await tx.execute(sql`select app.ensure_monthly_partitions('notifications', 3)`);
+    });
   }
 }

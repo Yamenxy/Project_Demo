@@ -71,6 +71,13 @@
       "when": 1790637031963,
       "tag": "0009_idempotency",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1790638390309,
+      "tag": "0010_notifications",
+      "breakpoints": true
     }
   ]
 }

@@ -1,7 +1,9 @@
-import { Module, type OnModuleInit } from '@nestjs/common';
+import { Global, Module, type OnModuleInit } from '@nestjs/common';
+import { ContactDirectory } from '../notify';
 import { JobsRuntime } from '../../jobs';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
+import { UserContactDirectory } from './contact-directory';
 import { DevicesController } from './devices/devices.controller';
 import { DevicesService } from './devices/devices.service';
 import { APP_CONFIG, type AppConfig } from '../../config';
@@ -15,6 +17,8 @@ import { TwoFactorController } from './two-factor/two-factor.controller';
 import { TwoFactorService } from './two-factor/two-factor.service';
 import { SessionsService } from './sessions.service';
 
+/** Global: provides the contact directory notify uses without importing identity. */
+@Global()
 @Module({
   controllers: [AuthController, RecoveryController, DevicesController, TwoFactorController],
   providers: [
@@ -25,6 +29,7 @@ import { SessionsService } from './sessions.service';
     RecoveryService,
     DevicesService,
     TwoFactorService,
+    { provide: ContactDirectory, useClass: UserContactDirectory },
     // Only development senders exist until WhatsApp is set up; config forbids them in production.
     {
       provide: OtpSender,
@@ -33,7 +38,7 @@ import { SessionsService } from './sessions.service';
         config.otpProvider === 'file' ? new FileOtpSender(config) : new ConsoleOtpSender(),
     },
   ],
-  exports: [SessionsService, RateLimiter, DevicesService],
+  exports: [SessionsService, RateLimiter, DevicesService, ContactDirectory],
 })
 export class IdentityModule implements OnModuleInit {
   constructor(
