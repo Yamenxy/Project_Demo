@@ -98,6 +98,7 @@ function StaffHome() {
     : [];
 
   const cards = [
+    { href: `${base}/classes`, title: t('nav.classes'), text: t('cards.classes'), show: true },
     {
       href: `${base}/students`,
       title: t('nav.students'),

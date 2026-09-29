@@ -123,7 +123,12 @@
     "date_of_birth_required": "Enter your date of birth first.",
     "guardian_phone_required": "Enter your guardian's number first.",
     "consent_not_needed": "Consent is already recorded or not needed.",
-    "invalid_date_of_birth": "This date of birth isn't valid."
+    "invalid_date_of_birth": "This date of birth isn't valid.",
+    "class_name_taken": "Another class has this name.",
+    "class_archived": "This class is archived.",
+    "invalid_responsible": "Choose the owner or a class teacher.",
+    "already_enrolled": "The student is already in that class.",
+    "same_class": "The student is already in this class."
   },
   "notifications": {
     "title": "Notifications",
@@ -213,7 +218,8 @@
       "home": "Home",
       "students": "Students",
       "staff": "Staff",
-      "billing": "Subscription"
+      "billing": "Subscription",
+      "classes": "Classes"
     },
     "suspended": "This workspace is temporarily unavailable. You can still see your grades and attendance.",
     "suspendedOwner": "Your workspace is paused. You can see your subscription and renew it with the platform.",
@@ -224,7 +230,8 @@
     "cards": {
       "staff": "Invite helpers and class teachers and set their permissions.",
       "billing": "Your plan, renewal date and payments.",
-      "students": "Students and join requests."
+      "students": "Students and join requests.",
+      "classes": "Your groups and classes, and who is in each."
     },
     "billingTitle": "Subscription",
     "billingHowToRenew": "To renew, pay the platform owners and the payment will show here.",
@@ -418,5 +425,28 @@
     "bioHint": "Up to 1000 characters. Don't put phone numbers here.",
     "save": "Save",
     "saved": "Saved."
+  },
+  "classes": {
+    "title": "Classes",
+    "showArchived": "Archived classes",
+    "showActive": "Current classes",
+    "empty": "No classes yet.",
+    "responsible": "Responsible: {name}",
+    "studentCount": "{count, plural, =0 {No students} one {1 student} other {# students}}",
+    "createTitle": "New class",
+    "name": "Class name",
+    "responsibleLabel": "Responsible teacher",
+    "me": "Me",
+    "create": "Create",
+    "back": "All classes",
+    "archive": "Archive class",
+    "restore": "Restore class",
+    "paused": "Access paused",
+    "transfer": "Move to…",
+    "transferTo": "Move {name} to another class",
+    "remove": "Remove from class",
+    "addTitle": "Add students",
+    "search": "Search by student name, code or number",
+    "add": "Add"
   }
 }

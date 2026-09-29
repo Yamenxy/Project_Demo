@@ -87,6 +87,7 @@ export function WorkspaceShell({
   const staffRole = value.membership.role !== 'student';
   const nav: NavItem[] = [
     { href: base, label: t('nav.home'), visible: () => true },
+    { href: `${base}/classes`, label: t('nav.classes'), visible: () => true },
     {
       href: `${base}/students`,
       label: t('nav.students'),

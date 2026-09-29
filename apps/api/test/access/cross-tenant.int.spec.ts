@@ -18,13 +18,18 @@ import { signIn } from '../support/sessions';
 let app: NestFastifyApplication;
 let routes: RouteInfo[];
 
-const victim = { workspaceId: '', membershipId: '', invitationId: '' };
+const victim = { workspaceId: '', membershipId: '', invitationId: '', classId: '' };
 const attacker = { workspaceId: '', token: '' };
 
 /** Plausible request bodies, keyed by "METHOD path". Empty for routes without a body. */
 const SAMPLE_BODIES: Record<string, object> = {
   'POST /api/v1/w/:workspaceId/students/:membershipId/remove': { reason: 'cross-tenant test' },
   'POST /api/v1/w/:workspaceId/students/:membershipId/consent': {},
+  'POST /api/v1/w/:workspaceId/classes/:classId': { name: 'تغيير' },
+  'POST /api/v1/w/:workspaceId/classes/:classId/students': { membershipIds: [randomUUID()] },
+  'POST /api/v1/w/:workspaceId/classes/:classId/students/:membershipId/transfer': {
+    toClassId: randomUUID(),
+  },
 };
 
 /** Victim resource IDs by route parameter name. */
@@ -32,6 +37,7 @@ function victimParams(): Record<string, string> {
   return {
     membershipId: victim.membershipId,
     invitationId: victim.invitationId,
+    classId: victim.classId,
     permission: 'attendance.mark',
   };
 }
@@ -44,6 +50,12 @@ beforeAll(async () => {
   victim.workspaceId = await insertWorkspace(victimOwner);
   victim.membershipId = await insertMembership(victim.workspaceId, await insertUser(), 'assistant');
   victim.invitationId = randomUUID();
+  victim.classId = randomUUID();
+  await adminQuery(
+    `insert into classes (workspace_id, id, name, responsible_membership_id, created_at, updated_at)
+     values ($1, $2, 'فصل الضحية', (select id from memberships where workspace_id = $1 and role = 'owner'), now(), now())`,
+    [victim.workspaceId, victim.classId],
+  );
   await adminQuery(
     `insert into workspace_invitations (workspace_id, id, phone_e164, role, token_hash, invited_by,
                                         created_at, expires_at)
