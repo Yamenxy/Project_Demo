@@ -76,6 +76,12 @@ function StudentHome() {
         </Link>
       ) : null}
       <Link
+        href={`/w/${workspace.id}/lessons`}
+        className="rounded-2xl bg-brand p-4 text-center font-semibold text-brand-contrast shadow-sm"
+      >
+        {t('myLessons')}
+      </Link>
+      <Link
         href={`/w/${workspace.id}/schedule`}
         className="rounded-2xl bg-surface p-4 text-center font-semibold shadow-sm"
       >

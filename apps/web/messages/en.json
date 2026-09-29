@@ -144,7 +144,9 @@
     "not_rejected": "Only a rejected request can be sent again.",
     "owner_holds_cash": "The owner keeps the cash; there's nothing to hand over.",
     "same_course_enrolled": "The student is already in another class of this course.",
-    "restore_window_over": "More than 30 days have passed since it was deleted."
+    "restore_window_over": "More than 30 days have passed since it was deleted.",
+    "no_access": "This lesson isn't open for you.",
+    "confirmation_mismatch": "The name you typed doesn't match the student."
   },
   "notifications": {
     "title": "Notifications",
@@ -245,7 +247,8 @@
       "prices": "Prices",
       "payments": "Payments",
       "cash": "Cash",
-      "courses": "Content"
+      "courses": "Content",
+      "groups": "Access groups"
     },
     "suspended": "This workspace is temporarily unavailable. You can still see your grades and attendance.",
     "suspendedOwner": "Your workspace is paused. You can see your subscription and renew it with the platform.",
@@ -275,7 +278,8 @@
     },
     "mySchedule": "My schedule",
     "qrAlt": "Your attendance code",
-    "myPayments": "My receipts"
+    "myPayments": "My receipts",
+    "myLessons": "My lessons"
   },
   "staff": {
     "title": "Staff",
@@ -380,7 +384,8 @@
     },
     "paperConsent": "Record paper consent",
     "paperConsentNote": "Did you receive a consent form signed by {name}'s guardian? Add a note (optional), then press OK:",
-    "paperConsentSaved": "Consent for {name} recorded."
+    "paperConsentSaved": "Consent for {name} recorded.",
+    "access": "Lesson access"
   },
   "joinTeacher": {
     "title": "Join a teacher",
@@ -609,7 +614,8 @@
       "wallet": "Mobile wallet",
       "other": "Other"
     },
-    "itemOption": "{name} — {price}"
+    "itemOption": "{name} — {price}",
+    "resumeAccess": "Resume the student's access"
   },
   "paymentRequests": {
     "title": "Report a payment you sent",
@@ -679,5 +685,52 @@
     "confirmDelete": "Delete the lesson “{title}”? It can be restored for 30 days.",
     "addLesson": "New lesson",
     "add": "Add"
+  },
+  "lessons": {
+    "title": "My lessons",
+    "none": "No lessons are open for you yet.",
+    "paused": "Your access to lessons is paused. Contact your teacher.",
+    "preview": "Teacher preview: students may not see this lesson.",
+    "denied": {
+      "not_student": "This lesson is for students only.",
+      "not_published": "This lesson isn't published.",
+      "workspace_suspended": "This workspace is temporarily unavailable.",
+      "paused": "Your access is paused.",
+      "blocked": "This lesson is closed for you.",
+      "no_access": "This lesson isn't open for you."
+    }
+  },
+  "access": {
+    "groupsTitle": "Access groups",
+    "groupsExplain": "A group is a set of lessons plus a set of students. A student opens the lessons of every group they're in.",
+    "groupCounts": "{lessons} lessons · {students} students",
+    "lessons": "Lessons",
+    "draft": "draft",
+    "students": "Students",
+    "removeStudent": "Remove",
+    "findStudent": "Find a student to add",
+    "addStudent": "Add",
+    "addClass": "Add all students of a class:",
+    "chooseClass": "Choose a class",
+    "archiveGroup": "Archive group",
+    "newGroup": "New group",
+    "groupName": "Group name",
+    "create": "Create",
+    "backToStudents": "Students",
+    "studentTitle": "Student's lesson access",
+    "isPaused": "Access is paused for this student.",
+    "notPaused": "Access is on.",
+    "pause": "Pause all access",
+    "resume": "Resume access",
+    "pauseReason": "Reason for pausing (optional):",
+    "inGroups": "In groups: {names}",
+    "viaGroup": "Open through: {names}",
+    "viaGrant": "Open by individual grant",
+    "ruleFor": "Rule for {title}",
+    "ruleNone": "As groups decide",
+    "ruleGrant": "Open for this student",
+    "ruleBlock": "Closed for this student",
+    "removeAll": "Remove from all groups and grants",
+    "removeAllPrompt": "Type the student's name exactly to confirm. Individual blocks stay."
   }
 }

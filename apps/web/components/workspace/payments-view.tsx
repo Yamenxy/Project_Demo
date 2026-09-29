@@ -35,6 +35,7 @@ interface Candidate {
   membershipId: string;
   name: string;
   platformCode: string | null;
+  paused: boolean;
 }
 
 const METHODS = ['cash', 'transfer', 'wallet', 'other'] as const;
@@ -56,7 +57,12 @@ export function PaymentsView() {
   const [student, setStudent] = useState<Candidate | null>(null);
   const [amount, setAmount] = useState('');
   const [itemId, setItemId] = useState('');
-  const [done, setDone] = useState<{ id: string; receiptNumber: number } | null>(null);
+  const [done, setDone] = useState<{
+    id: string;
+    receiptNumber: number;
+    student: Candidate;
+  } | null>(null);
+  const canResume = isOwner || permissions.includes('access.pause');
   const [error, setError] = useState<unknown>(null);
   const [busy, setBusy] = useState(false);
 
@@ -115,7 +121,7 @@ export function PaymentsView() {
       },
     })
       .then(async (result) => {
-        setDone(result);
+        setDone({ ...result, student });
         setStudent(null);
         setQuery('');
         setAmount('');
@@ -152,6 +158,25 @@ export function PaymentsView() {
               <Link href={`${base}/payments/${done.id}`} className="underline">
                 {t('openReceipt')}
               </Link>
+              {done.student.paused && canResume ? (
+                <button
+                  type="button"
+                  disabled={busy}
+                  onClick={() => {
+                    setBusy(true);
+                    api(`${base}/access/pause`, {
+                      method: 'POST',
+                      body: { membershipIds: [done.student.membershipId], paused: false },
+                    })
+                      .then(() => setDone({ ...done, student: { ...done.student, paused: false } }))
+                      .catch(setError)
+                      .finally(() => setBusy(false));
+                  }}
+                  className="ms-2 rounded-lg border bg-white px-2 py-0.5"
+                >
+                  {t('resumeAccess')}
+                </button>
+              ) : null}
             </p>
           ) : null}
           <form onSubmit={record} noValidate className="flex flex-col gap-3">

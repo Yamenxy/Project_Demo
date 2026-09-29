@@ -1,5 +1,6 @@
 export { AccessGuard, type WorkspaceContext } from './access.guard';
 export { PermissionSet, PermissionsService } from './permissions.service';
+export { studentScope } from './scope';
 export { CurrentWorkspace } from './workspace.controller';
 export {
   MembershipsService,

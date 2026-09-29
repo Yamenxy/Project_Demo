@@ -31,6 +31,7 @@ const victim = {
   handoverId: '',
   courseId: '',
   lessonId: '',
+  groupId: '',
 };
 const attacker = { workspaceId: '', token: '', studentToken: '' };
 
@@ -43,6 +44,11 @@ const SAMPLE_BODIES: Record<string, object> = {
   'POST /api/v1/w/:workspaceId/courses/:courseId': { title: 'تغيير' },
   'POST /api/v1/w/:workspaceId/courses/:courseId/lessons': { title: 'درس' },
   'POST /api/v1/w/:workspaceId/lessons/:lessonId': { title: 'تغيير' },
+  'POST /api/v1/w/:workspaceId/access-groups/:groupId': { name: 'تغيير' },
+  'POST /api/v1/w/:workspaceId/access-groups/:groupId/lessons': { add: [randomUUID()] },
+  'POST /api/v1/w/:workspaceId/access-groups/:groupId/members': { add: [randomUUID()] },
+  'POST /api/v1/w/:workspaceId/access-groups/:groupId/add-class': { classId: randomUUID() },
+  'POST /api/v1/w/:workspaceId/access/students/:membershipId/remove-all': { confirmation: 'x' },
   'POST /api/v1/w/:workspaceId/payments/:paymentId/reverse': { reason: 'cross-tenant test' },
   'POST /api/v1/w/:workspaceId/payment-requests/:requestId/reject': { reason: 'cross-tenant test' },
   'POST /api/v1/w/:workspaceId/classes/:classId/series': {
@@ -82,6 +88,7 @@ function victimParams(): Record<string, string> {
     handoverId: victim.handoverId,
     courseId: victim.courseId,
     lessonId: victim.lessonId,
+    groupId: victim.groupId,
     permission: 'attendance.mark',
   };
 }
@@ -137,6 +144,12 @@ beforeAll(async () => {
     `insert into lessons (workspace_id, id, course_id, title, position, created_at, updated_at)
      values ($1, $2, $3, 'درس الضحية', 0, now(), now())`,
     [victim.workspaceId, victim.lessonId, victim.courseId],
+  );
+  victim.groupId = randomUUID();
+  await adminQuery(
+    `insert into access_groups (workspace_id, id, name, created_at, updated_at)
+     values ($1, $2, 'مجموعة الضحية', now(), now())`,
+    [victim.workspaceId, victim.groupId],
   );
   victim.seriesId = randomUUID();
   await adminQuery(

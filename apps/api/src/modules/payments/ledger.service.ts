@@ -6,9 +6,11 @@ import { isUniqueViolation, TenantDb, type DbTx } from '../../database';
 import { AuditService } from '../audit';
 import { users } from '../identity';
 import { NotificationsService } from '../notify';
-import { memberships, type WorkspaceContext } from '../tenancy';
+import { memberships, studentScope, type WorkspaceContext } from '../tenancy';
 import type { Actor } from './price-list.service';
 import { paymentEntries, priceItems } from './schema';
+
+export { studentScope };
 
 export type PaymentMethod = 'cash' | 'transfer' | 'wallet' | 'other';
 
@@ -35,19 +37,6 @@ export interface RecordInput {
   method: PaymentMethod;
   priceItemId?: string;
   note?: string;
-}
-
-/**
- * Students the caller may act on for a key: everyone for a workspace-wide grant, otherwise
- * students enrolled in a covered class (REQ-RBAC-001). Expressed on `memberships.id`.
- */
-export function studentScope(ctx: WorkspaceContext, key: PermissionKey): SQL | undefined {
-  const scope = ctx.permissions.scopeOf(key);
-  if (scope === 'all') return undefined;
-  const ids = [...scope];
-  if (ids.length === 0) return sql`false`;
-  return sql`exists (select 1 from class_enrollments ce
-    where ce.membership_id = ${memberships.id} and ce.ended_at is null and ce.class_id in ${ids})`;
 }
 
 /** The immutable Flow B ledger with gapless receipt numbers (REQ-PAY-003, -004, -007). */
@@ -290,6 +279,7 @@ export class LedgerService {
       name: string;
       platformCode: string | null;
       internalCode: string | null;
+      paused: boolean;
     }[]
   > {
     const like = `%${query.trim().replace(/[%_\\]/g, (c) => `\\${c}`)}%`;
@@ -300,6 +290,7 @@ export class LedgerService {
           name: sql<string>`coalesce(${users.nameAr}, ${memberships.provisionalName})`,
           platformCode: users.platformCode,
           internalCode: memberships.internalCode,
+          paused: sql<boolean>`${memberships.pausedAt} is not null`,
         })
         .from(memberships)
         .leftJoin(users, eq(users.id, memberships.userId))

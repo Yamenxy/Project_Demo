@@ -10,7 +10,14 @@ export {
   classSessions,
   workspaceSkipDates,
 } from '../modules/classes/schedule-schema';
-export { courses, lessons } from '../modules/content/schema';
+export {
+  accessGroupLessons,
+  accessGroupMembers,
+  accessGroups,
+  courses,
+  lessonRules,
+  lessons,
+} from '../modules/content/schema';
 export { notifications } from '../modules/notify/schema';
 export {
   cashHandovers,

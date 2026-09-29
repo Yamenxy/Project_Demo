@@ -144,7 +144,9 @@
     "not_rejected": "يمكن إعادة إرسال الطلبات المرفوضة فقط.",
     "owner_holds_cash": "المالك يحتفظ بالنقدية، لا يوجد ما يُسلَّم.",
     "same_course_enrolled": "الطالب في فصل آخر لنفس المقرر.",
-    "restore_window_over": "مر أكثر من 30 يومًا على الحذف."
+    "restore_window_over": "مر أكثر من 30 يومًا على الحذف.",
+    "no_access": "هذا الدرس غير متاح لك.",
+    "confirmation_mismatch": "الاسم المكتوب لا يطابق اسم الطالب."
   },
   "notifications": {
     "title": "الإشعارات",
@@ -245,7 +247,8 @@
       "prices": "الأسعار",
       "payments": "المدفوعات",
       "cash": "الخزنة",
-      "courses": "المحتوى"
+      "courses": "المحتوى",
+      "groups": "مجموعات الوصول"
     },
     "suspended": "هذه المساحة غير متاحة مؤقتًا. يمكنك رؤية درجاتك وحضورك.",
     "suspendedOwner": "مساحتك موقوفة. يمكنك رؤية الاشتراك وتجديده مع إدارة المنصة.",
@@ -275,7 +278,8 @@
     },
     "mySchedule": "مواعيدي",
     "qrAlt": "كود الحضور الخاص بك",
-    "myPayments": "إيصالاتي"
+    "myPayments": "إيصالاتي",
+    "myLessons": "دروسي"
   },
   "staff": {
     "title": "الفريق",
@@ -380,7 +384,8 @@
     },
     "paperConsent": "تسجيل موافقة ورقية",
     "paperConsentNote": "استلمت نموذج موافقة موقعًا من ولي أمر {name}؟ اكتب ملاحظة (اختياري) ثم اضغط موافق:",
-    "paperConsentSaved": "تم تسجيل موافقة ولي أمر {name}."
+    "paperConsentSaved": "تم تسجيل موافقة ولي أمر {name}.",
+    "access": "الوصول للدروس"
   },
   "joinTeacher": {
     "title": "الانضمام إلى معلّم",
@@ -609,7 +614,8 @@
       "wallet": "محفظة إلكترونية",
       "other": "أخرى"
     },
-    "itemOption": "{name} — {price}"
+    "itemOption": "{name} — {price}",
+    "resumeAccess": "استئناف وصول الطالب"
   },
   "paymentRequests": {
     "title": "أبلغ عن دفعة حوّلتها",
@@ -679,5 +685,52 @@
     "confirmDelete": "حذف الدرس “{title}”؟ يمكن استعادته خلال 30 يومًا.",
     "addLesson": "درس جديد",
     "add": "إضافة"
+  },
+  "lessons": {
+    "title": "دروسي",
+    "none": "لا توجد دروس متاحة لك بعد.",
+    "paused": "وصولك للدروس متوقف مؤقتًا. تواصل مع معلمك.",
+    "preview": "معاينة المعلم: الطالب قد لا يرى هذا الدرس.",
+    "denied": {
+      "not_student": "هذا الدرس للطلاب فقط.",
+      "not_published": "هذا الدرس غير منشور.",
+      "workspace_suspended": "المساحة غير متاحة مؤقتًا.",
+      "paused": "وصولك متوقف مؤقتًا.",
+      "blocked": "هذا الدرس مغلق لك.",
+      "no_access": "هذا الدرس غير متاح لك."
+    }
+  },
+  "access": {
+    "groupsTitle": "مجموعات الوصول",
+    "groupsExplain": "المجموعة = دروس + طلاب. الطالب يفتح دروس كل المجموعات التي هو فيها.",
+    "groupCounts": "{lessons} درس · {students} طالب",
+    "lessons": "الدروس",
+    "draft": "مسودة",
+    "students": "الطلاب",
+    "removeStudent": "إخراج",
+    "findStudent": "ابحث عن طالب لإضافته",
+    "addStudent": "إضافة",
+    "addClass": "إضافة كل طلاب فصل:",
+    "chooseClass": "اختر فصلًا",
+    "archiveGroup": "أرشفة المجموعة",
+    "newGroup": "مجموعة جديدة",
+    "groupName": "اسم المجموعة",
+    "create": "إنشاء",
+    "backToStudents": "الطلاب",
+    "studentTitle": "وصول الطالب للدروس",
+    "isPaused": "الوصول متوقف لهذا الطالب.",
+    "notPaused": "الوصول يعمل.",
+    "pause": "إيقاف كل الوصول",
+    "resume": "استئناف الوصول",
+    "pauseReason": "سبب الإيقاف (اختياري):",
+    "inGroups": "في المجموعات: {names}",
+    "viaGroup": "مفتوح عبر: {names}",
+    "viaGrant": "مفتوح بإذن فردي",
+    "ruleFor": "قاعدة الدرس {title}",
+    "ruleNone": "حسب المجموعات",
+    "ruleGrant": "فتح لهذا الطالب",
+    "ruleBlock": "غلق لهذا الطالب",
+    "removeAll": "إخراج من كل المجموعات والأذونات",
+    "removeAllPrompt": "اكتب اسم الطالب كما هو للتأكيد. ستبقى أقفال الدروس الفردية."
   }
 }

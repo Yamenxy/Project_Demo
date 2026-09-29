@@ -4,6 +4,7 @@ import { toWesternDigits } from '@lms/shared';
 import { useTranslations } from 'next-intl';
 import { useSearchParams } from 'next/navigation';
 import { useCallback, useEffect, useState, type FormEvent } from 'react';
+import { Link } from '../../i18n/navigation';
 import { api } from '../../lib/api';
 import { Ltr } from '../../lib/bidi';
 import { ErrorMessage, Field, SubmitButton } from '../form';
@@ -345,6 +346,15 @@ export function StudentsView() {
                     >
                       {t('paperConsent')}
                     </button>
+                  ) : null}
+                  {(isOwner || permissions.includes('access.grants')) &&
+                  student.status !== 'pending' ? (
+                    <Link
+                      href={`${base}/students/${student.membershipId}/access`}
+                      className="rounded-lg border px-3 py-1"
+                    >
+                      {t('access')}
+                    </Link>
                   ) : null}
                   {canReset && !student.managed && student.status === 'active' ? (
                     <button
