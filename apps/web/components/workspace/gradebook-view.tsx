@@ -71,8 +71,12 @@ export function GradebookView({ classId }: { classId: string }) {
         book.students.map((s) => [s.membershipId, s.scores[itemId]?.toString() ?? '']),
       ),
     );
-    setSaved(false);
   }, [book, itemId]);
+
+  // "Saved." belongs to the item it was saved for; reloading the same item keeps it.
+  useEffect(() => {
+    setSaved(false);
+  }, [itemId]);
 
   const run = (action: () => Promise<unknown>) => {
     setBusy(true);
