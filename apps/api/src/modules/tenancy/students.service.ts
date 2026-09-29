@@ -49,6 +49,14 @@ export interface StudentRow {
   consent: ConsentState | null;
 }
 
+export interface StudentSummary {
+  active: number;
+  pending: number;
+  /** Records the teacher made that no student has taken over yet. */
+  managed: number;
+  missingConsent: number;
+}
+
 export interface JoinResult {
   workspaceId: string;
   workspaceName: string;
@@ -304,6 +312,28 @@ export class StudentsService {
         pendingCount: pending?.n ?? 0,
         missingConsentCount: missing?.n ?? 0,
       };
+    });
+  }
+
+  /** Counts for the staff home screen. */
+  async summary(workspaceId: string): Promise<StudentSummary> {
+    return this.db.inWorkspace(workspaceId, async (tx) => {
+      const [row] = await tx
+        .select({
+          active: sql<number>`count(*) filter (where ${memberships.status} = 'active')::int`,
+          pending: sql<number>`count(*) filter (where ${memberships.status} = 'pending')::int`,
+          managed: sql<number>`count(*) filter (where ${memberships.userId} is null and ${memberships.status} = 'active')::int`,
+          missingConsent: sql<number>`count(*) filter (where ${this.missingConsentFilter(this.clock.now())})::int`,
+        })
+        .from(memberships)
+        .leftJoin(users, eq(users.id, memberships.userId))
+        .where(
+          and(
+            eq(memberships.role, 'student'),
+            inArray(memberships.status, ['active', 'pending', 'suspended']),
+          ),
+        );
+      return row ?? { active: 0, pending: 0, managed: 0, missingConsent: 0 };
     });
   }
 

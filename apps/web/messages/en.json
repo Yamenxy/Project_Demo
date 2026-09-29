@@ -71,7 +71,8 @@
     },
     "joinTeacher": "Join a teacher with a code",
     "consentNeeded": "Guardian consent is needed. Tap here to complete it.",
-    "consentOverdue": "The guardian consent deadline has passed and your access is paused. Tap here to complete it."
+    "consentOverdue": "The guardian consent deadline has passed and your access is paused. Tap here to complete it.",
+    "waitingApproval": "Waiting for the teacher's approval"
   },
   "errors": {
     "generic": "Something went wrong. Please try again.",
@@ -227,7 +228,18 @@
     },
     "billingTitle": "Subscription",
     "billingHowToRenew": "To renew, pay the platform owners and the payment will show here.",
-    "giveConsent": "Complete guardian consent"
+    "giveConsent": "Complete guardian consent",
+    "switchWorkspace": "Switch workspace",
+    "yourCode": "Your platform code:",
+    "consentReminder": "Guardian consent is needed. Tap here to complete it.",
+    "joinAnother": "Join another teacher",
+    "helperSoon": "The tasks your teacher gives you will appear here.",
+    "tiles": {
+      "pending": "Join requests",
+      "missingConsent": "Missing guardian consent",
+      "active": "Active students",
+      "managed": "Not activated yet"
+    }
   },
   "staff": {
     "title": "Staff",

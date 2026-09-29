@@ -5,6 +5,7 @@ import { createContext, useCallback, useContext, useEffect, useState, type React
 import { Link, usePathname, useRouter } from '../../i18n/navigation';
 import { api, ApiError } from '../../lib/api';
 import { ErrorMessage } from '../form';
+import { WorkspaceSwitcher } from './workspace-switcher';
 
 export type Role = 'owner' | 'class_teacher' | 'assistant' | 'student';
 
@@ -111,9 +112,12 @@ export function WorkspaceShell({
               <p className="font-semibold">{value.workspace.name}</p>
               <p className="text-xs text-muted">{t(`roles.${value.membership.role}`)}</p>
             </div>
-            <Link href="/account" className="text-sm underline">
-              {t('myAccount')}
-            </Link>
+            <div className="flex items-center gap-3">
+              <WorkspaceSwitcher currentId={value.workspace.id} />
+              <Link href="/account" className="text-sm underline">
+                {t('myAccount')}
+              </Link>
+            </div>
           </div>
           {staffRole ? (
             <nav className="mx-auto flex max-w-3xl gap-4 overflow-x-auto px-4 pb-2 text-sm">

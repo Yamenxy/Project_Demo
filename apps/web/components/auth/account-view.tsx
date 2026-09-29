@@ -127,7 +127,9 @@ export function AccountView() {
                   className="flex items-center justify-between rounded-lg border px-3 py-2 hover:border-brand"
                 >
                   <span>{w.name}</span>
-                  <span className="text-sm text-muted">{t(`roles.${w.role}`)}</span>
+                  <span className="text-sm text-muted">
+                    {w.status === 'pending' ? t('waitingApproval') : t(`roles.${w.role}`)}
+                  </span>
                 </Link>
               </li>
             ))}

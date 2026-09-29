@@ -269,3 +269,33 @@ describe('managed students', () => {
     expect((await add('01011110002')).json<ErrorJson>().error.code).toBe('internal_code_taken');
   });
 });
+
+describe('the staff home summary', () => {
+  it('counts students for staff who manage them, and nothing for others', async () => {
+    const w = await workspace();
+    await insertMembership(w.workspaceId, await insertUser(), 'student', { status: 'active' });
+    await insertMembership(w.workspaceId, await insertUser(), 'student', { status: 'pending' });
+    await insertMembership(w.workspaceId, null, 'student', {
+      status: 'active',
+      provisional_name: 'سجل يدوي',
+      provisional_phone: '+201012349999',
+    });
+    const summary = await call('GET', `/api/v1/w/${w.workspaceId}/summary`, w.ownerToken);
+    expect(summary.json()).toEqual({
+      students: { active: 2, pending: 1, managed: 1, missingConsent: 2 },
+    });
+
+    const helper = await insertUser();
+    await insertMembership(w.workspaceId, helper, 'assistant');
+    const helperToken = await signIn(app, helper);
+    expect((await call('GET', `/api/v1/w/${w.workspaceId}/summary`, helperToken)).json()).toEqual({
+      students: null,
+    });
+    const student = await insertUser();
+    await insertMembership(w.workspaceId, student, 'student');
+    expect(
+      (await call('GET', `/api/v1/w/${w.workspaceId}/summary`, await signIn(app, student)))
+        .statusCode,
+    ).toBe(403);
+  });
+});

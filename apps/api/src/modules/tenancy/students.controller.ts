@@ -16,7 +16,12 @@ import {
   StudentImportService,
   type ImportReport,
 } from './student-import.service';
-import { StudentsService, type JoinResult, type StudentRow } from './students.service';
+import {
+  StudentsService,
+  type JoinResult,
+  type StudentRow,
+  type StudentSummary,
+} from './students.service';
 import { CurrentWorkspace } from './workspace.controller';
 
 const joinBody = z
@@ -104,6 +109,16 @@ export class StudentsController {
       missingConsent: query.consent === 'missing',
       showPhones: ctx.permissions.has('enrollment.manage') || ctx.permissions.has('students.edit'),
     });
+  }
+
+  /** The staff home screen: counts for what this staff member may manage. */
+  @Get('summary')
+  @WorkspaceRoles(['owner', 'class_teacher', 'assistant'])
+  async summary(
+    @CurrentWorkspace() ctx: WorkspaceContext,
+  ): Promise<{ students: StudentSummary | null }> {
+    const canSee = ctx.permissions.has('enrollment.manage');
+    return { students: canSee ? await this.students.summary(ctx.workspaceId) : null };
   }
 
   @Post('students')

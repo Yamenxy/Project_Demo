@@ -16,6 +16,8 @@ in staff and students. Everything free; paid items stay in [paid-services.md](..
 Each task ships with tests (integration against Postgres, cross-tenant suite, browser flow where
 there's UI), audit events, translations in Arabic and English, and doc updates.
 
+**Status (2026-09-29):** all seven tasks are done on branch `phase-2/onboarding`. Not done, by design: the price list on the public page (Phase 4, with payments), uploading scanned paper consent forms (Phase 5, with file storage), and the upload block for limited accounts (`isLimited()` exists; applied when uploads arrive). OpenAPI generation (AD-08) is still to do.
+
 **Risks:** invitations and imports must never reveal whether a phone number has an account
 (SEC-02); staff removal must take effect on the next request (REQ-USER-005); subscription jobs must
 be idempotent (review §3.27).
