@@ -64,6 +64,13 @@ export const CLASS_TEACHER_DEFAULTS: readonly PermissionKey[] = [
   'reports.academic',
 ];
 
+/** Keys that act on the whole workspace and can't be limited to classes (Appendix A.2). */
+export const WORKSPACE_ONLY: ReadonlySet<PermissionKey> = new Set([
+  'students.import',
+  'access.groups',
+  'finance.view',
+]);
+
 export type StaffRole = 'class_teacher' | 'assistant';
 
 /** Whether the owner may grant this key to a member with this role. */

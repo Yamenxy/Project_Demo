@@ -6,6 +6,7 @@ export {
   PERMISSION_KEYS,
   type PermissionKey,
   type StaffRole,
+  WORKSPACE_ONLY,
 } from './permissions';
 export { CurrentSession, type SessionContext } from './current-session';
 export {

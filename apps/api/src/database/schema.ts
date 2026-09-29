@@ -21,6 +21,7 @@ export {
 } from '../modules/identity/schema';
 export {
   memberships,
+  permissionGrantClasses,
   permissionGrants,
   platformOwners,
   workspaceInvitations,

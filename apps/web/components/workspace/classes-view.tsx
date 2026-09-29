@@ -180,14 +180,14 @@ export function ClassView({ classId }: { classId: string }) {
       return;
     }
     const timer = setTimeout(() => {
-      api<{ students: { membershipId: string; name: string; status: string }[] }>(
-        `${base}/students?q=${encodeURIComponent(toWesternDigits(query.trim()))}`,
+      api<{ students: { membershipId: string; name: string }[] }>(
+        `${base}/classes/${classId}/candidates?q=${encodeURIComponent(toWesternDigits(query.trim()))}`,
       )
-        .then((data) => setFound(data.students.filter((s) => s.status !== 'pending')))
+        .then((data) => setFound(data.students))
         .catch(() => setFound([]));
     }, 250);
     return () => clearTimeout(timer);
-  }, [base, query, canManage]);
+  }, [base, classId, query, canManage]);
 
   const run = (path: string, body?: object) => {
     setBusy(true);

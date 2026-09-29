@@ -66,6 +66,13 @@ export const permissionGrants = pgTable('permission_grants', {
   createdAt: tstz('created_at').notNull(),
 });
 
+/** Mirrors drizzle/0016_grant_scopes.sql. */
+export const permissionGrantClasses = pgTable('permission_grant_classes', {
+  workspaceId: uuid('workspace_id').notNull(),
+  grantId: uuid('grant_id').notNull(),
+  classId: uuid('class_id').notNull(),
+});
+
 export const workspaceSettings = pgTable('workspace_settings', {
   workspaceId: uuid('workspace_id').primaryKey(),
   joinCode: text('join_code').notNull(),

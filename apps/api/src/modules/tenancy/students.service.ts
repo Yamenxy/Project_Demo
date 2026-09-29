@@ -223,6 +223,8 @@ export class StudentsService {
       query?: string;
       missingConsent?: boolean;
       showPhones: boolean;
+      /** Staff limited to some classes see only students enrolled in them (REQ-RBAC-001). */
+      classIds?: ReadonlySet<string>;
     },
   ): Promise<{ students: StudentRow[]; pendingCount: number; missingConsentCount: number }> {
     return this.db.inWorkspace(workspaceId, async (tx) => {
@@ -235,6 +237,16 @@ export class StudentsService {
       const now = this.clock.now();
       const missingConsent = this.missingConsentFilter(now);
       if (options.missingConsent) filters.push(missingConsent);
+      if (options.classIds) {
+        const ids = [...options.classIds];
+        filters.push(
+          ids.length === 0
+            ? sql`false`
+            : sql`exists (select 1 from class_enrollments ce
+                where ce.membership_id = ${memberships.id} and ce.ended_at is null
+                  and ce.class_id in ${ids})`,
+        );
+      }
       const q = options.query?.trim();
       if (q) {
         const like = `%${q.replace(/[%_\\]/g, (c) => `\\${c}`)}%`;

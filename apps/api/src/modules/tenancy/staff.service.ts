@@ -5,7 +5,12 @@ import { CLASS_TEACHER_DEFAULTS, type PermissionKey } from '../../common/policy'
 import { TenantDb } from '../../database';
 import { AuditService } from '../audit';
 import { users } from '../identity';
-import { memberships, permissionGrants, type MembershipStatus } from './schema';
+import {
+  memberships,
+  permissionGrantClasses,
+  permissionGrants,
+  type MembershipStatus,
+} from './schema';
 
 export interface StaffMember {
   membershipId: string;
@@ -16,6 +21,8 @@ export interface StaffMember {
   status: MembershipStatus;
   /** Keys granted by the owner (class teachers also hold their default bundle). */
   granted: PermissionKey[];
+  /** For helpers: the classes their grants are limited to (empty means the whole workspace). */
+  classIds: string[];
   defaults: PermissionKey[];
 }
 
@@ -58,8 +65,13 @@ export class StaffService {
             .select({
               membershipId: permissionGrants.membershipId,
               permission: permissionGrants.permission,
+              classId: permissionGrantClasses.classId,
             })
             .from(permissionGrants)
+            .leftJoin(
+              permissionGrantClasses,
+              eq(permissionGrantClasses.grantId, permissionGrants.id),
+            )
             .where(
               inArray(
                 permissionGrants.membershipId,
@@ -74,9 +86,20 @@ export class StaffService {
         phoneE164: row.phoneE164,
         role: row.role as 'class_teacher' | 'assistant',
         status: row.status,
-        granted: grants
-          .filter((g) => g.membershipId === row.membershipId)
-          .map((g) => g.permission as PermissionKey),
+        granted: [
+          ...new Set(
+            grants
+              .filter((g) => g.membershipId === row.membershipId)
+              .map((g) => g.permission as PermissionKey),
+          ),
+        ],
+        classIds: [
+          ...new Set(
+            grants
+              .filter((g) => g.membershipId === row.membershipId && g.classId !== null)
+              .map((g) => g.classId as string),
+          ),
+        ],
         defaults: row.role === 'class_teacher' ? [...CLASS_TEACHER_DEFAULTS] : [],
       }));
     });

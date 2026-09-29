@@ -128,7 +128,8 @@
     "class_archived": "هذا الفصل مؤرشف.",
     "invalid_responsible": "اختر المالك أو معلم فصل.",
     "already_enrolled": "الطالب موجود بالفعل في ذلك الفصل.",
-    "same_class": "الطالب في هذا الفصل بالفعل."
+    "same_class": "الطالب في هذا الفصل بالفعل.",
+    "permission_not_class_scoped": "هذه الصلاحية تشمل المساحة كلها ولا يمكن قصرها على فصول."
   },
   "notifications": {
     "title": "الإشعارات",
@@ -293,7 +294,9 @@
       "announcements_post": "نشر الإعلانات",
       "reports_academic": "التقارير الدراسية",
       "data_export": "تصدير البيانات"
-    }
+    },
+    "classesTitle": "الفصول",
+    "classesExplain": "حدد فصولًا لتقتصر صلاحيات المساعد عليها. بدون تحديد تشمل كل المساحة."
   },
   "join": {
     "title": "دعوة للانضمام",

@@ -64,6 +64,13 @@ const importBody = z.object({
 
 const uuidParam = new ZodPipe(z.uuid());
 
+/** Workspace-wide student actions (join requests, new records) need an unscoped grant. */
+function requireEverywhere(ctx: WorkspaceContext): void {
+  if (!ctx.permissions.hasEverywhere('enrollment.manage')) {
+    throw new AppError(403, 'forbidden', 'Not allowed');
+  }
+}
+
 function actorOf(session: SessionContext, request: FastifyRequest) {
   return { userId: session.userId, requestId: String(request.id) };
 }
@@ -103,7 +110,9 @@ export class StudentsController {
     @CurrentWorkspace() ctx: WorkspaceContext,
     @Query(new ZodPipe(listQuery)) query: z.infer<typeof listQuery>,
   ): Promise<{ students: StudentRow[]; pendingCount: number; missingConsentCount: number }> {
+    const scope = ctx.permissions.scopeOf('enrollment.manage');
     return this.students.list(ctx.workspaceId, {
+      ...(scope === 'all' ? {} : { classIds: scope }),
       status: query.status,
       query: query.q,
       missingConsent: query.consent === 'missing',
@@ -117,7 +126,7 @@ export class StudentsController {
   async summary(
     @CurrentWorkspace() ctx: WorkspaceContext,
   ): Promise<{ students: StudentSummary | null }> {
-    const canSee = ctx.permissions.has('enrollment.manage');
+    const canSee = ctx.permissions.hasEverywhere('enrollment.manage');
     return { students: canSee ? await this.students.summary(ctx.workspaceId) : null };
   }
 
@@ -130,6 +139,7 @@ export class StudentsController {
     @Body(new ZodPipe(managedBody)) body: z.infer<typeof managedBody>,
     @Req() request: FastifyRequest,
   ): Promise<{ membershipId: string; link: string }> {
+    requireEverywhere(ctx);
     const { membershipId, token } = await this.students.addManaged(
       ctx.workspaceId,
       body,
@@ -165,6 +175,7 @@ export class StudentsController {
     @Param('membershipId', uuidParam) membershipId: string,
     @Req() request: FastifyRequest,
   ): Promise<void> {
+    requireEverywhere(ctx);
     await this.students.decide(ctx.workspaceId, membershipId, true, actorOf(session, request));
   }
 
@@ -177,6 +188,7 @@ export class StudentsController {
     @Param('membershipId', uuidParam) membershipId: string,
     @Req() request: FastifyRequest,
   ): Promise<void> {
+    requireEverywhere(ctx);
     await this.students.decide(ctx.workspaceId, membershipId, false, actorOf(session, request));
   }
 
@@ -189,6 +201,7 @@ export class StudentsController {
     @Param('membershipId', uuidParam) membershipId: string,
     @Req() request: FastifyRequest,
   ): Promise<{ link: string }> {
+    requireEverywhere(ctx);
     const token = await this.students.newClaimLink(
       ctx.workspaceId,
       membershipId,
@@ -207,6 +220,7 @@ export class StudentsController {
     @Body(new ZodPipe(paperConsentBody)) body: z.infer<typeof paperConsentBody>,
     @Req() request: FastifyRequest,
   ): Promise<void> {
+    requireEverywhere(ctx);
     await this.students.recordPaperConsent(
       ctx.workspaceId,
       membershipId,

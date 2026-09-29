@@ -7,4 +7,5 @@ export {
   PERMISSION_KEYS,
   type PermissionKey,
   type StaffRole,
+  WORKSPACE_ONLY,
 } from '@lms/shared';

@@ -1,4 +1,5 @@
 import {
+  Body,
   createParamDecorator,
   Controller,
   Delete,
@@ -33,6 +34,9 @@ export const CurrentWorkspace = createParamDecorator(
     return workspace;
   },
 );
+
+/** Without classes, the grant covers the whole workspace. */
+const grantBody = z.object({ classIds: z.array(z.uuid()).max(100).optional() }).optional();
 
 const ALL_ROLES: readonly MembershipRole[] = ['owner', 'class_teacher', 'assistant', 'student'];
 
@@ -79,13 +83,18 @@ export class WorkspaceController {
     @CurrentSession() session: SessionContext,
     @Param('membershipId', new ZodPipe(z.uuid())) membershipId: string,
     @Param('permission') permission: string,
+    @Body(new ZodPipe(grantBody)) body: z.infer<typeof grantBody>,
     @Req() request: FastifyRequest,
   ): Promise<void> {
     await this.db.inWorkspace(ctx.workspaceId, (tx) =>
-      this.permissions.grant(tx, ctx.workspaceId, membershipId, permission, {
-        userId: session.userId,
-        requestId: String(request.id),
-      }),
+      this.permissions.grant(
+        tx,
+        ctx.workspaceId,
+        membershipId,
+        permission,
+        { userId: session.userId, requestId: String(request.id) },
+        body?.classIds ?? [],
+      ),
     );
   }
 

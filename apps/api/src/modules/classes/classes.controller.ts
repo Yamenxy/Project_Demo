@@ -23,6 +23,7 @@ const updateBody = z
   .refine((b) => Object.keys(b).length > 0, { message: 'nothing to change' });
 const enrollBody = z.object({ membershipIds: z.array(z.uuid()).min(1).max(500) });
 const transferBody = z.object({ toClassId: z.uuid() });
+const candidatesQuery = z.object({ q: z.string().trim().max(80).default('') });
 const listQuery = z.object({ archived: z.enum(['true', 'false']).optional() });
 
 const STAFF = ['owner', 'class_teacher', 'assistant'] as const;
@@ -79,6 +80,16 @@ export class ClassesController {
     @Req() request: FastifyRequest,
   ): Promise<void> {
     await this.classes.update(ctx, classId, body, actorOf(session, request));
+  }
+
+  @Get(':classId/candidates')
+  @WorkspacePermission('enrollment.manage')
+  async candidates(
+    @CurrentWorkspace() ctx: WorkspaceContext,
+    @Param('classId', uuidParam) classId: string,
+    @Query(new ZodPipe(candidatesQuery)) query: z.infer<typeof candidatesQuery>,
+  ): Promise<{ students: Awaited<ReturnType<ClassesService['candidates']>> }> {
+    return { students: await this.classes.candidates(ctx, classId, query.q) };
   }
 
   @Post(':classId/students')

@@ -128,7 +128,8 @@
     "class_archived": "This class is archived.",
     "invalid_responsible": "Choose the owner or a class teacher.",
     "already_enrolled": "The student is already in that class.",
-    "same_class": "The student is already in this class."
+    "same_class": "The student is already in this class.",
+    "permission_not_class_scoped": "This permission covers the whole workspace and can't be limited to classes."
   },
   "notifications": {
     "title": "Notifications",
@@ -293,7 +294,9 @@
       "announcements_post": "Post announcements",
       "reports_academic": "Academic reports",
       "data_export": "Export data"
-    }
+    },
+    "classesTitle": "Classes",
+    "classesExplain": "Pick classes to limit this helper's permissions to them. With none picked, they cover the whole workspace."
   },
   "join": {
     "title": "Invitation",

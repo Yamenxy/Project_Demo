@@ -1,6 +1,12 @@
 'use client';
 
-import { isGrantable, PERMISSION_KEYS, toWesternDigits, type PermissionKey } from '@lms/shared';
+import {
+  isGrantable,
+  PERMISSION_KEYS,
+  toWesternDigits,
+  WORKSPACE_ONLY,
+  type PermissionKey,
+} from '@lms/shared';
 import { useFormatter, useTranslations } from 'next-intl';
 import { useCallback, useEffect, useState, type FormEvent } from 'react';
 import { api } from '../../lib/api';
@@ -17,6 +23,7 @@ interface StaffMember {
   phoneE164: string;
   role: StaffRole;
   granted: PermissionKey[];
+  classIds: string[];
   defaults: PermissionKey[];
 }
 
@@ -40,6 +47,7 @@ export function StaffView() {
   const [newLink, setNewLink] = useState<string | null>(null);
   const [error, setError] = useState<unknown>(null);
   const [busy, setBusy] = useState(false);
+  const [classes, setClasses] = useState<{ id: string; name: string }[]>([]);
   const base = `/w/${workspace.id}`;
 
   const load = useCallback(async () => {
@@ -55,6 +63,12 @@ export function StaffView() {
   useEffect(() => {
     void load();
   }, [load]);
+
+  useEffect(() => {
+    api<{ classes: { id: string; name: string }[] }>(`${base}/classes`)
+      .then((data) => setClasses(data.classes))
+      .catch(() => setClasses([]));
+  }, [base]);
 
   const run = async (action: () => Promise<void>) => {
     setBusy(true);
@@ -84,12 +98,33 @@ export function StaffView() {
     });
   };
 
+  const grantUrl = (member: StaffMember, key: PermissionKey) =>
+    `${base}/memberships/${member.membershipId}/permissions/${key}`;
+  const scopeBody = (member: StaffMember, key: PermissionKey, classIds: string[]) =>
+    member.role === 'assistant' && !WORKSPACE_ONLY.has(key) && classIds.length > 0
+      ? { body: { classIds } }
+      : {};
+
   const toggle = (member: StaffMember, key: PermissionKey, on: boolean) =>
     void run(() =>
-      api(`${base}/memberships/${member.membershipId}/permissions/${key}`, {
+      api(grantUrl(member, key), {
         method: on ? 'PUT' : 'DELETE',
+        ...(on ? scopeBody(member, key, member.classIds) : {}),
       }),
     );
+
+  /** A helper's class limit applies to each of their grants (none selected: whole workspace). */
+  const toggleClass = (member: StaffMember, classId: string, on: boolean) => {
+    const classIds = on
+      ? [...member.classIds, classId]
+      : member.classIds.filter((id) => id !== classId);
+    void run(async () => {
+      for (const key of member.granted) {
+        if (WORKSPACE_ONLY.has(key)) continue;
+        await api(grantUrl(member, key), { method: 'PUT', ...scopeBody(member, key, classIds) });
+      }
+    });
+  };
 
   return (
     <div className="flex flex-col gap-6">
@@ -160,6 +195,26 @@ export function StaffView() {
                 })}
               </div>
             </fieldset>
+            {member.role === 'assistant' && classes.length > 0 ? (
+              <fieldset className="mt-3">
+                <legend className="mb-1 text-sm font-semibold">{t('classesTitle')}</legend>
+                <p className="mb-2 text-xs text-muted">{t('classesExplain')}</p>
+                <div className="grid gap-1 sm:grid-cols-2">
+                  {classes.map((c) => (
+                    <label key={c.id} className="flex items-center gap-2 text-sm">
+                      <input
+                        type="checkbox"
+                        className="size-4"
+                        checked={member.classIds.includes(c.id)}
+                        disabled={busy || member.granted.length === 0}
+                        onChange={(event) => toggleClass(member, c.id, event.target.checked)}
+                      />
+                      {c.name}
+                    </label>
+                  ))}
+                </div>
+              </fieldset>
+            ) : null}
           </article>
         ))}
       </section>

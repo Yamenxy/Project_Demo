@@ -113,6 +113,13 @@
       "when": 1790668235590,
       "tag": "0015_classes",
       "breakpoints": true
+    },
+    {
+      "idx": 16,
+      "version": "7",
+      "when": 1790708904099,
+      "tag": "0016_grant_scopes",
+      "breakpoints": true
     }
   ]
 }

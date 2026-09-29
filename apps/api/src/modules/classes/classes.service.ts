@@ -1,9 +1,10 @@
 import { Injectable } from '@nestjs/common';
-import { and, asc, eq, inArray, isNull, sql, type SQL } from 'drizzle-orm';
+import { and, asc, eq, ilike, inArray, isNull, or, sql, type SQL } from 'drizzle-orm';
 import { AppError, Clock, IdGenerator, notFound } from '../../common';
 import { isUniqueViolation, TenantDb, type DbTx } from '../../database';
 import { AuditService } from '../audit';
 import { users } from '../identity';
+import { WORKSPACE_ONLY, type PermissionKey } from '../../common/policy';
 import { memberships, type WorkspaceContext } from '../tenancy';
 import { classEnrollments, classes } from './schema';
 
@@ -34,14 +35,22 @@ export interface ClassDetail extends ClassSummary {
 }
 
 /**
- * Who sees which classes (REQ-RBAC-006): the owner and helpers see all of them (helper class
- * scopes arrive in Phase 3 task 3.2); a class teacher sees only the classes they're responsible
- * for. Classes outside the caller's view answer 404, like other workspaces.
+ * Who sees which classes (REQ-RBAC-001, REQ-RBAC-006): the owner sees all; a class teacher sees
+ * the classes they're responsible for; a helper sees the classes their grants cover (all of them
+ * for a workspace-wide grant). Classes outside the caller's view answer 404, like other
+ * workspaces.
  */
 function scopeFilter(ctx: WorkspaceContext): SQL | undefined {
-  return ctx.role === 'class_teacher'
-    ? eq(classes.responsibleMembershipId, ctx.membershipId)
-    : undefined;
+  if (ctx.role === 'owner') return undefined;
+  if (ctx.role === 'class_teacher') return eq(classes.responsibleMembershipId, ctx.membershipId);
+  const covered = new Set<string>();
+  for (const key of ctx.permissions.list()) {
+    if (WORKSPACE_ONLY.has(key)) continue;
+    const scope = ctx.permissions.scopeOf(key);
+    if (scope === 'all') return undefined;
+    for (const id of scope) covered.add(id);
+  }
+  return covered.size > 0 ? inArray(classes.id, [...covered]) : sql`false`;
 }
 
 const nameOf = sql<string>`coalesce(${users.nameAr}, ${memberships.provisionalName})`;
@@ -200,7 +209,7 @@ export class ClassesService {
     actor: Actor,
   ): Promise<{ added: number }> {
     return this.db.inWorkspace(ctx.workspaceId, async (tx) => {
-      const current = await this.lockClass(tx, ctx, classId);
+      const current = await this.lockClass(tx, ctx, classId, 'enrollment.manage');
       if (current.archivedAt) throw new AppError(409, 'class_archived', 'The class is archived');
       const students = await this.students(tx, membershipIds);
       const enrolled = new Set(
@@ -249,7 +258,7 @@ export class ClassesService {
     actor: Actor,
   ): Promise<void> {
     await this.db.inWorkspace(ctx.workspaceId, async (tx) => {
-      await this.lockClass(tx, ctx, classId);
+      await this.lockClass(tx, ctx, classId, 'enrollment.manage');
       await this.end(tx, classId, membershipId, 'removed', actor.userId);
       await this.audit.record(tx, {
         action: 'class.student_removed',
@@ -274,8 +283,8 @@ export class ClassesService {
       throw new AppError(400, 'same_class', 'The student is already in this class');
     }
     await this.write(async (tx) => {
-      await this.lockClass(tx, ctx, fromClassId);
-      const target = await this.lockClass(tx, ctx, toClassId);
+      await this.lockClass(tx, ctx, fromClassId, 'enrollment.manage');
+      const target = await this.lockClass(tx, ctx, toClassId, 'enrollment.manage');
       if (target.archivedAt) throw new AppError(409, 'class_archived', 'The class is archived');
       await this.end(tx, fromClassId, membershipId, 'transferred', actor.userId);
       const now = this.clock.now();
@@ -297,6 +306,55 @@ export class ClassesService {
         requestId: actor.requestId,
       });
     }, ctx.workspaceId);
+  }
+
+  /**
+   * Students who could join this class: active students of the workspace not in it. Only names
+   * and codes, never phone numbers, so staff scoped to one class can add new students to it.
+   */
+  async candidates(
+    ctx: WorkspaceContext,
+    classId: string,
+    query: string,
+  ): Promise<
+    {
+      membershipId: string;
+      name: string;
+      platformCode: string | null;
+      internalCode: string | null;
+    }[]
+  > {
+    return this.db.inWorkspace(ctx.workspaceId, async (tx) => {
+      await this.lockClass(tx, ctx, classId, 'enrollment.manage');
+      const like = `%${query.trim().replace(/[%_\\]/g, (c) => `\\${c}`)}%`;
+      return tx
+        .select({
+          membershipId: memberships.id,
+          name: nameOf,
+          platformCode: users.platformCode,
+          internalCode: memberships.internalCode,
+        })
+        .from(memberships)
+        .leftJoin(users, eq(users.id, memberships.userId))
+        .where(
+          and(
+            eq(memberships.role, 'student'),
+            inArray(memberships.status, ['active', 'suspended']),
+            or(
+              ilike(users.nameAr, like),
+              ilike(memberships.provisionalName, like),
+              ilike(memberships.internalCode, like),
+              ilike(users.platformCode, like),
+            ),
+            sql`not exists (select 1 from ${classEnrollments}
+              where ${classEnrollments.classId} = ${classId}
+                and ${classEnrollments.membershipId} = ${memberships.id}
+                and ${classEnrollments.endedAt} is null)`,
+          ),
+        )
+        .orderBy(asc(nameOf))
+        .limit(20);
+    });
   }
 
   /** The classes a student is in now, and was in before (for the student's page). */
@@ -340,8 +398,9 @@ export class ClassesService {
     if (ended.length === 0) throw notFound('The student is not in this class');
   }
 
-  /** The class, locked, if the caller may act on it; otherwise 404. */
-  private async lockClass(tx: DbTx, ctx: WorkspaceContext, classId: string) {
+  /** The class, locked, if the caller may act on it (with `key` for that class); otherwise 404. */
+  private async lockClass(tx: DbTx, ctx: WorkspaceContext, classId: string, key?: PermissionKey) {
+    if (key && !ctx.permissions.coversClass(key, classId)) throw notFound('Class not found');
     const [row] = await tx
       .select()
       .from(classes)
