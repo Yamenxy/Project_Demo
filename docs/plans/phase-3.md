@@ -18,6 +18,10 @@ The course link in REQ-CLASS-001 ("not in two active classes of the same course"
 which arrive with content in Phase 5; until then the rule is not enforced and the class has no
 course.
 
+**Status (2026-09-29):** tasks 3.1 to 3.5 are done on branch `phase-3/classes`. Not done: the
+course rule of REQ-CLASS-001 (waits for courses, Phase 5); opening the scanner offline from a
+closed tab (PWA service worker, Phase 8); camera scanning on iOS Safari (typed codes work).
+
 Each task ships with tests (integration against Postgres, cross-tenant suite, browser flow where
 there's UI), audit events, translations in Arabic and English, and doc updates.
 

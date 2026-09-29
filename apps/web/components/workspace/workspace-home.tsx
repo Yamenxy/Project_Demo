@@ -6,6 +6,7 @@ import { Link } from '../../i18n/navigation';
 import { api } from '../../lib/api';
 import { Ltr } from '../../lib/bidi';
 import type { ConsentStatus } from '../auth/consent-view';
+import { qrText } from '../../lib/scan';
 import { useWorkspace } from './workspace-shell';
 
 interface StudentSummary {
@@ -25,11 +26,16 @@ function StudentHome() {
   const t = useTranslations('workspace');
   const { workspace, membership } = useWorkspace();
   const [code, setCode] = useState<string | null>(null);
+  const [qr, setQr] = useState<string | null>(null);
   const [consent, setConsent] = useState<ConsentStatus | null>(null);
 
   useEffect(() => {
     api<{ user: { platformCode: string } }>('/auth/me')
-      .then((me) => setCode(me.user.platformCode))
+      .then(async (me) => {
+        setCode(me.user.platformCode);
+        const { toDataURL } = await import('qrcode');
+        setQr(await toDataURL(qrText(me.user.platformCode), { margin: 1, width: 240 }));
+      })
       .catch(() => setCode(null));
     api<ConsentStatus>('/auth/consent')
       .then(setConsent)
@@ -43,6 +49,15 @@ function StudentHome() {
           {t('studentWelcome', { name: workspace.name })}
         </h1>
         <p className="text-muted">{membership.paused ? t('studentPaused') : t('studentSoon')}</p>
+        {qr ? (
+          <img
+            src={qr}
+            alt={t('qrAlt')}
+            width={240}
+            height={240}
+            className="mx-auto mt-4 rounded-lg bg-white p-2"
+          />
+        ) : null}
         {code ? (
           <p className="mt-4 text-sm">
             {t('yourCode')}{' '}

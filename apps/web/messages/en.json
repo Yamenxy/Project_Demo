@@ -255,7 +255,8 @@
       "active": "Active students",
       "managed": "Not activated yet"
     },
-    "mySchedule": "My schedule"
+    "mySchedule": "My schedule",
+    "qrAlt": "Your attendance code"
   },
   "staff": {
     "title": "Staff",
@@ -515,5 +516,26 @@
     "noStudents": "No students in this class.",
     "save": "{count, plural, =0 {Save} one {Save 1 change} other {Save # changes}}",
     "saved": "Saved."
+  },
+  "scanner": {
+    "title": "Scan attendance codes",
+    "backToList": "Attendance list",
+    "noRoster": "Open this page once while online to load the student list.",
+    "online": "Online",
+    "offline": "Offline — saving on this device",
+    "waiting": "{count, plural, =0 {nothing waiting} other {# waiting to upload}}",
+    "uploaded": "{count, plural, =0 {none uploaded yet} other {# uploaded}}",
+    "refused": "The server refused the upload. Open the attendance list for details.",
+    "startCamera": "Start camera",
+    "noCamera": "This browser can't scan codes with the camera. Type the student's code instead.",
+    "typeCode": "Student code",
+    "check": "Record",
+    "result": {
+      "ok": "Present ✓",
+      "paused": "This student's access is paused",
+      "not_in_class": "Not in this class",
+      "unknown": "Unknown code"
+    },
+    "recordAnyway": "Record anyway"
   }
 }
