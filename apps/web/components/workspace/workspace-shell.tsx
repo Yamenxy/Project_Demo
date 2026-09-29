@@ -97,6 +97,11 @@ export function WorkspaceShell({
         c.permissions.includes('enrollment.manage') ||
         c.permissions.includes('students.import'),
     },
+    {
+      href: `${base}/prices`,
+      label: t('nav.prices'),
+      visible: (c) => c.membership.role === 'owner',
+    },
     { href: `${base}/staff`, label: t('nav.staff'), visible: (c) => c.membership.role === 'owner' },
     {
       href: `${base}/billing`,

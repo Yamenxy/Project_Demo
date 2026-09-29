@@ -135,7 +135,8 @@
     "session_cancelled": "This session is cancelled.",
     "attendance_locked": "More than 48 hours have passed. Changing it needs the late-edit permission.",
     "reason_required": "Give a reason for the change.",
-    "session_has_attendance": "Attendance was taken in this session."
+    "session_has_attendance": "Attendance was taken in this session.",
+    "invalid_amount": "This amount isn't valid. Use a number with at most two decimals."
   },
   "notifications": {
     "title": "Notifications",
@@ -227,7 +228,8 @@
       "staff": "Staff",
       "billing": "Subscription",
       "classes": "Classes",
-      "schedule": "Schedule"
+      "schedule": "Schedule",
+      "prices": "Prices"
     },
     "suspended": "This workspace is temporarily unavailable. You can still see your grades and attendance.",
     "suspendedOwner": "Your workspace is paused. You can see your subscription and renew it with the platform.",
@@ -424,7 +426,7 @@
     "join": "Ask to join",
     "noAccount": "No account yet?",
     "register": "Create one",
-    "priceListSoon": "The price list will appear here soon."
+    "prices": "Prices"
   },
   "publicPage": {
     "title": "Your public page",
@@ -537,5 +539,20 @@
       "unknown": "Unknown code"
     },
     "recordAnyway": "Record anyway"
+  },
+  "prices": {
+    "title": "Price list",
+    "explain": "Shown on your public page, and used to fill in the amount when recording a payment. Changing a price doesn't change past payments.",
+    "showArchived": "Archived items",
+    "showActive": "Current items",
+    "empty": "No items.",
+    "archive": "Archive",
+    "restore": "Restore",
+    "addTitle": "New item",
+    "name": "Name",
+    "amount": "Price in pounds",
+    "amountHint": "For example 150 or 150.50",
+    "description": "Description (optional)",
+    "add": "Add"
   }
 }

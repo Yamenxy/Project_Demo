@@ -1,6 +1,8 @@
 'use client';
 
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
+import type { Locale } from '../../i18n/routing';
+import { formatMoney } from '../../lib/format';
 import { useEffect, useState } from 'react';
 import { Link, useRouter } from '../../i18n/navigation';
 import { api, ApiError } from '../../lib/api';
@@ -11,6 +13,7 @@ interface TeacherPage {
   name: string;
   bio: string | null;
   subjects: string[];
+  prices: { name: string; amountPiastres: number; currency: string; description: string | null }[];
 }
 
 interface JoinResult {
@@ -23,6 +26,7 @@ interface JoinResult {
 export function TeacherPageView({ slug }: { slug: string }) {
   const t = useTranslations('teacherPage');
   const tj = useTranslations('joinTeacher');
+  const locale = useLocale() as Locale;
   const router = useRouter();
   const [page, setPage] = useState<TeacherPage | null>(null);
   const [missing, setMissing] = useState(false);
@@ -127,7 +131,26 @@ export function TeacherPageView({ slug }: { slug: string }) {
           </>
         )}
       </section>
-      <p className="text-center text-xs text-muted">{t('priceListSoon')}</p>
+      {page.prices.length > 0 ? (
+        <section className="rounded-2xl bg-surface p-6 shadow-sm">
+          <h2 className="mb-3 font-semibold">{t('prices')}</h2>
+          <ul className="flex flex-col gap-2">
+            {page.prices.map((price) => (
+              <li key={price.name} className="flex items-start justify-between gap-3">
+                <div>
+                  <p>{price.name}</p>
+                  {price.description ? (
+                    <p className="text-sm text-muted">{price.description}</p>
+                  ) : null}
+                </div>
+                <span className="shrink-0 font-semibold">
+                  {formatMoney(price.amountPiastres, locale, price.currency)}
+                </span>
+              </li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
     </main>
   );
 }

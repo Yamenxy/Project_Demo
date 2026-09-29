@@ -9,6 +9,7 @@ import { AuditModule } from './modules/audit';
 import { ClassesModule } from './modules/classes';
 import { IdentityModule } from './modules/identity';
 import { NotifyModule } from './modules/notify';
+import { PaymentsModule } from './modules/payments';
 import { PlatformAdminModule } from './modules/platform-admin';
 import { TenancyModule } from './modules/tenancy';
 
@@ -23,6 +24,7 @@ import { TenancyModule } from './modules/tenancy';
     IdentityModule,
     TenancyModule,
     ClassesModule,
+    PaymentsModule,
     IdempotencyModule,
     PlatformAdminModule,
   ],

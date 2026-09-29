@@ -134,6 +134,13 @@
       "when": 1790710008764,
       "tag": "0018_attendance",
       "breakpoints": true
+    },
+    {
+      "idx": 19,
+      "version": "7",
+      "when": 1790710945144,
+      "tag": "0019_price_list",
+      "breakpoints": true
     }
   ]
 }

@@ -6,11 +6,19 @@ import { AuditService } from '../audit';
 import { workspaces, workspaceSettings } from './schema';
 import type { Actor } from './students.service';
 
+export interface PublicPriceItem {
+  name: string;
+  amountPiastres: number;
+  currency: string;
+  description: string | null;
+}
+
 export interface PublicTeacherPage {
   slug: string;
   name: string;
   bio: string | null;
   subjects: string[];
+  prices: PublicPriceItem[];
 }
 
 export interface PublicPageSettings {
@@ -28,8 +36,8 @@ const splitSubjects = (value: string | null): string[] =>
 
 /**
  * The public teacher page (REQ-CONTENT-003): the workspace name, a short text and subjects the
- * owner writes, and the join action. No student data, no phone numbers. The price list is added
- * with payments (Phase 4).
+ * owner writes, the price list (REQ-PAY-006) and the join action. No student data, no phone
+ * numbers.
  */
 @Injectable()
 export class PublicPageService {
@@ -40,14 +48,31 @@ export class PublicPageService {
   ) {}
 
   async page(slug: string): Promise<PublicTeacherPage> {
-    const result = await this.db.transaction((tx) =>
-      tx.execute<{ slug: string; name: string; bio: string | null; subjects: string | null }>(
+    const [result, prices] = await this.db.transaction(async (tx) => [
+      await tx.execute<{ slug: string; name: string; bio: string | null; subjects: string | null }>(
         sql`select * from app.public_teacher_page(${slug})`,
       ),
-    );
+      await tx.execute<{
+        name: string;
+        amount_piastres: string | number;
+        currency: string;
+        description: string | null;
+      }>(sql`select * from app.public_price_list(${slug})`),
+    ]);
     const row = result.rows[0];
     if (!row) throw notFound('Page not found');
-    return { slug: row.slug, name: row.name, bio: row.bio, subjects: splitSubjects(row.subjects) };
+    return {
+      slug: row.slug,
+      name: row.name,
+      bio: row.bio,
+      subjects: splitSubjects(row.subjects),
+      prices: prices.rows.map((p) => ({
+        name: p.name,
+        amountPiastres: Number(p.amount_piastres),
+        currency: p.currency,
+        description: p.description,
+      })),
+    };
   }
 
   async settings(workspaceId: string): Promise<PublicPageSettings> {

@@ -65,6 +65,7 @@ describe('public teacher page (REQ-CONTENT-003)', () => {
       name: 'مساحة تجريبية',
       bio: 'مدرس فيزياء للثانوية العامة منذ 10 سنوات.',
       subjects: ['فيزياء', 'ميكانيكا'],
+      prices: [],
     });
     const text = res.body;
     expect(text).not.toMatch(/\+20\d+/);
