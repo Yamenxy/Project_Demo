@@ -161,7 +161,10 @@
     "invalid_response": "This answer doesn't fit the question.",
     "exam_has_attempts": "Students have started this exam; it can't be changed now.",
     "invalid_window": "The exam closes before it opens.",
-    "invalid_key": "This key doesn't fit the question."
+    "invalid_key": "This key doesn't fit the question.",
+    "no_resubmission": "You can’t submit again.",
+    "homework_closed": "The due date for this homework has passed.",
+    "homework_unavailable": "This homework is not available."
   },
   "notifications": {
     "title": "Notifications",
@@ -296,7 +299,8 @@
     "myPayments": "My receipts",
     "myLessons": "My lessons",
     "myGrades": "My grades",
-    "myExams": "My exams"
+    "myExams": "My exams",
+    "myHomework": "My homework"
   },
   "staff": {
     "title": "Staff",
@@ -706,7 +710,8 @@
     "files": "Lesson files",
     "video": "Lesson video",
     "questionBank": "Question bank",
-    "exams": "Exams"
+    "exams": "Exams",
+    "homework": "Homework"
   },
   "lessons": {
     "title": "My lessons",
@@ -900,5 +905,50 @@
     "previewLine": "{attempts} attempts change, {students} students' scores change, and pass/fail changes for {passFail}.",
     "true": "True",
     "false": "False"
+  },
+  "homeworkAdmin": {
+    "title": "Homework",
+    "backToCourse": "Course",
+    "published": "Published",
+    "draft": "Draft",
+    "released": "Results released",
+    "due": "Due {at}",
+    "submissionCount": "{count, plural, =0 {no submissions} one {1 submission} other {# submissions}}",
+    "publish": "Publish",
+    "unpublish": "Unpublish",
+    "submissions": "Submissions",
+    "release": "Release results",
+    "releaseAgain": "Update released results",
+    "newTitle": "New homework",
+    "homeworkTitle": "Homework title",
+    "instructions": "Instructions",
+    "dueAt": "Due (Cairo time)",
+    "max": "Maximum score",
+    "latePolicy": "Late submissions",
+    "acceptFlagged": "Accept and flag as late",
+    "reject": "Reject",
+    "allowResubmission": "Allow one resubmission",
+    "classes": "Classes",
+    "create": "Create homework",
+    "noSubmissions": "No submissions yet.",
+    "attempt": "Submission {number}",
+    "late": "Late",
+    "score": "Score",
+    "feedback": "Feedback",
+    "saveGrade": "Save grade"
+  },
+  "homework": {
+    "title": "My homework",
+    "none": "No homework right now.",
+    "due": "Due {at}",
+    "noLate": "Late work isn’t accepted",
+    "submitted": "Submission {number} on {at}",
+    "late": "Late",
+    "score": "Score: {score} of {max}",
+    "feedback": "Teacher’s feedback: {text}",
+    "answer": "Your answer",
+    "filesAfter": "After submitting you can attach PDF files or images.",
+    "submit": "Submit",
+    "resubmit": "Resubmit"
   }
 }

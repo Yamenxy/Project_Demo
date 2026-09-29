@@ -12,6 +12,9 @@ items stay in [paid-services.md](../paid-services.md).
 | 6.4 | Answer-key corrections after attempts exist, with a regrade preview (scores and pass/fail changes) before confirming | REQ-EXAM-003 | assessment, web |
 | 6.5 | Homework: submissions with files for enrolled, unpaused students; late policy (reject, or accept with a flag); at most one resubmission; grading into the gradebook | REQ-HW-001, REQ-HW-002 | assessment, files, grading, web |
 
+**Status (2026-09-30):** tasks 6.1 to 6.5 are done on branch `phase-6/assessments`. Not done:
+the REQ-EXAM-005 load test, which needs real hardware.
+
 Performance targets of REQ-EXAM-005 are measured with a load test once the demo runs on real
 hardware; this phase keeps start and autosave to a few indexed queries.
 

@@ -7,12 +7,18 @@ import { CurrentWorkspace, type WorkspaceContext } from '../tenancy';
 import { FilesService, type FileView, type OwnerType } from './files.service';
 
 const uuidParam = new ZodPipe(z.uuid());
-const ownerParam = new ZodPipe(z.enum(['lessons', 'payment-requests']));
+const ownerParam = new ZodPipe(z.enum(['lessons', 'payment-requests', 'homework-submissions']));
 const nameQuery = z.object({ name: z.string().trim().min(1).max(200).default('file') });
 const ALL_ROLES = ['owner', 'class_teacher', 'assistant', 'student'] as const;
 
-const ownerType = (segment: 'lessons' | 'payment-requests'): OwnerType =>
-  segment === 'lessons' ? 'lesson' : 'payment_request';
+type OwnerSegment = 'lessons' | 'payment-requests' | 'homework-submissions';
+
+const OWNER_TYPES: Record<OwnerSegment, OwnerType> = {
+  lessons: 'lesson',
+  'payment-requests': 'payment_request',
+  'homework-submissions': 'homework_submission',
+};
+const ownerType = (segment: OwnerSegment): OwnerType => OWNER_TYPES[segment];
 
 /**
  * Files of lessons and payment requests (REQ-FILE-001, REQ-PAY-010). Each route checks the
@@ -29,7 +35,7 @@ export class FilesController {
   upload(
     @CurrentWorkspace() ctx: WorkspaceContext,
     @CurrentSession() session: SessionContext,
-    @Param('owner', ownerParam) owner: 'lessons' | 'payment-requests',
+    @Param('owner', ownerParam) owner: OwnerSegment,
     @Param('ownerId', uuidParam) ownerId: string,
     @Query(new ZodPipe(nameQuery)) query: z.infer<typeof nameQuery>,
     @Body() body: unknown,
@@ -47,7 +53,7 @@ export class FilesController {
   @WorkspaceRoles([...ALL_ROLES])
   async list(
     @CurrentWorkspace() ctx: WorkspaceContext,
-    @Param('owner', ownerParam) owner: 'lessons' | 'payment-requests',
+    @Param('owner', ownerParam) owner: OwnerSegment,
     @Param('ownerId', uuidParam) ownerId: string,
   ): Promise<{ files: FileView[] }> {
     return { files: await this.filesService.list(ctx, { type: ownerType(owner), id: ownerId }) };

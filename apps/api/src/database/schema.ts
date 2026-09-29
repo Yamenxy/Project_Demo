@@ -9,6 +9,9 @@ export {
   examItems,
   exams,
   examTargets,
+  homework,
+  homeworkSubmissions,
+  homeworkTargets,
   questions,
   questionVersions,
 } from '../modules/assessment/schema';

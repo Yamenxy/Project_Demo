@@ -137,3 +137,48 @@ export const examAnswers = pgTable(
   },
   (t) => [primaryKey({ columns: [t.attemptId, t.position] })],
 );
+
+/** Mirrors drizzle/0030_homework.sql. */
+export const homework = pgTable('homework', {
+  workspaceId: uuid('workspace_id').notNull(),
+  id: uuid('id').primaryKey(),
+  courseId: uuid('course_id').notNull(),
+  title: text('title').notNull(),
+  instructions: text('instructions'),
+  dueAt: tstz('due_at').notNull(),
+  latePolicy: text('late_policy', { enum: ['reject', 'accept_flagged'] })
+    .notNull()
+    .default('accept_flagged'),
+  allowResubmission: boolean('allow_resubmission').notNull().default(false),
+  maxScoreCenti: integer('max_score_centi').notNull(),
+  publishedAt: tstz('published_at'),
+  resultsReleasedAt: tstz('results_released_at'),
+  createdBy: uuid('created_by').notNull(),
+  createdAt: tstz('created_at').notNull(),
+  updatedAt: tstz('updated_at').notNull(),
+});
+
+export const homeworkTargets = pgTable(
+  'homework_targets',
+  {
+    workspaceId: uuid('workspace_id').notNull(),
+    homeworkId: uuid('homework_id').notNull(),
+    classId: uuid('class_id').notNull(),
+  },
+  (t) => [primaryKey({ columns: [t.homeworkId, t.classId] })],
+);
+
+export const homeworkSubmissions = pgTable('homework_submissions', {
+  workspaceId: uuid('workspace_id').notNull(),
+  id: uuid('id').primaryKey(),
+  homeworkId: uuid('homework_id').notNull(),
+  membershipId: uuid('membership_id').notNull(),
+  number: integer('number').notNull(),
+  text: text('text'),
+  submittedAt: tstz('submitted_at').notNull(),
+  late: boolean('late').notNull(),
+  scoreCenti: integer('score_centi'),
+  feedback: text('feedback'),
+  gradedBy: uuid('graded_by'),
+  gradedAt: tstz('graded_at'),
+});

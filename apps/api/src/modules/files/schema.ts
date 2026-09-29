@@ -6,7 +6,9 @@ const tstz = (name: string) => timestamp(name, { withTimezone: true });
 export const files = pgTable('files', {
   workspaceId: uuid('workspace_id').notNull(),
   id: uuid('id').primaryKey(),
-  ownerType: text('owner_type', { enum: ['lesson', 'payment_request'] }).notNull(),
+  ownerType: text('owner_type', {
+    enum: ['lesson', 'payment_request', 'homework_submission'],
+  }).notNull(),
   ownerId: uuid('owner_id').notNull(),
   name: text('name').notNull(),
   contentType: text('content_type').notNull(),

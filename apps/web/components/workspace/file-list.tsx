@@ -28,7 +28,7 @@ export function FileList({
   accept,
 }: {
   base: string;
-  owner: 'lessons' | 'payment-requests';
+  owner: 'lessons' | 'payment-requests' | 'homework-submissions';
   ownerId: string;
   canUpload: boolean;
   accept: string;

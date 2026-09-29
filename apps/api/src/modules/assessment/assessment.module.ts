@@ -5,14 +5,16 @@ import { GradingModule } from '../grading';
 import { AttemptsService } from './attempts.service';
 import { ExamsController } from './exams.controller';
 import { ExamsService } from './exams.service';
+import { HomeworkController } from './homework.controller';
+import { HomeworkService } from './homework.service';
 import { QuestionsController } from './questions.controller';
 import { QuestionsService } from './questions.service';
 import { RegradeService } from './regrade.service';
 
 @Module({
   imports: [ContentModule, GradingModule],
-  controllers: [QuestionsController, ExamsController],
-  providers: [QuestionsService, ExamsService, AttemptsService, RegradeService],
+  controllers: [QuestionsController, ExamsController, HomeworkController],
+  providers: [QuestionsService, ExamsService, AttemptsService, RegradeService, HomeworkService],
   exports: [QuestionsService, ExamsService, AttemptsService],
 })
 export class AssessmentModule implements OnModuleInit {

@@ -161,7 +161,10 @@
     "invalid_response": "هذه الإجابة لا تناسب السؤال.",
     "exam_has_attempts": "بدأ طلاب الامتحان، لا يمكن تعديله الآن.",
     "invalid_window": "موعد الإغلاق قبل موعد الفتح.",
-    "invalid_key": "الإجابة النموذجية لا تناسب السؤال."
+    "invalid_key": "الإجابة النموذجية لا تناسب السؤال.",
+    "no_resubmission": "لا يمكنك التسليم مرة أخرى.",
+    "homework_closed": "انتهى موعد تسليم هذا الواجب.",
+    "homework_unavailable": "هذا الواجب غير متاح."
   },
   "notifications": {
     "title": "الإشعارات",
@@ -296,7 +299,8 @@
     "myPayments": "إيصالاتي",
     "myLessons": "دروسي",
     "myGrades": "درجاتي",
-    "myExams": "امتحاناتي"
+    "myExams": "امتحاناتي",
+    "myHomework": "واجباتي"
   },
   "staff": {
     "title": "الفريق",
@@ -706,7 +710,8 @@
     "files": "ملفات الدرس",
     "video": "فيديو الدرس",
     "questionBank": "بنك الأسئلة",
-    "exams": "الامتحانات"
+    "exams": "الامتحانات",
+    "homework": "الواجبات"
   },
   "lessons": {
     "title": "دروسي",
@@ -900,5 +905,50 @@
     "previewLine": "سيتغير {attempts} محاولة، ودرجات {students} طالب، ونتيجة النجاح لـ {passFail} طالب.",
     "true": "صح",
     "false": "خطأ"
+  },
+  "homeworkAdmin": {
+    "title": "الواجبات",
+    "backToCourse": "المقرر",
+    "published": "منشور",
+    "draft": "مسودة",
+    "released": "النتائج معلنة",
+    "due": "التسليم حتى {at}",
+    "submissionCount": "{count, plural, =0 {لا تسليمات} one {تسليم واحد} two {تسليمان} few {# تسليمات} many {# تسليمًا} other {# تسليم}}",
+    "publish": "نشر",
+    "unpublish": "إلغاء النشر",
+    "submissions": "التسليمات",
+    "release": "إعلان النتائج",
+    "releaseAgain": "تحديث النتائج المعلنة",
+    "newTitle": "واجب جديد",
+    "homeworkTitle": "عنوان الواجب",
+    "instructions": "التعليمات",
+    "dueAt": "موعد التسليم (بتوقيت القاهرة)",
+    "max": "الدرجة العظمى",
+    "latePolicy": "التسليم المتأخر",
+    "acceptFlagged": "يُقبل مع علامة تأخير",
+    "reject": "يُرفض",
+    "allowResubmission": "السماح بإعادة التسليم مرة واحدة",
+    "classes": "الفصول",
+    "create": "إنشاء الواجب",
+    "noSubmissions": "لا توجد تسليمات بعد.",
+    "attempt": "التسليم {number}",
+    "late": "متأخر",
+    "score": "الدرجة",
+    "feedback": "ملاحظات",
+    "saveGrade": "حفظ الدرجة"
+  },
+  "homework": {
+    "title": "واجباتي",
+    "none": "لا توجد واجبات الآن.",
+    "due": "التسليم حتى {at}",
+    "noLate": "لا يُقبل التسليم المتأخر",
+    "submitted": "التسليم {number} في {at}",
+    "late": "متأخر",
+    "score": "الدرجة: {score} من {max}",
+    "feedback": "ملاحظات المعلم: {text}",
+    "answer": "إجابتك",
+    "filesAfter": "بعد التسليم يمكنك إرفاق ملفات PDF أو صور.",
+    "submit": "تسليم",
+    "resubmit": "إعادة التسليم"
   }
 }

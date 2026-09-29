@@ -20,7 +20,7 @@ interface ExamSummary {
 }
 
 /** "2026-10-01T10:00" in Cairo, from a datetime-local input, to an ISO instant. */
-function cairoLocalToIso(local: string): string {
+export function cairoLocalToIso(local: string): string {
   // Cairo is UTC+2 or UTC+3; ask the browser for the offset at that moment in Cairo.
   const guess = new Date(`${local}:00Z`);
   const cairo = new Date(guess.toLocaleString('en-US', { timeZone: 'Africa/Cairo' }));

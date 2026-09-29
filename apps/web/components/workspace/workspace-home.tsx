@@ -94,6 +94,12 @@ function StudentHome() {
         {t('myExams')}
       </Link>
       <Link
+        href={`/w/${workspace.id}/homework`}
+        className="rounded-2xl bg-surface p-4 text-center font-semibold shadow-sm"
+      >
+        {t('myHomework')}
+      </Link>
+      <Link
         href={`/w/${workspace.id}/grades`}
         className="rounded-2xl bg-surface p-4 text-center font-semibold shadow-sm"
       >

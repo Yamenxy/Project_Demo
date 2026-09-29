@@ -37,6 +37,8 @@ const victim = {
   questionId: '',
   examId: '',
   attemptId: '',
+  homeworkId: '',
+  submissionId: '',
 };
 const attacker = { workspaceId: '', token: '', studentToken: '' };
 
@@ -79,6 +81,15 @@ const SAMPLE_BODIES: Record<string, object> = {
     response: { value: true },
     seq: 1,
   },
+  'POST /api/v1/w/:workspaceId/courses/:courseId/homework': {
+    title: 'واجب',
+    dueAt: '2026-10-02T21:00:00Z',
+    maxScore: 10,
+    classIds: [randomUUID()],
+  },
+  'POST /api/v1/w/:workspaceId/homework/:homeworkId/publish': { published: true },
+  'POST /api/v1/w/:workspaceId/my/homework/:homeworkId/submissions': { text: 'حل' },
+  'POST /api/v1/w/:workspaceId/homework-submissions/:submissionId/grade': { score: 5 },
   'POST /api/v1/w/:workspaceId/courses/:courseId/questions': {
     kind: 'true_false',
     body: 'سؤال',
@@ -139,6 +150,8 @@ function victimParams(): Record<string, string> {
     questionId: victim.questionId,
     examId: victim.examId,
     attemptId: victim.attemptId,
+    homeworkId: victim.homeworkId,
+    submissionId: victim.submissionId,
     position: '0',
     fileId: victim.fileId,
     videoId: victim.videoId,
@@ -240,6 +253,20 @@ beforeAll(async () => {
                                 deadline_at, layout, max_centi)
      values ($1, $2, $3, $4, 1, now(), now() + interval '30 minutes', '[]', 100)`,
     [victim.workspaceId, victim.attemptId, victim.examId, victim.membershipId],
+  );
+  victim.homeworkId = randomUUID();
+  await adminQuery(
+    `insert into homework (workspace_id, id, course_id, title, due_at, max_score_centi, published_at,
+                           created_by, created_at, updated_at)
+     values ($1, $2, $3, 'واجب الضحية', now() + interval '1 day', 1000, now(), $4, now(), now())`,
+    [victim.workspaceId, victim.homeworkId, victim.courseId, victimOwner],
+  );
+  victim.submissionId = randomUUID();
+  await adminQuery(
+    `insert into homework_submissions (workspace_id, id, homework_id, membership_id, number,
+                                       submitted_at, late)
+     values ($1, $2, $3, $4, 1, now(), false)`,
+    [victim.workspaceId, victim.submissionId, victim.homeworkId, victim.membershipId],
   );
   victim.seriesId = randomUUID();
   await adminQuery(

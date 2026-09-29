@@ -17,7 +17,7 @@ export interface Actor {
   requestId?: string;
 }
 
-export type OwnerType = 'lesson' | 'payment_request';
+export type OwnerType = 'lesson' | 'payment_request' | 'homework_submission';
 
 export interface FileView {
   id: string;
@@ -31,6 +31,7 @@ export interface FileView {
 const ALLOWED: Record<OwnerType, ReadonlySet<KnownType>> = {
   lesson: new Set(['application/pdf', 'image/png', 'image/jpeg', 'image/webp']),
   payment_request: new Set(['image/png', 'image/jpeg', 'image/webp']),
+  homework_submission: new Set(['application/pdf', 'image/png', 'image/jpeg', 'image/webp']),
 };
 
 const keyOf = (area: 'quarantine' | 'available', workspaceId: string, fileId: string) =>
@@ -202,6 +203,14 @@ export class FilesService {
       await this.staffLesson(tx, ctx, owner.id);
       return;
     }
+    if (owner.type === 'homework_submission') {
+      // Files go on the student's own submission, until it's graded.
+      const own = await tx.execute<{ id: string }>(sql`
+        select id from homework_submissions
+         where id = ${owner.id} and membership_id = ${ctx.membershipId} and score_centi is null`);
+      if (ctx.role !== 'student' || own.rows.length === 0) throw notFound('Submission not found');
+      return;
+    }
     // A proof goes on the student's own pending request.
     const found = await tx.execute<{ id: string }>(sql`
       select id from payment_requests
@@ -220,6 +229,28 @@ export class FilesService {
         return;
       }
       await this.staffLesson(tx, ctx, owner.id);
+      return;
+    }
+    if (owner.type === 'homework_submission') {
+      if (ctx.role === 'student') {
+        const own = await tx.execute<{ id: string }>(sql`
+          select id from homework_submissions
+           where id = ${owner.id} and membership_id = ${ctx.membershipId}`);
+        if (own.rows.length === 0) throw notFound('File not found');
+        return;
+      }
+      // Staff who grade the student (REQ-HW-002).
+      if (!ctx.permissions.has('grading.grade')) throw notFound('File not found');
+      const [row] = await tx
+        .select({ id: memberships.id })
+        .from(memberships)
+        .where(
+          and(
+            sql`${memberships.id} = (select membership_id from homework_submissions where id = ${owner.id})`,
+            studentScope(ctx, 'grading.grade'),
+          ),
+        );
+      if (!row) throw notFound('File not found');
       return;
     }
     if (ctx.role === 'student') {
