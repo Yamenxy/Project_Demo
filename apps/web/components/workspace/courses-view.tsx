@@ -5,6 +5,7 @@ import { useCallback, useEffect, useState, type FormEvent } from 'react';
 import { Link } from '../../i18n/navigation';
 import { api } from '../../lib/api';
 import { ErrorMessage, Field, SubmitButton } from '../form';
+import { FileList } from './file-list';
 import { useWorkspace } from './workspace-shell';
 
 export interface CourseSummary {
@@ -189,6 +190,16 @@ export function CourseView({ courseId }: { courseId: string }) {
                   />
                 </div>
                 <SubmitButton busy={busy}>{t('save')}</SubmitButton>
+                <div className="mt-4">
+                  <p className="mb-1 text-sm font-semibold">{t('files')}</p>
+                  <FileList
+                    base={base}
+                    owner="lessons"
+                    ownerId={lesson.id}
+                    canUpload
+                    accept="application/pdf,image/png,image/jpeg,image/webp"
+                  />
+                </div>
               </form>
             ) : (
               <div className="flex flex-wrap items-center justify-between gap-2">

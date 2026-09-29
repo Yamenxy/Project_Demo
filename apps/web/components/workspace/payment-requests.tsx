@@ -7,6 +7,7 @@ import { api, ApiError } from '../../lib/api';
 import { Ltr } from '../../lib/bidi';
 import { formatMoney, parseMoney } from '../../lib/format';
 import { ErrorMessage, SubmitButton } from '../form';
+import { FileList } from './file-list';
 
 export interface PaymentRequest {
   id: string;
@@ -166,6 +167,15 @@ export function MyPaymentRequests({ base, onChange }: { base: string; onChange?:
                 {tp(`methods.${r.method}`)} · <Ltr>{r.reference}</Ltr>
               </p>
               {r.rejectReason ? <p className="text-red-700">{r.rejectReason}</p> : null}
+              <div className="mt-2">
+                <FileList
+                  base={base}
+                  owner="payment-requests"
+                  ownerId={r.id}
+                  canUpload={r.status === 'pending'}
+                  accept="image/png,image/jpeg,image/webp"
+                />
+              </div>
               {r.status === 'pending' ? (
                 <button
                   type="button"
@@ -257,6 +267,13 @@ export function PendingRequests({ base, onDecided }: { base: string; onDecided: 
               {tp(`methods.${r.method}`)} · <Ltr>{r.reference}</Ltr>
               {r.note ? ` · ${r.note}` : ''}
             </p>
+            <FileList
+              base={base}
+              owner="payment-requests"
+              ownerId={r.id}
+              canUpload={false}
+              accept=""
+            />
             {r.duplicateReference ? (
               <p className="mt-1 rounded bg-amber-50 px-2 py-1 text-amber-900">{t('duplicate')}</p>
             ) : null}

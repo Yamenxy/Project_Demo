@@ -29,6 +29,12 @@ export const QUEUES = {
     retryBackoff: true,
     deadLetter: FAILED_JOBS_QUEUE,
   },
+  'files.scan': {
+    retryLimit: 3,
+    retryDelay: 30,
+    retryBackoff: true,
+    deadLetter: FAILED_JOBS_QUEUE,
+  },
   'maintenance.idempotency_purge': {
     retryLimit: 3,
     retryDelay: 60,

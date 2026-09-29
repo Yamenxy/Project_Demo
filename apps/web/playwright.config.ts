@@ -43,6 +43,7 @@ export default defineConfig({
         WEB_ORIGINS: 'http://localhost:3100',
         OTP_PROVIDER: 'file',
         OTP_OUTBOX_FILE: OTP_OUTBOX,
+        STORAGE_DIR: path.resolve(__dirname, 'test-results', 'storage'),
         // Test-only key, for this throwaway local run.
         SECRET_ENCRYPTION_KEY: 'ZTJlLW9ubHkta2V5LWZvci1sb2NhbC1icm93c2VyLXQ=',
       },

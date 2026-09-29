@@ -12,3 +12,6 @@ coverage/
 apps/web/next-env.d.ts
 test-results/
 playwright-report/
+
+# Uploaded files on the free setup (STORAGE_DIR)
+apps/api/var/

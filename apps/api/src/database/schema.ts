@@ -18,6 +18,7 @@ export {
   lessonRules,
   lessons,
 } from '../modules/content/schema';
+export { files } from '../modules/files/schema';
 export { notifications } from '../modules/notify/schema';
 export {
   cashHandovers,

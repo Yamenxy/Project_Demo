@@ -23,6 +23,9 @@ export interface HttpOptions {
 }
 
 /** Shared HTTP setup for main.ts and tests. */
+/** The largest upload accepted (REQ-FILE-001). */
+export const UPLOAD_LIMIT_BYTES = 20 * 1024 * 1024;
+
 export async function configureHttp(
   app: NestFastifyApplication,
   options: HttpOptions,
@@ -31,6 +34,14 @@ export async function configureHttp(
   await app.register(fastifyCookie);
   const allowed = new Set(options.allowedOrigins);
   const fastify = app.getHttpAdapter().getInstance();
+
+  // File uploads send raw bytes (REQ-FILE-001). Not a CORS-simple type, so another site can't
+  // send one without a preflight; the Origin check below still applies.
+  fastify.addContentTypeParser(
+    'application/octet-stream',
+    { parseAs: 'buffer', bodyLimit: UPLOAD_LIMIT_BYTES },
+    (_request, body, done) => done(null, body),
+  );
 
   fastify.addHook('onRequest', (request, reply, done) => {
     void reply.header(REQUEST_ID_HEADER, request.id);

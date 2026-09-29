@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react';
 import { Link } from '../../i18n/navigation';
 import { api, ApiError } from '../../lib/api';
 import { ErrorMessage } from '../form';
+import { FileList } from './file-list';
 import { useWorkspace } from './workspace-shell';
 
 export interface StudentLesson {
@@ -115,6 +116,13 @@ export function LessonView({ lessonId }: { lessonId: string }) {
           {lesson.body}
         </div>
       ) : null}
+      <FileList
+        base={`/w/${workspace.id}`}
+        owner="lessons"
+        ownerId={lessonId}
+        canUpload={false}
+        accept=""
+      />
     </article>
   );
 }

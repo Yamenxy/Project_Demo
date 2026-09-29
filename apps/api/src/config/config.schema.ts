@@ -31,6 +31,9 @@ const envSchema = z
     // 32 random bytes, base64. Encrypts secrets at rest (TOTP). Each environment has its own.
     // Email for teachers and owners. 'smtp' covers Mailpit locally and any SMTP relay.
     EMAIL_PROVIDER: z.enum(['none', 'smtp']).default('none'),
+    // Uploaded files (REQ-FILE-001). Only local disk exists for the free setup (OD-09).
+    STORAGE_PROVIDER: z.enum(['local']).default('local'),
+    STORAGE_DIR: z.string().min(1).default('var/storage'),
     SMTP_URL: z.url({ protocol: /^smtps?$/ }).optional(),
     EMAIL_FROM: z.string().min(3).default('LMS <no-reply@localhost>'),
     SECRET_ENCRYPTION_KEY: z
@@ -108,6 +111,7 @@ export interface AppConfig {
   /** Platform role (app_platform): the restricted cross-workspace handle. */
   databasePlatformUrl: string;
   databasePoolMax: number;
+  storage: { provider: 'local'; dir: string };
 }
 
 export class ConfigError extends Error {
@@ -149,5 +153,6 @@ export function loadConfig(env: Record<string, string | undefined>): AppConfig {
     databaseUrl: e.DATABASE_URL,
     databasePlatformUrl: e.DATABASE_PLATFORM_URL,
     databasePoolMax: e.DATABASE_POOL_MAX,
+    storage: { provider: e.STORAGE_PROVIDER, dir: e.STORAGE_DIR },
   };
 }

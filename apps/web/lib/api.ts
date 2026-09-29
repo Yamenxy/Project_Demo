@@ -38,6 +38,27 @@ export async function api<T>(
   return payload as T;
 }
 
+/** Sends a file's raw bytes (REQ-FILE-001). */
+export async function uploadFile<T>(path: string, file: Blob): Promise<T> {
+  let response: Response;
+  try {
+    response = await fetch(`/api/v1${path}`, {
+      method: 'POST',
+      credentials: 'same-origin',
+      headers: { 'content-type': 'application/octet-stream' },
+      body: file,
+    });
+  } catch {
+    throw new ApiError(0, 'network_error');
+  }
+  const payload: unknown = await response.json().catch(() => null);
+  if (!response.ok) {
+    const error = (payload as { error?: { code?: string; details?: unknown } } | null)?.error;
+    throw new ApiError(response.status, error?.code ?? 'generic', error?.details);
+  }
+  return payload as T;
+}
+
 export interface UserSummary {
   id: string;
   nameAr: string;

@@ -32,6 +32,7 @@ const victim = {
   courseId: '',
   lessonId: '',
   groupId: '',
+  fileId: '',
 };
 const attacker = { workspaceId: '', token: '', studentToken: '' };
 
@@ -89,6 +90,9 @@ function victimParams(): Record<string, string> {
     courseId: victim.courseId,
     lessonId: victim.lessonId,
     groupId: victim.groupId,
+    fileId: victim.fileId,
+    owner: 'lessons',
+    ownerId: victim.lessonId,
     permission: 'attendance.mark',
   };
 }
@@ -150,6 +154,14 @@ beforeAll(async () => {
     `insert into access_groups (workspace_id, id, name, created_at, updated_at)
      values ($1, $2, 'مجموعة الضحية', now(), now())`,
     [victim.workspaceId, victim.groupId],
+  );
+  victim.fileId = randomUUID();
+  await adminQuery(
+    `insert into files (workspace_id, id, owner_type, owner_id, name, content_type, size_bytes,
+                        sha256, status, uploaded_by, created_at)
+     values ($1, $2, 'lesson', $3, 'x.pdf', 'application/pdf', 10, repeat('a', 64), 'available',
+             $4, now())`,
+    [victim.workspaceId, victim.fileId, victim.lessonId, victimOwner],
   );
   victim.seriesId = randomUUID();
   await adminQuery(

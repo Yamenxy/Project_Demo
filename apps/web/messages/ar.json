@@ -146,7 +146,9 @@
     "same_course_enrolled": "الطالب في فصل آخر لنفس المقرر.",
     "restore_window_over": "مر أكثر من 30 يومًا على الحذف.",
     "no_access": "هذا الدرس غير متاح لك.",
-    "confirmation_mismatch": "الاسم المكتوب لا يطابق اسم الطالب."
+    "confirmation_mismatch": "الاسم المكتوب لا يطابق اسم الطالب.",
+    "file_too_large": "الملف أكبر من 20 ميجابايت.",
+    "unsupported_media_type": "تعذر رفع الملف."
   },
   "notifications": {
     "title": "الإشعارات",
@@ -684,7 +686,8 @@
     "delete": "حذف",
     "confirmDelete": "حذف الدرس “{title}”؟ يمكن استعادته خلال 30 يومًا.",
     "addLesson": "درس جديد",
-    "add": "إضافة"
+    "add": "إضافة",
+    "files": "ملفات الدرس"
   },
   "lessons": {
     "title": "دروسي",
@@ -732,5 +735,14 @@
     "ruleBlock": "غلق لهذا الطالب",
     "removeAll": "إخراج من كل المجموعات والأذونات",
     "removeAllPrompt": "اكتب اسم الطالب كما هو للتأكيد. ستبقى أقفال الدروس الفردية."
+  },
+  "files": {
+    "upload": "إرفاق ملف",
+    "uploading": "جارٍ الرفع…",
+    "status": {
+      "quarantine": "قيد الفحص",
+      "available": "متاح",
+      "rejected": "مرفوض: نوع غير مسموح"
+    }
   }
 }

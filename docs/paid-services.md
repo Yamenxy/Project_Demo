@@ -12,6 +12,7 @@ The current goal is a **sales demo** that runs entirely on free services. This f
 | **Domain name** | About $10 a year | The hosting provider's subdomains | DNS and configuration | OQ-20 |
 | **External penetration test** | A freelance tester before general launch | The automated cross-tenant suite and the security checks in CI | Book the test before real data | REQ-SEC-002 |
 | **Legal and accounting advice** | Lawyer and accountant | Deferred (OD-08) | See open-questions.md | OQ-11 to OQ-16 |
+| **File storage and a separate file origin** | S3-compatible object storage (Cloudflare R2) and a cookieless file domain (for example `files.<domain>`) | `STORAGE_PROVIDER=local` (files on the API server's disk under `STORAGE_DIR`), served by the API with `nosniff`, a sandbox policy and `attachment` for non-images | Write an S3 `FileStorage` adapter; buy the domain and serve files there; move the scan job's image re-encoding in with an image library (a new dependency) | REQ-FILE-001 |
 
 ## Rules while the product is a demo
 
