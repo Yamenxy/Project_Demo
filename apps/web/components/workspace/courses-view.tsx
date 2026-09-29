@@ -170,6 +170,11 @@ export function CourseView({ courseId }: { courseId: string }) {
           {t('back')}
         </Link>
         <h1 className="mt-2 text-xl font-semibold">{course.title}</h1>
+        {isOwner || permissions.includes('assessment.edit') ? (
+          <Link href={`${base}/courses/${courseId}/questions`} className="text-sm underline">
+            {t('questionBank')}
+          </Link>
+        ) : null}
       </div>
       <ErrorMessage error={error} />
       <ol className="flex flex-col gap-2">

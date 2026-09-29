@@ -152,7 +152,8 @@
     "view_limit_reached": "استهلكت حد المشاهدة لهذا الفيديو.",
     "invalid_playback_token": "انتهت صلاحية التشغيل. أعد تحميل الصفحة.",
     "score_out_of_range": "درجة خارج المدى المسموح.",
-    "invalid_score": "الدرجة غير صحيحة."
+    "invalid_score": "الدرجة غير صحيحة.",
+    "invalid_correct_choice": "اختر رقم الاختيار الصحيح من القائمة."
   },
   "notifications": {
     "title": "الإشعارات",
@@ -694,7 +695,8 @@
     "addLesson": "درس جديد",
     "add": "إضافة",
     "files": "ملفات الدرس",
-    "video": "فيديو الدرس"
+    "video": "فيديو الدرس",
+    "questionBank": "بنك الأسئلة"
   },
   "lessons": {
     "title": "دروسي",
@@ -794,5 +796,30 @@
     "average": "المتوسط {value}٪",
     "absent": "غائب",
     "scoreOf": "{score} / {max}"
+  },
+  "questions": {
+    "title": "بنك الأسئلة",
+    "backToCourse": "المقرر",
+    "empty": "لا توجد أسئلة بعد.",
+    "meta": "سؤال {number} · {kind} · {points} درجة · إصدار {version}",
+    "kinds": {
+      "mcq": "اختيار من متعدد",
+      "true_false": "صح أو خطأ",
+      "short": "إجابة قصيرة"
+    },
+    "true": "صح",
+    "false": "خطأ",
+    "newTitle": "سؤال جديد",
+    "kind": "النوع",
+    "body": "نص السؤال",
+    "mathHint": "اكتب المعادلات بين علامتي $ مثل: $x^2 + 1$",
+    "preview": "معاينة",
+    "choices": "الاختيارات (كل اختيار في سطر)",
+    "correct": "رقم الاختيار الصحيح:",
+    "answer": "الإجابة:",
+    "accepted": "الإجابات المقبولة (كل إجابة في سطر)",
+    "variants": "اعتبر أ/إ/آ و ة/ه و ى/ي متساوية",
+    "points": "الدرجة:",
+    "add": "إضافة السؤال"
   }
 }

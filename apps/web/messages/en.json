@@ -152,7 +152,8 @@
     "view_limit_reached": "You've used the view limit for this video.",
     "invalid_playback_token": "Playback expired. Reload the page.",
     "score_out_of_range": "A score is outside the allowed range.",
-    "invalid_score": "This score isn't valid."
+    "invalid_score": "This score isn't valid.",
+    "invalid_correct_choice": "Choose the number of the correct choice from the list."
   },
   "notifications": {
     "title": "Notifications",
@@ -694,7 +695,8 @@
     "addLesson": "New lesson",
     "add": "Add",
     "files": "Lesson files",
-    "video": "Lesson video"
+    "video": "Lesson video",
+    "questionBank": "Question bank"
   },
   "lessons": {
     "title": "My lessons",
@@ -794,5 +796,30 @@
     "average": "average {value}%",
     "absent": "Absent",
     "scoreOf": "{score} / {max}"
+  },
+  "questions": {
+    "title": "Question bank",
+    "backToCourse": "Course",
+    "empty": "No questions yet.",
+    "meta": "Question {number} · {kind} · {points} points · version {version}",
+    "kinds": {
+      "mcq": "Multiple choice",
+      "true_false": "True or false",
+      "short": "Short answer"
+    },
+    "true": "True",
+    "false": "False",
+    "newTitle": "New question",
+    "kind": "Type",
+    "body": "Question text",
+    "mathHint": "Write maths between $ signs, for example: $x^2 + 1$",
+    "preview": "Preview",
+    "choices": "Choices (one per line)",
+    "correct": "Number of the correct choice:",
+    "answer": "Answer:",
+    "accepted": "Accepted answers (one per line)",
+    "variants": "Treat Arabic letter variants (أ/إ/آ, ة/ه, ى/ي) as equal",
+    "points": "Points:",
+    "add": "Add question"
   }
 }

@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react';
 import { Link } from '../../i18n/navigation';
 import { api, ApiError } from '../../lib/api';
 import { ErrorMessage } from '../form';
+import { MathText } from '../math-text';
 import { FileList } from './file-list';
 import { VideoPlayer } from './video-player';
 import { useWorkspace } from './workspace-shell';
@@ -123,7 +124,7 @@ export function LessonView({ lessonId }: { lessonId: string }) {
       <VideoPlayer base={`/w/${workspace.id}`} lessonId={lessonId} watermark={watermark} />
       {lesson.body ? (
         <div className="whitespace-pre-line rounded-2xl bg-surface p-5 leading-relaxed shadow-sm">
-          {lesson.body}
+          <MathText text={lesson.body} />
         </div>
       ) : null}
       <FileList

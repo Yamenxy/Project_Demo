@@ -34,6 +34,7 @@ const victim = {
   groupId: '',
   fileId: '',
   videoId: '',
+  questionId: '',
 };
 const attacker = { workspaceId: '', token: '', studentToken: '' };
 
@@ -52,6 +53,16 @@ const SAMPLE_BODIES: Record<string, object> = {
   'POST /api/v1/w/:workspaceId/courses/:courseId': { title: 'تغيير' },
   'POST /api/v1/w/:workspaceId/courses/:courseId/lessons': { title: 'درس' },
   'POST /api/v1/w/:workspaceId/lessons/:lessonId': { title: 'تغيير' },
+  'POST /api/v1/w/:workspaceId/courses/:courseId/questions': {
+    kind: 'true_false',
+    body: 'سؤال',
+    value: true,
+  },
+  'POST /api/v1/w/:workspaceId/questions/:questionId': {
+    kind: 'true_false',
+    body: 'سؤال',
+    value: true,
+  },
   'POST /api/v1/w/:workspaceId/access-groups/:groupId': { name: 'تغيير' },
   'POST /api/v1/w/:workspaceId/access-groups/:groupId/lessons': { add: [randomUUID()] },
   'POST /api/v1/w/:workspaceId/access-groups/:groupId/members': { add: [randomUUID()] },
@@ -99,6 +110,7 @@ function victimParams(): Record<string, string> {
     courseId: victim.courseId,
     lessonId: victim.lessonId,
     groupId: victim.groupId,
+    questionId: victim.questionId,
     fileId: victim.fileId,
     videoId: victim.videoId,
     file: 'master.m3u8',
@@ -179,6 +191,12 @@ beforeAll(async () => {
     `insert into lesson_videos (workspace_id, id, lesson_id, status, uploaded_by, created_at, updated_at)
      values ($1, $2, $3, 'ready', $4, now(), now())`,
     [victim.workspaceId, victim.videoId, victim.lessonId, victimOwner],
+  );
+  victim.questionId = randomUUID();
+  await adminQuery(
+    `insert into questions (workspace_id, id, course_id, current_version, created_at, updated_at)
+     values ($1, $2, $3, 1, now(), now())`,
+    [victim.workspaceId, victim.questionId, victim.courseId],
   );
   victim.seriesId = randomUUID();
   await adminQuery(
