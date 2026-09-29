@@ -160,7 +160,8 @@
     "attempt_closed": "The attempt's time is over.",
     "invalid_response": "This answer doesn't fit the question.",
     "exam_has_attempts": "Students have started this exam; it can't be changed now.",
-    "invalid_window": "The exam closes before it opens."
+    "invalid_window": "The exam closes before it opens.",
+    "invalid_key": "This key doesn't fit the question."
   },
   "notifications": {
     "title": "Notifications",
@@ -892,6 +893,12 @@
     "extraTime": "Extra time",
     "extraPrompt": "Extra minutes for {name} (leave empty to remove):",
     "points": "{points} points",
-    "pointsInBrackets": "({points} points)"
+    "pointsInBrackets": "({points} points)",
+    "correctKey": "Correct the answer key",
+    "previewKey": "Preview the change",
+    "applyKey": "Confirm and regrade",
+    "previewLine": "{attempts} attempts change, {students} students' scores change, and pass/fail changes for {passFail}.",
+    "true": "True",
+    "false": "False"
   }
 }

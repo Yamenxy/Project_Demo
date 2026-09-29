@@ -160,7 +160,8 @@
     "attempt_closed": "انتهى وقت المحاولة.",
     "invalid_response": "هذه الإجابة لا تناسب السؤال.",
     "exam_has_attempts": "بدأ طلاب الامتحان، لا يمكن تعديله الآن.",
-    "invalid_window": "موعد الإغلاق قبل موعد الفتح."
+    "invalid_window": "موعد الإغلاق قبل موعد الفتح.",
+    "invalid_key": "الإجابة النموذجية لا تناسب السؤال."
   },
   "notifications": {
     "title": "الإشعارات",
@@ -892,6 +893,12 @@
     "extraTime": "وقت إضافي",
     "extraPrompt": "دقائق إضافية لـ {name} (اتركه فارغًا للإلغاء):",
     "points": "{points} درجة",
-    "pointsInBrackets": "({points} درجة)"
+    "pointsInBrackets": "({points} درجة)",
+    "correctKey": "تصحيح الإجابة النموذجية",
+    "previewKey": "معاينة التغيير",
+    "applyKey": "تأكيد وإعادة التصحيح",
+    "previewLine": "سيتغير {attempts} محاولة، ودرجات {students} طالب، ونتيجة النجاح لـ {passFail} طالب.",
+    "true": "صح",
+    "false": "خطأ"
   }
 }

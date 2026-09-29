@@ -72,6 +72,8 @@ const SAMPLE_BODIES: Record<string, object> = {
     questionIds: [randomUUID()],
   },
   'POST /api/v1/w/:workspaceId/exams/:examId/publish': { published: true },
+  'POST /api/v1/w/:workspaceId/exams/:examId/items/:position/key-preview': { key: { value: true } },
+  'POST /api/v1/w/:workspaceId/exams/:examId/items/:position/key': { key: { value: true } },
   'PUT /api/v1/w/:workspaceId/exams/:examId/accommodations/:membershipId': { extraMinutes: 10 },
   'PUT /api/v1/w/:workspaceId/my/attempts/:attemptId/answers/:position': {
     response: { value: true },

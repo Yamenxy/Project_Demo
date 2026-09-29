@@ -11,6 +11,7 @@ import {
 import { CurrentWorkspace, type WorkspaceContext } from '../tenancy';
 import { AttemptsService, type AttemptPaper, type StudentExam } from './attempts.service';
 import { ExamsService, type ExamSummary } from './exams.service';
+import { RegradeService, type RegradePreview } from './regrade.service';
 
 const uuidParam = new ZodPipe(z.uuid());
 const positionParam = new ZodPipe(z.coerce.number().int().min(0).max(500));
@@ -31,6 +32,16 @@ const settingsBody = z
   .refine((b) => new Set(b.questionIds).size === b.questionIds.length, {
     message: 'repeated question',
   });
+const keyBody = z.object({
+  key: z.union([
+    z.object({ correctChoiceId: z.string().min(1).max(40) }),
+    z.object({ value: z.boolean() }),
+    z.object({
+      accepted: z.array(z.string().trim().min(1).max(200)).min(1).max(10),
+      arabicVariants: z.boolean().default(true),
+    }),
+  ]),
+});
 const publishBody = z.object({ published: z.boolean() });
 const accommodationBody = z.object({ extraMinutes: z.number().int().min(1).max(600).nullable() });
 const answerBody = z.object({
@@ -56,6 +67,7 @@ export class ExamsController {
   constructor(
     private readonly exams: ExamsService,
     private readonly attempts: AttemptsService,
+    private readonly regrade: RegradeService,
   ) {}
 
   // --- staff ------------------------------------------------------------------------------------
@@ -150,6 +162,33 @@ export class ExamsController {
     @Req() request: FastifyRequest,
   ): Promise<void> {
     await this.exams.releaseResults(ctx, examId, actorOf(session, request));
+  }
+
+  /** How many scores and pass/fail outcomes a key correction changes (REQ-EXAM-003). */
+  @Post('exams/:examId/items/:position/key-preview')
+  @HttpCode(200)
+  @WorkspacePermission('assessment.edit')
+  keyPreview(
+    @CurrentWorkspace() ctx: WorkspaceContext,
+    @Param('examId', uuidParam) examId: string,
+    @Param('position', positionParam) position: number,
+    @Body(new ZodPipe(keyBody)) body: z.infer<typeof keyBody>,
+  ): Promise<RegradePreview> {
+    return this.regrade.preview(ctx, examId, position, body.key);
+  }
+
+  @Post('exams/:examId/items/:position/key')
+  @HttpCode(200)
+  @WorkspacePermission('assessment.edit')
+  correctKey(
+    @CurrentWorkspace() ctx: WorkspaceContext,
+    @CurrentSession() session: SessionContext,
+    @Param('examId', uuidParam) examId: string,
+    @Param('position', positionParam) position: number,
+    @Body(new ZodPipe(keyBody)) body: z.infer<typeof keyBody>,
+    @Req() request: FastifyRequest,
+  ): Promise<RegradePreview> {
+    return this.regrade.apply(ctx, examId, position, body.key, actorOf(session, request));
   }
 
   // --- students --------------------------------------------------------------------------------

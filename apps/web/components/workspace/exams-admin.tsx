@@ -6,6 +6,7 @@ import { Link } from '../../i18n/navigation';
 import { api } from '../../lib/api';
 import { ErrorMessage, Field, SubmitButton } from '../form';
 import { MathText } from '../math-text';
+import { KeyCorrection, type ExamItem } from './key-correction';
 import { useWorkspace } from './workspace-shell';
 
 interface ExamSummary {
@@ -200,7 +201,7 @@ export function ExamAdminView({ examId }: { examId: string }) {
   const [exam, setExam] = useState<
     | (ExamSummary & {
         courseId: string;
-        items: { position: number; body: string; points: number }[];
+        items: ExamItem[];
       })
     | null
   >(null);
@@ -314,11 +315,15 @@ export function ExamAdminView({ examId }: { examId: string }) {
       </section>
       <section className="rounded-2xl bg-surface p-4 shadow-sm">
         <h2 className="mb-2 font-semibold">{t('questions')}</h2>
-        <ol className="flex list-decimal flex-col gap-1 ps-5 text-sm">
+        <ol className="flex flex-col gap-2 text-sm">
           {exam.items.map((i) => (
-            <li key={i.position}>
-              <MathText text={i.body} /> {t('pointsInBrackets', { points: i.points })}
-            </li>
+            <KeyCorrection
+              key={i.position}
+              base={base}
+              examId={examId}
+              item={i}
+              onDone={() => void load()}
+            />
           ))}
         </ol>
       </section>

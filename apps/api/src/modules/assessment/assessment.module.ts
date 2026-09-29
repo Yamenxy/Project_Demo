@@ -7,11 +7,12 @@ import { ExamsController } from './exams.controller';
 import { ExamsService } from './exams.service';
 import { QuestionsController } from './questions.controller';
 import { QuestionsService } from './questions.service';
+import { RegradeService } from './regrade.service';
 
 @Module({
   imports: [ContentModule, GradingModule],
   controllers: [QuestionsController, ExamsController],
-  providers: [QuestionsService, ExamsService, AttemptsService],
+  providers: [QuestionsService, ExamsService, AttemptsService, RegradeService],
   exports: [QuestionsService, ExamsService, AttemptsService],
 })
 export class AssessmentModule implements OnModuleInit {
