@@ -120,6 +120,13 @@
       "when": 1790708904099,
       "tag": "0016_grant_scopes",
       "breakpoints": true
+    },
+    {
+      "idx": 17,
+      "version": "7",
+      "when": 1790709348556,
+      "tag": "0017_schedules",
+      "breakpoints": true
     }
   ]
 }

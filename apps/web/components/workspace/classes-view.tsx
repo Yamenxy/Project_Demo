@@ -7,6 +7,7 @@ import { Link } from '../../i18n/navigation';
 import { api } from '../../lib/api';
 import { Ltr } from '../../lib/bidi';
 import { ErrorMessage, Field, SubmitButton } from '../form';
+import { ClassSchedule } from './class-schedule';
 import { useWorkspace } from './workspace-shell';
 
 interface ClassSummary {
@@ -221,6 +222,12 @@ export function ClassView({ classId }: { classId: string }) {
         ) : null}
       </div>
       <ErrorMessage error={error} />
+
+      <ClassSchedule
+        base={base}
+        classId={classId}
+        canManage={!detail.archived && (isOwner || permissions.includes('schedule.manage'))}
+      />
 
       <section className="flex flex-col gap-2">
         <h2 className="font-semibold">{t('studentCount', { count: detail.students.length })}</h2>

@@ -18,7 +18,14 @@ import { signIn } from '../support/sessions';
 let app: NestFastifyApplication;
 let routes: RouteInfo[];
 
-const victim = { workspaceId: '', membershipId: '', invitationId: '', classId: '' };
+const victim = {
+  workspaceId: '',
+  membershipId: '',
+  invitationId: '',
+  classId: '',
+  seriesId: '',
+  sessionId: '',
+};
 const attacker = { workspaceId: '', token: '' };
 
 /** Plausible request bodies, keyed by "METHOD path". Empty for routes without a body. */
@@ -26,6 +33,19 @@ const SAMPLE_BODIES: Record<string, object> = {
   'POST /api/v1/w/:workspaceId/students/:membershipId/remove': { reason: 'cross-tenant test' },
   'POST /api/v1/w/:workspaceId/students/:membershipId/consent': {},
   'POST /api/v1/w/:workspaceId/classes/:classId': { name: 'تغيير' },
+  'POST /api/v1/w/:workspaceId/classes/:classId/series': {
+    weekday: 6,
+    startTime: '17:00',
+    durationMinutes: 60,
+    startsOn: '2026-12-01',
+  },
+  'POST /api/v1/w/:workspaceId/classes/:classId/series/:seriesId/end': { endsOn: '2026-12-31' },
+  'POST /api/v1/w/:workspaceId/classes/:classId/sessions': {
+    date: '2026-12-05',
+    startTime: '10:00',
+    durationMinutes: 60,
+  },
+  'POST /api/v1/w/:workspaceId/sessions/:sessionId/cancel': { reason: 'cross-tenant test' },
   'POST /api/v1/w/:workspaceId/classes/:classId/students': { membershipIds: [randomUUID()] },
   'POST /api/v1/w/:workspaceId/classes/:classId/students/:membershipId/transfer': {
     toClassId: randomUUID(),
@@ -38,6 +58,9 @@ function victimParams(): Record<string, string> {
     membershipId: victim.membershipId,
     invitationId: victim.invitationId,
     classId: victim.classId,
+    seriesId: victim.seriesId,
+    sessionId: victim.sessionId,
+    date: '2026-12-25',
     permission: 'attendance.mark',
   };
 }
@@ -55,6 +78,20 @@ beforeAll(async () => {
     `insert into classes (workspace_id, id, name, responsible_membership_id, created_at, updated_at)
      values ($1, $2, 'فصل الضحية', (select id from memberships where workspace_id = $1 and role = 'owner'), now(), now())`,
     [victim.workspaceId, victim.classId],
+  );
+  victim.seriesId = randomUUID();
+  await adminQuery(
+    `insert into class_series (workspace_id, id, class_id, weekday, start_time, duration_minutes,
+                               starts_on, created_at)
+     values ($1, $2, $3, 6, '17:00', 60, '2026-12-01', now())`,
+    [victim.workspaceId, victim.seriesId, victim.classId],
+  );
+  victim.sessionId = randomUUID();
+  await adminQuery(
+    `insert into class_sessions (workspace_id, id, class_id, local_date, starts_at, ends_at,
+                                 created_at)
+     values ($1, $2, $3, '2026-12-05', '2026-12-05T08:00Z', '2026-12-05T09:00Z', now())`,
+    [victim.workspaceId, victim.sessionId, victim.classId],
   );
   await adminQuery(
     `insert into workspace_invitations (workspace_id, id, phone_e164, role, token_hash, invited_by,

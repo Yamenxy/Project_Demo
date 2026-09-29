@@ -129,7 +129,9 @@
     "invalid_responsible": "Choose the owner or a class teacher.",
     "already_enrolled": "The student is already in that class.",
     "same_class": "The student is already in this class.",
-    "permission_not_class_scoped": "This permission covers the whole workspace and can't be limited to classes."
+    "permission_not_class_scoped": "This permission covers the whole workspace and can't be limited to classes.",
+    "invalid_range": "The requested period is too long.",
+    "invalid_date": "This date isn't valid."
   },
   "notifications": {
     "title": "Notifications",
@@ -220,7 +222,8 @@
       "students": "Students",
       "staff": "Staff",
       "billing": "Subscription",
-      "classes": "Classes"
+      "classes": "Classes",
+      "schedule": "Schedule"
     },
     "suspended": "This workspace is temporarily unavailable. You can still see your grades and attendance.",
     "suspendedOwner": "Your workspace is paused. You can see your subscription and renew it with the platform.",
@@ -247,7 +250,8 @@
       "missingConsent": "Missing guardian consent",
       "active": "Active students",
       "managed": "Not activated yet"
-    }
+    },
+    "mySchedule": "My schedule"
   },
   "staff": {
     "title": "Staff",
@@ -451,5 +455,42 @@
     "addTitle": "Add students",
     "search": "Search by student name, code or number",
     "add": "Add"
+  },
+  "schedule": {
+    "title": "Schedule",
+    "noSeries": "No weekly times yet.",
+    "seriesLine": "Every {day} at {time} for {minutes} minutes",
+    "until": "until {date}",
+    "endSeries": "Stop",
+    "weekday": "Day",
+    "startTime": "Time",
+    "duration": "Minutes",
+    "startsOn": "Starting",
+    "addSeries": "Add weekly time",
+    "overlapWarning": "Note: the same teacher has other sessions at the same time:",
+    "upcoming": "Upcoming sessions",
+    "cancel": "Cancel session",
+    "restore": "Restore session",
+    "cancelReason": "Why is this session cancelled?",
+    "cancelled": "cancelled",
+    "agendaTitle": "Schedule — next two weeks",
+    "noSessions": "No sessions in the next two weeks.",
+    "skipTitle": "Days off",
+    "skipExplain": "No sessions are created on these days, for any class.",
+    "skipDate": "Date",
+    "skipReason": "Reason (optional)",
+    "addSkip": "Add day off",
+    "removeSkip": "Remove",
+    "weekdays": {
+      "0": "Sunday",
+      "1": "Monday",
+      "2": "Tuesday",
+      "3": "Wednesday",
+      "4": "Thursday",
+      "5": "Friday",
+      "6": "Saturday"
+    },
+    "timeRange": "{from} – {to}",
+    "overlapLine": "{name} — {when}"
   }
 }

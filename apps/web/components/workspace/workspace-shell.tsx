@@ -88,6 +88,7 @@ export function WorkspaceShell({
   const nav: NavItem[] = [
     { href: base, label: t('nav.home'), visible: () => true },
     { href: `${base}/classes`, label: t('nav.classes'), visible: () => true },
+    { href: `${base}/schedule`, label: t('nav.schedule'), visible: () => true },
     {
       href: `${base}/students`,
       label: t('nav.students'),

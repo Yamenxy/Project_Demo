@@ -40,7 +40,7 @@ export interface ClassDetail extends ClassSummary {
  * for a workspace-wide grant). Classes outside the caller's view answer 404, like other
  * workspaces.
  */
-function scopeFilter(ctx: WorkspaceContext): SQL | undefined {
+export function classScope(ctx: WorkspaceContext): SQL | undefined {
   if (ctx.role === 'owner') return undefined;
   if (ctx.role === 'class_teacher') return eq(classes.responsibleMembershipId, ctx.membershipId);
   const covered = new Set<string>();
@@ -83,7 +83,7 @@ export class ClassesService {
         .where(
           and(
             options.archived ? sql`${classes.archivedAt} is not null` : isNull(classes.archivedAt),
-            scopeFilter(ctx),
+            classScope(ctx),
           ),
         )
         .orderBy(asc(classes.name));
@@ -372,7 +372,7 @@ export class ClassesService {
         })
         .from(classEnrollments)
         .innerJoin(classes, eq(classes.id, classEnrollments.classId))
-        .where(and(eq(classEnrollments.membershipId, membershipId), scopeFilter(ctx)))
+        .where(and(eq(classEnrollments.membershipId, membershipId), classScope(ctx)))
         .orderBy(asc(classEnrollments.enrolledAt)),
     );
   }
@@ -404,7 +404,7 @@ export class ClassesService {
     const [row] = await tx
       .select()
       .from(classes)
-      .where(and(eq(classes.id, classId), scopeFilter(ctx)))
+      .where(and(eq(classes.id, classId), classScope(ctx)))
       .for('update');
     if (!row) throw notFound('Class not found');
     return row;
