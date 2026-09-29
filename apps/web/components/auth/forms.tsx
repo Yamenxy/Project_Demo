@@ -39,6 +39,7 @@ function value(form: HTMLFormElement, name: string): string {
 export function RegisterForm() {
   const t = useTranslations('auth');
   const router = useRouter();
+  const next = useNext('');
   const { busy, error, run } = useSubmit();
 
   const submit = (event: FormEvent<HTMLFormElement>) => {
@@ -54,7 +55,7 @@ export function RegisterForm() {
           ...(value(form, 'dateOfBirth') ? { dateOfBirth: value(form, 'dateOfBirth') } : {}),
         },
       });
-      router.push('/verify-phone');
+      router.push(next ? `/verify-phone?next=${encodeURIComponent(next)}` : '/verify-phone');
     });
   };
 
@@ -99,6 +100,7 @@ export function RegisterForm() {
 export function VerifyPhoneForm() {
   const t = useTranslations('auth');
   const router = useRouter();
+  const next = useNext('/account');
   const { busy, error, run } = useSubmit();
   const [sent, setSent] = useState(false);
 
@@ -116,7 +118,7 @@ export function VerifyPhoneForm() {
         method: 'POST',
         body: { code: toWesternDigits(value(form, 'code')) },
       });
-      router.push('/account');
+      router.push(next);
     });
   };
 

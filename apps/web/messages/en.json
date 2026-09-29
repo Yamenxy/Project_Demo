@@ -384,5 +384,27 @@
     "backToAccount": "Back to my account",
     "paperOption": "If your guardian has no number of their own, ask your teacher for the paper consent form.",
     "dateOfBirthIs": "Date of birth:"
+  },
+  "teacherPage": {
+    "notFound": "This page doesn't exist.",
+    "home": "Home",
+    "subjects": "Subjects",
+    "joinExplain": "Sign in, then ask to join. You'll be notified when you're accepted.",
+    "join": "Ask to join",
+    "noAccount": "No account yet?",
+    "register": "Create one",
+    "priceListSoon": "The price list will appear here soon."
+  },
+  "publicPage": {
+    "title": "Your public page",
+    "explain": "A page anyone can see without signing in: the workspace name, subjects, a short text about you and the join button. No student data appears on it.",
+    "enabled": "Public page is visible",
+    "shareMessage": "{name}'s page on the platform:",
+    "subjects": "Subjects",
+    "subjectsHint": "Separate subjects with commas, up to 8.",
+    "bio": "About you",
+    "bioHint": "Up to 1000 characters. Don't put phone numbers here.",
+    "save": "Save",
+    "saved": "Saved."
   }
 }

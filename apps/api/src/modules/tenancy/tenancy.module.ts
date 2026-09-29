@@ -5,6 +5,8 @@ import { AccessGuard } from './access.guard';
 import { MembershipDeviceLimitPolicy } from './device-limit.policy';
 import { InvitationsService } from './invitations.service';
 import { MeController } from './me.controller';
+import { PublicPageSettingsController, PublicTeacherController } from './public-page.controller';
+import { PublicPageService } from './public-page.service';
 import { MembersController } from './members.controller';
 import { MembersService } from './members.service';
 import { MembershipsService } from './memberships.service';
@@ -32,6 +34,8 @@ import { WorkspacesService } from './workspaces.service';
     InvitationAcceptController,
     JoinController,
     StudentsController,
+    PublicTeacherController,
+    PublicPageSettingsController,
   ],
   providers: [
     MembershipsService,
@@ -42,6 +46,7 @@ import { WorkspacesService } from './workspaces.service';
     StaffService,
     StudentsService,
     StudentImportService,
+    PublicPageService,
     { provide: DeviceLimitPolicy, useClass: MembershipDeviceLimitPolicy },
     { provide: APP_GUARD, useClass: AccessGuard },
   ],

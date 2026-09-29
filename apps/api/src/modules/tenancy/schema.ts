@@ -70,5 +70,8 @@ export const workspaceSettings = pgTable('workspace_settings', {
   workspaceId: uuid('workspace_id').primaryKey(),
   joinCode: text('join_code').notNull(),
   autoApproveJoins: boolean('auto_approve_joins').notNull(),
+  publicPageEnabled: boolean('public_page_enabled').notNull().default(true),
+  publicBio: text('public_bio'),
+  publicSubjects: text('public_subjects'),
   updatedAt: tstz('updated_at').notNull(),
 });

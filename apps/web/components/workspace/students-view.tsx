@@ -8,6 +8,7 @@ import { api } from '../../lib/api';
 import { Ltr } from '../../lib/bidi';
 import { ErrorMessage, Field, SubmitButton } from '../form';
 import { absoluteUrl, ShareLink } from './share-link';
+import { PublicPageSettings } from './public-page-settings';
 import { StudentImport } from './student-import';
 import { useWorkspace } from './workspace-shell';
 
@@ -207,6 +208,8 @@ export function StudentsView() {
           </div>
         </section>
       ) : null}
+
+      {isOwner ? <PublicPageSettings workspaceId={workspace.id} name={workspace.name} /> : null}
 
       {canManage ? (
         <section className="flex flex-col gap-3">
