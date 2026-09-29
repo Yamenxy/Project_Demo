@@ -138,7 +138,10 @@
     "session_has_attendance": "سُجل حضور في هذه الحصة.",
     "invalid_amount": "المبلغ غير صحيح. اكتب رقمًا بحد أقصى خانتين عشريتين.",
     "already_reversed": "هذه الدفعة أُلغيت بالفعل.",
-    "not_reversible": "لا يمكن إلغاء قيد عكسي."
+    "not_reversible": "لا يمكن إلغاء قيد عكسي.",
+    "request_not_pending": "تمت مراجعة هذا الطلب بالفعل.",
+    "own_request": "لا يمكنك قبول طلب قدمته بنفسك.",
+    "not_rejected": "يمكن إعادة إرسال الطلبات المرفوضة فقط."
   },
   "notifications": {
     "title": "الإشعارات",
@@ -159,7 +162,9 @@
       "student_join_requested": "طالب جديد يطلب الانضمام.",
       "student_join_approved": "تم قبولك. يمكنك الآن فتح المساحة.",
       "payment_recorded": "تم تسجيل دفعتك. الإيصال متاح.",
-      "payment_reversed": "تم إلغاء دفعة بقيد عكسي."
+      "payment_reversed": "تم إلغاء دفعة بقيد عكسي.",
+      "payment_request_submitted": "طلب دفع جديد بانتظار المراجعة.",
+      "payment_request_rejected": "تم رفض طلب الدفع. راجع السبب."
     }
   },
   "platform": {
@@ -597,5 +602,27 @@
       "other": "أخرى"
     },
     "itemOption": "{name} — {price}"
+  },
+  "paymentRequests": {
+    "title": "أبلغ عن دفعة حوّلتها",
+    "resubmitTitle": "إعادة إرسال الطلب",
+    "explain": "إذا دفعت بتحويل أو محفظة، اكتب المبلغ ورقم العملية. يراجعها المعلم ويصدر لك إيصالًا.",
+    "sent": "تم إرسال الطلب. سيصلك إشعار بعد المراجعة.",
+    "amount": "المبلغ بالجنيه",
+    "reference": "رقم العملية",
+    "send": "إرسال الطلب",
+    "cancel": "إلغاء الطلب",
+    "resubmit": "تعديل وإعادة الإرسال",
+    "status": {
+      "pending": "قيد المراجعة",
+      "approved": "تم القبول",
+      "rejected": "مرفوض",
+      "cancelled": "ملغى"
+    },
+    "pendingTitle": "{count, plural, =0 {لا توجد طلبات دفع للمراجعة} other {طلبات دفع للمراجعة (#)}}",
+    "duplicate": "تنبيه: رقم العملية هذا مستخدم في طلب آخر.",
+    "approve": "قبول وإصدار إيصال",
+    "reject": "رفض",
+    "rejectReason": "سبب رفض طلب {name}:"
   }
 }

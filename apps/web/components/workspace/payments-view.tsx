@@ -10,6 +10,7 @@ import { Ltr } from '../../lib/bidi';
 import { formatMoney, parseMoney } from '../../lib/format';
 import { ErrorMessage, SubmitButton } from '../form';
 import { TIME_ZONE } from './class-schedule';
+import { MyPaymentRequests, PendingRequests } from './payment-requests';
 import type { PriceItem } from './price-list-view';
 import { useWorkspace } from './workspace-shell';
 
@@ -246,6 +247,10 @@ export function PaymentsView() {
         </section>
       ) : null}
 
+      {isOwner || permissions.includes('payments.confirm') ? (
+        <PendingRequests base={base} onDecided={() => void load()} />
+      ) : null}
+
       {canView ? (
         <section className="flex flex-col gap-2">
           <h2 className="font-semibold">{t('ledgerTitle')}</h2>
@@ -371,6 +376,7 @@ export function MyPaymentsView() {
   return (
     <div className="flex flex-col gap-4">
       <h1 className="text-xl font-semibold">{t('myTitle')}</h1>
+      <MyPaymentRequests base={`/w/${workspace.id}`} />
       <ErrorMessage error={error} />
       {entries.length === 0 ? <p className="text-muted">{t('empty')}</p> : null}
       <ul className="flex flex-col gap-2">

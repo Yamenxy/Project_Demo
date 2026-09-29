@@ -148,6 +148,13 @@
       "when": 1790711373840,
       "tag": "0020_payment_ledger",
       "breakpoints": true
+    },
+    {
+      "idx": 21,
+      "version": "7",
+      "when": 1790711907015,
+      "tag": "0021_payment_requests",
+      "breakpoints": true
     }
   ]
 }

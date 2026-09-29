@@ -27,8 +27,9 @@ const victim = {
   sessionId: '',
   itemId: '',
   paymentId: '',
+  requestId: '',
 };
-const attacker = { workspaceId: '', token: '' };
+const attacker = { workspaceId: '', token: '', studentToken: '' };
 
 /** Plausible request bodies, keyed by "METHOD path". Empty for routes without a body. */
 const SAMPLE_BODIES: Record<string, object> = {
@@ -37,6 +38,7 @@ const SAMPLE_BODIES: Record<string, object> = {
   'POST /api/v1/w/:workspaceId/classes/:classId': { name: 'تغيير' },
   'POST /api/v1/w/:workspaceId/price-items/:itemId': { name: 'تغيير' },
   'POST /api/v1/w/:workspaceId/payments/:paymentId/reverse': { reason: 'cross-tenant test' },
+  'POST /api/v1/w/:workspaceId/payment-requests/:requestId/reject': { reason: 'cross-tenant test' },
   'POST /api/v1/w/:workspaceId/classes/:classId/series': {
     weekday: 6,
     startTime: '17:00',
@@ -70,6 +72,7 @@ function victimParams(): Record<string, string> {
     date: '2026-12-25',
     itemId: victim.itemId,
     paymentId: victim.paymentId,
+    requestId: victim.requestId,
     permission: 'attendance.mark',
   };
 }
@@ -101,6 +104,13 @@ beforeAll(async () => {
      values ($1, $2, $3, 'payment', 1000, 'transfer', 1, $4, now())`,
     [victim.workspaceId, victim.paymentId, victim.membershipId, victimOwner],
   );
+  victim.requestId = randomUUID();
+  await adminQuery(
+    `insert into payment_requests (workspace_id, id, membership_id, submitted_by, amount_piastres,
+                                   method, reference, status, created_at, updated_at)
+     values ($1, $2, $3, $4, 1000, 'wallet', 'REF-VICTIM', 'pending', now(), now())`,
+    [victim.workspaceId, victim.requestId, victim.membershipId, victimOwner],
+  );
   victim.seriesId = randomUUID();
   await adminQuery(
     `insert into class_series (workspace_id, id, class_id, weekday, start_time, duration_minutes,
@@ -125,7 +135,21 @@ beforeAll(async () => {
   const attackerOwner = await insertUser();
   attacker.workspaceId = await insertWorkspace(attackerOwner);
   attacker.token = await signIn(app, attackerOwner, { twoFactor: true });
+  // Student-only routes are called as a student of the attacker's workspace, so they reach the
+  // resource lookup instead of stopping at the role check.
+  const attackerStudent = await insertUser();
+  await insertMembership(attacker.workspaceId, attackerStudent, 'student');
+  attacker.studentToken = await signIn(app, attackerStudent);
 });
+
+function studentOnly(route: RouteInfo): boolean {
+  const policy = route.policy;
+  return (
+    policy?.kind === 'workspace' &&
+    'roles' in policy.requirement &&
+    policy.requirement.roles.every((role) => role === 'student')
+  );
+}
 
 afterAll(async () => {
   await app.close();
@@ -137,7 +161,7 @@ function call(route: RouteInfo, workspaceId: string) {
   return app.inject({
     method: route.method as 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE',
     url,
-    cookies: { lms_session: attacker.token },
+    cookies: { lms_session: studentOnly(route) ? attacker.studentToken : attacker.token },
     ...(body ? { payload: body } : {}),
   });
 }

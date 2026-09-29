@@ -138,7 +138,10 @@
     "session_has_attendance": "Attendance was taken in this session.",
     "invalid_amount": "This amount isn't valid. Use a number with at most two decimals.",
     "already_reversed": "This payment is already reversed.",
-    "not_reversible": "A reversal can't be reversed."
+    "not_reversible": "A reversal can't be reversed.",
+    "request_not_pending": "This request was already reviewed.",
+    "own_request": "You can't approve your own request.",
+    "not_rejected": "Only a rejected request can be sent again."
   },
   "notifications": {
     "title": "Notifications",
@@ -159,7 +162,9 @@
       "student_join_requested": "A new student asked to join.",
       "student_join_approved": "You were accepted. You can open the workspace now.",
       "payment_recorded": "Your payment was recorded. The receipt is available.",
-      "payment_reversed": "A payment was reversed."
+      "payment_reversed": "A payment was reversed.",
+      "payment_request_submitted": "A new payment request is waiting for review.",
+      "payment_request_rejected": "Your payment request was rejected. See the reason."
     }
   },
   "platform": {
@@ -597,5 +602,27 @@
       "other": "Other"
     },
     "itemOption": "{name} — {price}"
+  },
+  "paymentRequests": {
+    "title": "Report a payment you sent",
+    "resubmitTitle": "Send the request again",
+    "explain": "If you paid by transfer or mobile wallet, enter the amount and the transaction number. Your teacher reviews it and issues a receipt.",
+    "sent": "Request sent. You'll be notified after the review.",
+    "amount": "Amount in pounds",
+    "reference": "Transaction number",
+    "send": "Send request",
+    "cancel": "Cancel request",
+    "resubmit": "Edit and send again",
+    "status": {
+      "pending": "Under review",
+      "approved": "Approved",
+      "rejected": "Rejected",
+      "cancelled": "Cancelled"
+    },
+    "pendingTitle": "{count, plural, =0 {No payment requests to review} other {Payment requests to review (#)}}",
+    "duplicate": "Note: this transaction number is used on another request.",
+    "approve": "Approve and issue receipt",
+    "reject": "Reject",
+    "rejectReason": "Why is {name}'s request rejected?"
   }
 }

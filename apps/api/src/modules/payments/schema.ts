@@ -41,3 +41,23 @@ export const paymentEntries = pgTable('payment_entries', {
   recordedBy: uuid('recorded_by').notNull(),
   recordedAt: tstz('recorded_at').notNull(),
 });
+
+/** Mirrors drizzle/0021_payment_requests.sql. */
+export const paymentRequests = pgTable('payment_requests', {
+  workspaceId: uuid('workspace_id').notNull(),
+  id: uuid('id').primaryKey(),
+  membershipId: uuid('membership_id').notNull(),
+  submittedBy: uuid('submitted_by').notNull(),
+  amountPiastres: bigint('amount_piastres', { mode: 'number' }).notNull(),
+  currency: text('currency').notNull().default('EGP'),
+  method: text('method', { enum: ['transfer', 'wallet', 'other'] }).notNull(),
+  reference: text('reference').notNull(),
+  note: text('note'),
+  status: text('status', { enum: ['pending', 'approved', 'rejected', 'cancelled'] }).notNull(),
+  resubmitsId: uuid('resubmits_id'),
+  decidedBy: uuid('decided_by'),
+  decidedAt: tstz('decided_at'),
+  rejectReason: text('reject_reason'),
+  createdAt: tstz('created_at').notNull(),
+  updatedAt: tstz('updated_at').notNull(),
+});
