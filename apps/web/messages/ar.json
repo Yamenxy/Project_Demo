@@ -153,7 +153,14 @@
     "invalid_playback_token": "انتهت صلاحية التشغيل. أعد تحميل الصفحة.",
     "score_out_of_range": "درجة خارج المدى المسموح.",
     "invalid_score": "الدرجة غير صحيحة.",
-    "invalid_correct_choice": "اختر رقم الاختيار الصحيح من القائمة."
+    "invalid_correct_choice": "اختر رقم الاختيار الصحيح من القائمة.",
+    "exam_unavailable": "هذا الامتحان غير متاح.",
+    "exam_not_open": "الامتحان غير مفتوح الآن.",
+    "no_attempts_left": "لا توجد محاولات متبقية.",
+    "attempt_closed": "انتهى وقت المحاولة.",
+    "invalid_response": "هذه الإجابة لا تناسب السؤال.",
+    "exam_has_attempts": "بدأ طلاب الامتحان، لا يمكن تعديله الآن.",
+    "invalid_window": "موعد الإغلاق قبل موعد الفتح."
   },
   "notifications": {
     "title": "الإشعارات",
@@ -287,7 +294,8 @@
     "qrAlt": "كود الحضور الخاص بك",
     "myPayments": "إيصالاتي",
     "myLessons": "دروسي",
-    "myGrades": "درجاتي"
+    "myGrades": "درجاتي",
+    "myExams": "امتحاناتي"
   },
   "staff": {
     "title": "الفريق",
@@ -696,7 +704,8 @@
     "add": "إضافة",
     "files": "ملفات الدرس",
     "video": "فيديو الدرس",
-    "questionBank": "بنك الأسئلة"
+    "questionBank": "بنك الأسئلة",
+    "exams": "الامتحانات"
   },
   "lessons": {
     "title": "دروسي",
@@ -821,5 +830,68 @@
     "variants": "اعتبر أ/إ/آ و ة/ه و ى/ي متساوية",
     "points": "الدرجة:",
     "add": "إضافة السؤال"
+  },
+  "exam": {
+    "myTitle": "امتحاناتي",
+    "none": "لا توجد امتحانات لك.",
+    "window": "من {from} إلى {to} · {minutes} دقيقة",
+    "attempts": "المحاولات: {used} من {max}",
+    "result": "النتيجة: {score} من {max}",
+    "start": "ابدأ الامتحان",
+    "continue": "أكمل الامتحان",
+    "status": {
+      "upcoming": "لم يبدأ بعد",
+      "open": "غير متاح لك الآن",
+      "closed": "انتهى"
+    },
+    "submitted": "تم تسليم إجاباتك.",
+    "backToExams": "امتحاناتي",
+    "timeLeft": "الوقت المتبقي",
+    "unsavedCount": "{count, plural, one {إجابة واحدة لم تُحفظ بعد، ستُرسل عند عودة الاتصال} two {إجابتان لم تُحفظا بعد} few {# إجابات لم تُحفظ بعد} other {# إجابة لم تُحفظ بعد}}",
+    "questionMeta": "سؤال {number} · {points} درجة",
+    "saved": "محفوظ ✓",
+    "unsaved": "لم يُحفظ بعد",
+    "true": "صح",
+    "false": "خطأ",
+    "yourAnswer": "إجابتك",
+    "submit": "تسليم الامتحان",
+    "confirmSubmit": "هل تريد تسليم الامتحان؟ لا يمكن التعديل بعد التسليم."
+  },
+  "examAdmin": {
+    "title": "الامتحانات",
+    "backToCourse": "المقرر",
+    "published": "منشور",
+    "draft": "مسودة",
+    "attemptCount": "{count, plural, =0 {لا محاولات} one {محاولة واحدة} two {محاولتان} few {# محاولات} other {# محاولة}}",
+    "released": "النتائج معلنة",
+    "newTitle": "امتحان جديد",
+    "examTitle": "اسم الامتحان",
+    "opens": "يفتح (بتوقيت القاهرة)",
+    "closes": "يغلق (بتوقيت القاهرة)",
+    "limit": "المدة بالدقائق",
+    "attempts": "عدد المحاولات",
+    "rule": "الدرجة المحتسبة:",
+    "highest": "الأعلى",
+    "latest": "الأخيرة",
+    "pass": "نسبة النجاح ٪ (اختياري)",
+    "shuffleQuestions": "ترتيب عشوائي للأسئلة",
+    "shuffleChoices": "ترتيب عشوائي للاختيارات",
+    "classes": "الفصول",
+    "questions": "الأسئلة",
+    "create": "إنشاء الامتحان",
+    "publish": "نشر",
+    "unpublish": "إلغاء النشر",
+    "release": "إعلان النتائج وإضافتها للدرجات",
+    "confirmRelease": "إعلان النتائج؟ ستظهر الدرجات للطلاب.",
+    "results": "النتائج (من {max})",
+    "noAttempts": "لا توجد محاولات بعد.",
+    "inProgress": "جارٍ",
+    "score": "{score} من {max}",
+    "passed": "ناجح",
+    "failed": "لم ينجح",
+    "extraTime": "وقت إضافي",
+    "extraPrompt": "دقائق إضافية لـ {name} (اتركه فارغًا للإلغاء):",
+    "points": "{points} درجة",
+    "pointsInBrackets": "({points} درجة)"
   }
 }

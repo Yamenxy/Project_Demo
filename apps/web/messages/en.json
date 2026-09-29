@@ -153,7 +153,14 @@
     "invalid_playback_token": "Playback expired. Reload the page.",
     "score_out_of_range": "A score is outside the allowed range.",
     "invalid_score": "This score isn't valid.",
-    "invalid_correct_choice": "Choose the number of the correct choice from the list."
+    "invalid_correct_choice": "Choose the number of the correct choice from the list.",
+    "exam_unavailable": "This exam isn't available.",
+    "exam_not_open": "The exam isn't open now.",
+    "no_attempts_left": "No attempts left.",
+    "attempt_closed": "The attempt's time is over.",
+    "invalid_response": "This answer doesn't fit the question.",
+    "exam_has_attempts": "Students have started this exam; it can't be changed now.",
+    "invalid_window": "The exam closes before it opens."
   },
   "notifications": {
     "title": "Notifications",
@@ -287,7 +294,8 @@
     "qrAlt": "Your attendance code",
     "myPayments": "My receipts",
     "myLessons": "My lessons",
-    "myGrades": "My grades"
+    "myGrades": "My grades",
+    "myExams": "My exams"
   },
   "staff": {
     "title": "Staff",
@@ -696,7 +704,8 @@
     "add": "Add",
     "files": "Lesson files",
     "video": "Lesson video",
-    "questionBank": "Question bank"
+    "questionBank": "Question bank",
+    "exams": "Exams"
   },
   "lessons": {
     "title": "My lessons",
@@ -821,5 +830,68 @@
     "variants": "Treat Arabic letter variants (أ/إ/آ, ة/ه, ى/ي) as equal",
     "points": "Points:",
     "add": "Add question"
+  },
+  "exam": {
+    "myTitle": "My exams",
+    "none": "No exams for you.",
+    "window": "From {from} to {to} · {minutes} minutes",
+    "attempts": "Attempts: {used} of {max}",
+    "result": "Result: {score} of {max}",
+    "start": "Start exam",
+    "continue": "Continue exam",
+    "status": {
+      "upcoming": "Not open yet",
+      "open": "Not available to you now",
+      "closed": "Closed"
+    },
+    "submitted": "Your answers were submitted.",
+    "backToExams": "My exams",
+    "timeLeft": "Time left",
+    "unsavedCount": "{count, plural, one {1 answer not saved yet; it will be sent when the connection returns} other {# answers not saved yet}}",
+    "questionMeta": "Question {number} · {points} points",
+    "saved": "Saved ✓",
+    "unsaved": "Not saved yet",
+    "true": "True",
+    "false": "False",
+    "yourAnswer": "Your answer",
+    "submit": "Submit exam",
+    "confirmSubmit": "Submit the exam? You can't change answers afterwards."
+  },
+  "examAdmin": {
+    "title": "Exams",
+    "backToCourse": "Course",
+    "published": "Published",
+    "draft": "Draft",
+    "attemptCount": "{count, plural, =0 {no attempts} one {1 attempt} other {# attempts}}",
+    "released": "Results released",
+    "newTitle": "New exam",
+    "examTitle": "Exam name",
+    "opens": "Opens (Cairo time)",
+    "closes": "Closes (Cairo time)",
+    "limit": "Time limit in minutes",
+    "attempts": "Attempts allowed",
+    "rule": "Score that counts:",
+    "highest": "Highest",
+    "latest": "Latest",
+    "pass": "Pass mark % (optional)",
+    "shuffleQuestions": "Shuffle questions",
+    "shuffleChoices": "Shuffle choices",
+    "classes": "Classes",
+    "questions": "Questions",
+    "create": "Create exam",
+    "publish": "Publish",
+    "unpublish": "Unpublish",
+    "release": "Release results to the gradebook",
+    "confirmRelease": "Release results? Students will see their scores.",
+    "results": "Results (out of {max})",
+    "noAttempts": "No attempts yet.",
+    "inProgress": "In progress",
+    "score": "{score} of {max}",
+    "passed": "passed",
+    "failed": "not passed",
+    "extraTime": "Extra time",
+    "extraPrompt": "Extra minutes for {name} (leave empty to remove):",
+    "points": "{points} points",
+    "pointsInBrackets": "({points} points)"
   }
 }

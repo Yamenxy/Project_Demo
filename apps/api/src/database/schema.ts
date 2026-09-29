@@ -2,7 +2,16 @@
 // (created with `pnpm db:new-migration <name>`); these table definitions mirror them for typed
 // queries, and test/database/schema-drift.int.spec.ts checks that they match.
 export { idempotencyKeys } from '../idempotency/schema';
-export { questions, questionVersions } from '../modules/assessment/schema';
+export {
+  examAccommodations,
+  examAnswers,
+  examAttempts,
+  examItems,
+  exams,
+  examTargets,
+  questions,
+  questionVersions,
+} from '../modules/assessment/schema';
 export { auditLog } from '../modules/audit/schema';
 export { classEnrollments, classes } from '../modules/classes/schema';
 export {

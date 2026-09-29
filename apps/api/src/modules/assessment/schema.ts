@@ -1,4 +1,14 @@
-import { integer, jsonb, pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core';
+import {
+  bigint,
+  boolean,
+  integer,
+  jsonb,
+  pgTable,
+  primaryKey,
+  text,
+  timestamp,
+  uuid,
+} from 'drizzle-orm/pg-core';
 
 const tstz = (name: string) => timestamp(name, { withTimezone: true });
 
@@ -36,3 +46,94 @@ export const questionVersions = pgTable('question_versions', {
   createdBy: uuid('created_by').notNull(),
   createdAt: tstz('created_at').notNull(),
 });
+
+/** Mirrors drizzle/0029_exams.sql. */
+export const exams = pgTable('exams', {
+  workspaceId: uuid('workspace_id').notNull(),
+  id: uuid('id').primaryKey(),
+  courseId: uuid('course_id').notNull(),
+  title: text('title').notNull(),
+  timeLimitMinutes: integer('time_limit_minutes').notNull(),
+  opensAt: tstz('opens_at').notNull(),
+  closesAt: tstz('closes_at').notNull(),
+  maxAttempts: integer('max_attempts').notNull().default(1),
+  scoreRule: text('score_rule', { enum: ['highest', 'latest'] })
+    .notNull()
+    .default('highest'),
+  shuffleQuestions: boolean('shuffle_questions').notNull().default(false),
+  shuffleChoices: boolean('shuffle_choices').notNull().default(false),
+  passPercent: integer('pass_percent'),
+  publishedAt: tstz('published_at'),
+  resultsReleasedAt: tstz('results_released_at'),
+  createdBy: uuid('created_by').notNull(),
+  createdAt: tstz('created_at').notNull(),
+  updatedAt: tstz('updated_at').notNull(),
+});
+
+export const examTargets = pgTable(
+  'exam_targets',
+  {
+    workspaceId: uuid('workspace_id').notNull(),
+    examId: uuid('exam_id').notNull(),
+    classId: uuid('class_id').notNull(),
+  },
+  (t) => [primaryKey({ columns: [t.examId, t.classId] })],
+);
+
+export const examItems = pgTable(
+  'exam_items',
+  {
+    workspaceId: uuid('workspace_id').notNull(),
+    examId: uuid('exam_id').notNull(),
+    position: integer('position').notNull(),
+    questionVersionId: uuid('question_version_id').notNull(),
+  },
+  (t) => [primaryKey({ columns: [t.examId, t.position] })],
+);
+
+export const examAccommodations = pgTable(
+  'exam_accommodations',
+  {
+    workspaceId: uuid('workspace_id').notNull(),
+    examId: uuid('exam_id').notNull(),
+    membershipId: uuid('membership_id').notNull(),
+    extraMinutes: integer('extra_minutes').notNull(),
+  },
+  (t) => [primaryKey({ columns: [t.examId, t.membershipId] })],
+);
+
+export interface AttemptLayoutEntry {
+  position: number;
+  choiceOrder: string[];
+}
+
+export const examAttempts = pgTable('exam_attempts', {
+  workspaceId: uuid('workspace_id').notNull(),
+  id: uuid('id').primaryKey(),
+  examId: uuid('exam_id').notNull(),
+  membershipId: uuid('membership_id').notNull(),
+  number: integer('number').notNull(),
+  startedAt: tstz('started_at').notNull(),
+  deadlineAt: tstz('deadline_at').notNull(),
+  submittedAt: tstz('submitted_at'),
+  submitReason: text('submit_reason', { enum: ['student', 'timeout'] }),
+  layout: jsonb('layout').$type<AttemptLayoutEntry[]>().notNull(),
+  scoreCenti: integer('score_centi'),
+  maxCenti: integer('max_centi').notNull(),
+});
+
+export type ExamResponse = { choiceId: string } | { value: boolean } | { text: string };
+
+export const examAnswers = pgTable(
+  'exam_answers',
+  {
+    workspaceId: uuid('workspace_id').notNull(),
+    attemptId: uuid('attempt_id').notNull(),
+    position: integer('position').notNull(),
+    response: jsonb('response').$type<ExamResponse>().notNull(),
+    seq: bigint('seq', { mode: 'number' }).notNull(),
+    correct: boolean('correct'),
+    savedAt: tstz('saved_at').notNull(),
+  },
+  (t) => [primaryKey({ columns: [t.attemptId, t.position] })],
+);

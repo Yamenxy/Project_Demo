@@ -175,6 +175,11 @@ export function CourseView({ courseId }: { courseId: string }) {
             {t('questionBank')}
           </Link>
         ) : null}
+        {isOwner || permissions.includes('assessment.edit') ? (
+          <Link href={`${base}/courses/${courseId}/exams`} className="ms-3 text-sm underline">
+            {t('exams')}
+          </Link>
+        ) : null}
       </div>
       <ErrorMessage error={error} />
       <ol className="flex flex-col gap-2">

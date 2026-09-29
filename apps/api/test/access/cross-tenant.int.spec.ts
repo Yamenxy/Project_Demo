@@ -35,6 +35,8 @@ const victim = {
   fileId: '',
   videoId: '',
   questionId: '',
+  examId: '',
+  attemptId: '',
 };
 const attacker = { workspaceId: '', token: '', studentToken: '' };
 
@@ -53,6 +55,28 @@ const SAMPLE_BODIES: Record<string, object> = {
   'POST /api/v1/w/:workspaceId/courses/:courseId': { title: 'تغيير' },
   'POST /api/v1/w/:workspaceId/courses/:courseId/lessons': { title: 'درس' },
   'POST /api/v1/w/:workspaceId/lessons/:lessonId': { title: 'تغيير' },
+  'POST /api/v1/w/:workspaceId/courses/:courseId/exams': {
+    title: 'امتحان',
+    timeLimitMinutes: 30,
+    opensAt: '2026-10-01T09:00:00Z',
+    closesAt: '2026-10-01T12:00:00Z',
+    classIds: [randomUUID()],
+    questionIds: [randomUUID()],
+  },
+  'PUT /api/v1/w/:workspaceId/exams/:examId': {
+    title: 'امتحان',
+    timeLimitMinutes: 30,
+    opensAt: '2026-10-01T09:00:00Z',
+    closesAt: '2026-10-01T12:00:00Z',
+    classIds: [randomUUID()],
+    questionIds: [randomUUID()],
+  },
+  'POST /api/v1/w/:workspaceId/exams/:examId/publish': { published: true },
+  'PUT /api/v1/w/:workspaceId/exams/:examId/accommodations/:membershipId': { extraMinutes: 10 },
+  'PUT /api/v1/w/:workspaceId/my/attempts/:attemptId/answers/:position': {
+    response: { value: true },
+    seq: 1,
+  },
   'POST /api/v1/w/:workspaceId/courses/:courseId/questions': {
     kind: 'true_false',
     body: 'سؤال',
@@ -111,6 +135,9 @@ function victimParams(): Record<string, string> {
     lessonId: victim.lessonId,
     groupId: victim.groupId,
     questionId: victim.questionId,
+    examId: victim.examId,
+    attemptId: victim.attemptId,
+    position: '0',
     fileId: victim.fileId,
     videoId: victim.videoId,
     file: 'master.m3u8',
@@ -197,6 +224,20 @@ beforeAll(async () => {
     `insert into questions (workspace_id, id, course_id, current_version, created_at, updated_at)
      values ($1, $2, $3, 1, now(), now())`,
     [victim.workspaceId, victim.questionId, victim.courseId],
+  );
+  victim.examId = randomUUID();
+  await adminQuery(
+    `insert into exams (workspace_id, id, course_id, title, time_limit_minutes, opens_at, closes_at,
+                        created_by, created_at, updated_at)
+     values ($1, $2, $3, 'امتحان الضحية', 30, now(), now() + interval '1 day', $4, now(), now())`,
+    [victim.workspaceId, victim.examId, victim.courseId, victimOwner],
+  );
+  victim.attemptId = randomUUID();
+  await adminQuery(
+    `insert into exam_attempts (workspace_id, id, exam_id, membership_id, number, started_at,
+                                deadline_at, layout, max_centi)
+     values ($1, $2, $3, $4, 1, now(), now() + interval '30 minutes', '[]', 100)`,
+    [victim.workspaceId, victim.attemptId, victim.examId, victim.membershipId],
   );
   victim.seriesId = randomUUID();
   await adminQuery(
