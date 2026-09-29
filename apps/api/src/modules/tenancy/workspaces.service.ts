@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { eq } from 'drizzle-orm';
 import { AppError, Clock, IdGenerator } from '../../common';
-import { isUniqueViolation } from '../../database';
+import { isUniqueViolation, type DbTx } from '../../database';
 import { PlatformDb } from '../../database/platform-db';
 import { AuditService } from '../audit';
 import { users } from '../identity';
@@ -25,8 +25,15 @@ export class WorkspacesService {
     private readonly clock: Clock,
   ) {}
 
-  /** Creates a workspace and its owner membership together (OD-01). */
-  async create(input: CreateWorkspaceInput, platformOwnerId: string): Promise<string> {
+  /**
+   * Creates a workspace and its owner membership together (OD-01). `afterCreate` runs in the same
+   * transaction (for example to start the trial subscription).
+   */
+  async create(
+    input: CreateWorkspaceInput,
+    platformOwnerId: string,
+    afterCreate?: (tx: DbTx, workspaceId: string) => Promise<void>,
+  ): Promise<string> {
     const slug = input.slug.trim().toLowerCase();
     if (!SLUG.test(slug)) throw new AppError(400, 'invalid_slug', 'Slug is not valid');
     const workspaceId = this.ids.newId();
@@ -65,6 +72,7 @@ export class WorkspacesService {
           entity: { type: 'workspace', id: workspaceId },
           newValue: { slug, ownerUserId: input.ownerUserId },
         });
+        if (afterCreate) await afterCreate(tx, workspaceId);
       });
     } catch (err) {
       if (isUniqueViolation(err, 'workspaces_slug_key')) {

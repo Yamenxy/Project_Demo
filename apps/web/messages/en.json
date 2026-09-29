@@ -58,7 +58,8 @@
     "recoveryCodesSaved": "I've saved the codes",
     "notifications": "{count, plural, =0 {Notifications} other {Notifications (#)}}",
     "twoFactorQrAlt": "QR code to add this account to an authenticator app",
-    "twoFactorKeyLabel": "Or type this key by hand:"
+    "twoFactorKeyLabel": "Or type this key by hand:",
+    "platformConsole": "Platform console"
   },
   "errors": {
     "generic": "Something went wrong. Please try again.",
@@ -83,7 +84,15 @@
     "second_factor_required": "Enter your verification code first.",
     "unauthenticated": "Please sign in first.",
     "two_factor_already_enabled": "Two-step verification is already on.",
-    "two_factor_not_set_up": "Start two-step verification setup first."
+    "two_factor_not_set_up": "Start two-step verification setup first.",
+    "teacher_not_found": "No confirmed account has this number. Ask the teacher to register and confirm their number first.",
+    "slug_taken": "That page link is taken. Choose another.",
+    "invalid_slug": "That page link isn't valid.",
+    "workspace_suspended": "This workspace is temporarily unavailable.",
+    "forbidden": "You don't have permission for this.",
+    "two_factor_setup_required": "Turn on two-step verification from your account page first.",
+    "not_found": "Not found.",
+    "account_not_active": "Confirm your mobile number first."
   },
   "notifications": {
     "title": "Notifications",
@@ -94,7 +103,55 @@
       "account_two_factor_enabled": "Two-step verification was turned on for your account.",
       "account_password_reset": "Your password was changed and you were signed out everywhere.",
       "account_devices_reset": "Your teacher reset your devices. You can sign in on a new device.",
+      "billing_payment_recorded": "Your payment was recorded. Your subscription runs until {until}.",
+      "billing_workspace_suspended": "Your workspace is paused because the subscription ended. Renew to continue.",
+      "billing_reminder_before_end": "Your subscription ends soon ({until}).",
+      "billing_reminder_on_end": "Your subscription ended today. You have a 7-day grace period.",
+      "billing_reminder_after_end": "Your subscription has ended. Renew before the grace period is over.",
       "unknown": "New notification."
+    }
+  },
+  "platform": {
+    "title": "Platform console",
+    "myAccount": "My account",
+    "workspaces": "Teacher workspaces",
+    "noWorkspaces": "No workspaces yet.",
+    "until": "until {date}",
+    "studentsCount": "{count, plural, =0 {No students} one {# student} other {# students}}",
+    "staffCount": "{count, plural, =0 {No staff} one {# staff member} other {# staff}}",
+    "newTeacher": "Add a teacher",
+    "newTeacherExplain": "The teacher creates an account and confirms their number first; then you create their workspace here. It starts with a 14-day trial.",
+    "workspaceName": "Workspace name",
+    "slug": "Page link",
+    "slugHint": "Lowercase letters, digits and dashes, like mohamed-physics",
+    "ownerPhone": "Teacher's mobile",
+    "planLabel": "Plan",
+    "create": "Create workspace",
+    "back": "Back to all workspaces",
+    "recordPayment": "Record a payment",
+    "amount": "Amount (EGP)",
+    "method": "Payment method",
+    "reference": "Reference (optional)",
+    "paidOn": "Paid on",
+    "months": "Period",
+    "monthsCount": "{count, plural, one {# month} other {# months}}",
+    "savePayment": "Save payment",
+    "payments": "Payments",
+    "noPayments": "No payments yet.",
+    "suspendTitle": "Suspend workspace",
+    "restoreTitle": "Restore workspace",
+    "note": "Reason",
+    "suspend": "Suspend",
+    "restore": "Restore",
+    "status": { "trial": "Trial", "active": "Paid", "grace": "Grace period", "lapsed": "Lapsed" },
+    "plan": { "starter": "Starter", "growth": "Growth", "pro": "Pro" },
+    "suspension": { "billing": "Suspended: unpaid", "admin": "Suspended by the platform" },
+    "methods": {
+      "cash": "Cash",
+      "instapay": "InstaPay",
+      "wallet": "Mobile wallet",
+      "bank_transfer": "Bank transfer",
+      "fawry": "Fawry"
     }
   }
 }

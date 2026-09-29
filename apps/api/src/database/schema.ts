@@ -5,6 +5,11 @@ export { idempotencyKeys } from '../idempotency/schema';
 export { auditLog } from '../modules/audit/schema';
 export { notifications } from '../modules/notify/schema';
 export {
+  platformPayments,
+  subscriptionReminders,
+  subscriptions,
+} from '../modules/platform-admin/schema';
+export {
   deviceRegistrations,
   otpChallenges,
   rateLimitCounters,

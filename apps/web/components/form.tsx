@@ -1,7 +1,7 @@
 'use client';
 
 import { useTranslations } from 'next-intl';
-import type { InputHTMLAttributes, ReactNode } from 'react';
+import type { InputHTMLAttributes, ReactNode, SelectHTMLAttributes } from 'react';
 import { useId } from 'react';
 import { ApiError } from '../lib/api';
 
@@ -39,6 +39,33 @@ export function Field({ label, hint, ...input }: FieldProps) {
         {...input}
       />
       {hint ? <p className="text-sm text-muted">{hint}</p> : null}
+    </div>
+  );
+}
+
+interface SelectProps extends SelectHTMLAttributes<HTMLSelectElement> {
+  label: string;
+  options: { value: string; label: string }[];
+}
+
+export function Select({ label, options, ...select }: SelectProps) {
+  const id = useId();
+  return (
+    <div className="mb-4 flex flex-col gap-1">
+      <label htmlFor={id} className="text-sm font-semibold">
+        {label}
+      </label>
+      <select
+        id={id}
+        className="rounded-lg border border-gray-300 bg-white px-3 py-3 text-base focus:border-brand focus:outline-none"
+        {...select}
+      >
+        {options.map((option) => (
+          <option key={option.value} value={option.value}>
+            {option.label}
+          </option>
+        ))}
+      </select>
     </div>
   );
 }

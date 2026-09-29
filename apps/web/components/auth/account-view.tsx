@@ -20,6 +20,7 @@ export function AccountView() {
   const [me, setMe] = useState<Me | null>(null);
   const [devices, setDevices] = useState<DeviceSummary[]>([]);
   const [unread, setUnread] = useState(0);
+  const [platformOwner, setPlatformOwner] = useState(false);
   const [error, setError] = useState<unknown>(null);
 
   const load = useCallback(async () => {
@@ -32,6 +33,7 @@ export function AccountView() {
       setMe(current);
       setDevices((await api<{ devices: DeviceSummary[] }>('/auth/devices')).devices);
       setUnread((await api<{ unread: number }>('/notifications')).unread);
+      setPlatformOwner((await api<{ platformOwner: boolean }>('/me/workspaces')).platformOwner);
     } catch (err) {
       if (err instanceof ApiError && err.status === 401) router.replace('/login');
       else setError(err);
@@ -87,6 +89,15 @@ export function AccountView() {
           </Link>
         )}
       </section>
+
+      {platformOwner ? (
+        <Link
+          href="/platform"
+          className="rounded-lg bg-brand px-4 py-3 text-center font-semibold text-brand-contrast"
+        >
+          {t('platformConsole')}
+        </Link>
+      ) : null}
 
       <TwoFactorSection enabled={me.user.twoFactorEnabled} onChange={load} />
 

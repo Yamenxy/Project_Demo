@@ -17,6 +17,12 @@ export const QUEUES = {
     retentionSeconds: 30 * 24 * 3600,
     deleteAfterSeconds: 30 * 24 * 3600,
   },
+  'billing.subscription_check': {
+    retryLimit: 3,
+    retryDelay: 60,
+    retryBackoff: true,
+    deadLetter: FAILED_JOBS_QUEUE,
+  },
   'notify.email': {
     retryLimit: 5,
     retryDelay: 30,

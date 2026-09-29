@@ -43,7 +43,11 @@ export default tseslint.config(
     plugins: { react },
     settings: { react: { version: 'detect' } },
     rules: {
-      'react/jsx-no-literals': ['error', { noStrings: true, ignoreProps: true }],
+      // Punctuation used as separators isn't text to translate.
+      'react/jsx-no-literals': [
+        'error',
+        { noStrings: true, ignoreProps: true, allowedStrings: [' ', '·', ' ·'] },
+      ],
     },
   },
   {

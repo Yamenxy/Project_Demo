@@ -138,6 +138,20 @@ export async function seedDemoData(
       [physics, randomUUID(), `${DEMO_PHONE_PREFIX}0199`],
     );
 
+    // Physics has paid for a month; chemistry is still on its trial.
+    await client.query(
+      `insert into subscriptions (workspace_id, plan, period_ends_at, grace_days, created_at, updated_at)
+       values ($1, 'growth', now() + interval '20 days', 7, now(), now()),
+              ($2, 'starter', now() + interval '10 days', 7, now(), now())`,
+      [physics, chemistry],
+    );
+    await client.query(
+      `insert into platform_payments (id, workspace_id, amount_piastres, currency, method, reference,
+                                      paid_on, months, recorded_by, created_at)
+       values ($1, $2, 150000, 'EGP', 'instapay', 'DEMO-0001', current_date - 10, 1, $3, now())`,
+      [randomUUID(), physics, ids.platform],
+    );
+
     await client.query('commit');
     return { created: true, password: options.password, logins };
   } catch (err) {

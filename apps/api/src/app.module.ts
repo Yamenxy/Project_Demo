@@ -8,6 +8,7 @@ import { JobsModule } from './jobs';
 import { AuditModule } from './modules/audit';
 import { IdentityModule } from './modules/identity';
 import { NotifyModule } from './modules/notify';
+import { PlatformAdminModule } from './modules/platform-admin';
 import { TenancyModule } from './modules/tenancy';
 
 @Module({
@@ -21,6 +22,7 @@ import { TenancyModule } from './modules/tenancy';
     IdentityModule,
     TenancyModule,
     IdempotencyModule,
+    PlatformAdminModule,
   ],
   controllers: [HealthController],
 })
