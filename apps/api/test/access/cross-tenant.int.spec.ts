@@ -46,6 +46,9 @@ const SAMPLE_BODIES: Record<string, object> = {
     durationMinutes: 60,
   },
   'POST /api/v1/w/:workspaceId/sessions/:sessionId/cancel': { reason: 'cross-tenant test' },
+  'POST /api/v1/w/:workspaceId/sessions/:sessionId/attendance': {
+    records: [{ membershipId: randomUUID(), status: 'present' }],
+  },
   'POST /api/v1/w/:workspaceId/classes/:classId/students': { membershipIds: [randomUUID()] },
   'POST /api/v1/w/:workspaceId/classes/:classId/students/:membershipId/transfer': {
     toClassId: randomUUID(),

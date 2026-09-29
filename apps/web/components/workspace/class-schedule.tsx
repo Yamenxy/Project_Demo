@@ -2,7 +2,8 @@
 
 import { useFormatter, useTranslations } from 'next-intl';
 import { useCallback, useEffect, useState, type FormEvent } from 'react';
-import { api } from '../../lib/api';
+import { Link } from '../../i18n/navigation';
+import { api, ApiError } from '../../lib/api';
 import { ErrorMessage, SubmitButton } from '../form';
 
 export const TIME_ZONE = 'Africa/Cairo';
@@ -102,12 +103,17 @@ export function ClassSchedule({
   const cancel = (session: Session) => {
     const reason = window.prompt(t('cancelReason'));
     if (!reason || reason.trim().length < 3) return;
-    run(() =>
-      api(`${base}/sessions/${session.id}/cancel`, {
-        method: 'POST',
-        body: { reason: reason.trim() },
-      }),
-    );
+    run(async () => {
+      const url = `${base}/sessions/${session.id}/cancel`;
+      try {
+        await api(url, { method: 'POST', body: { reason: reason.trim() } });
+      } catch (err) {
+        // Attendance was already taken: the records are kept, but ask first (REQ-ATT-002).
+        if (!(err instanceof ApiError) || err.code !== 'session_has_attendance') throw err;
+        if (!window.confirm(t('confirmCancelWithAttendance'))) return;
+        await api(url, { method: 'POST', body: { reason: reason.trim(), confirm: true } });
+      }
+    });
   };
 
   const weekday = (day: number) => t(`weekdays.${String(day)}`);
@@ -223,9 +229,13 @@ export function ClassSchedule({
       <ul className="flex flex-col gap-1 text-sm">
         {sessions.slice(0, 10).map((session) => (
           <li key={session.id} className="flex flex-wrap items-center justify-between gap-2">
-            <span className={session.cancelled ? 'text-muted line-through' : ''}>
-              {when(session.startsAt)}
-            </span>
+            {session.cancelled ? (
+              <span className="text-muted line-through">{when(session.startsAt)}</span>
+            ) : (
+              <Link href={`${base}/sessions/${session.id}`} className="underline">
+                {when(session.startsAt)}
+              </Link>
+            )}
             {canManage ? (
               session.cancelled ? (
                 <button

@@ -131,7 +131,11 @@
     "same_class": "الطالب في هذا الفصل بالفعل.",
     "permission_not_class_scoped": "هذه الصلاحية تشمل المساحة كلها ولا يمكن قصرها على فصول.",
     "invalid_range": "الفترة المطلوبة طويلة جدًا.",
-    "invalid_date": "التاريخ غير صحيح."
+    "invalid_date": "التاريخ غير صحيح.",
+    "session_cancelled": "هذه الحصة ملغاة.",
+    "attendance_locked": "مر أكثر من 48 ساعة. التعديل يحتاج صلاحية التعديل المتأخر.",
+    "reason_required": "اكتب سببًا للتعديل.",
+    "session_has_attendance": "سُجل حضور في هذه الحصة."
   },
   "notifications": {
     "title": "الإشعارات",
@@ -491,6 +495,25 @@
       "6": "السبت"
     },
     "timeRange": "{from} – {to}",
-    "overlapLine": "{name} — {when}"
+    "overlapLine": "{name} — {when}",
+    "confirmCancelWithAttendance": "سُجل حضور في هذه الحصة. هل تريد إلغاءها؟ السجلات ستبقى محفوظة."
+  },
+  "attendance": {
+    "status": {
+      "present": "حاضر",
+      "late": "متأخر",
+      "absent": "غائب",
+      "excused": "بعذر"
+    },
+    "countLine": "{label}: {count}",
+    "cancelled": "هذه الحصة ملغاة. السجلات محفوظة ولا تدخل في نسب الحضور.",
+    "locked": "مر أكثر من 48 ساعة على الحصة. أي تعديل يحتاج صلاحية التعديل المتأخر وسببًا.",
+    "lateReason": "سبب تعديل الحضور بعد 48 ساعة:",
+    "scan": "مسح أكواد الطلاب",
+    "allPresent": "الباقون حاضرون",
+    "paused": "الوصول متوقف",
+    "noStudents": "لا يوجد طلاب في هذا الفصل.",
+    "save": "{count, plural, =0 {حفظ} one {حفظ تغيير واحد} two {حفظ تغييرين} few {حفظ # تغييرات} other {حفظ # تغييرًا}}",
+    "saved": "تم الحفظ."
   }
 }

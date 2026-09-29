@@ -4,7 +4,12 @@
 export { idempotencyKeys } from '../idempotency/schema';
 export { auditLog } from '../modules/audit/schema';
 export { classEnrollments, classes } from '../modules/classes/schema';
-export { classSeries, classSessions, workspaceSkipDates } from '../modules/classes/schedule-schema';
+export {
+  attendanceRecords,
+  classSeries,
+  classSessions,
+  workspaceSkipDates,
+} from '../modules/classes/schedule-schema';
 export { notifications } from '../modules/notify/schema';
 export {
   platformPayments,

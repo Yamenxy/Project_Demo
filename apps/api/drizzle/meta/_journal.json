@@ -127,6 +127,13 @@
       "when": 1790709348556,
       "tag": "0017_schedules",
       "breakpoints": true
+    },
+    {
+      "idx": 18,
+      "version": "7",
+      "when": 1790710008764,
+      "tag": "0018_attendance",
+      "breakpoints": true
     }
   ]
 }

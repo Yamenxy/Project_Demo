@@ -4,7 +4,12 @@ import { AppError, Clock, IdGenerator, notFound } from '../../common';
 import { TenantDb, type DbTx } from '../../database';
 import { AuditService } from '../audit';
 import { classEnrollments, classes } from './schema';
-import { classSeries, classSessions, workspaceSkipDates } from './schedule-schema';
+import {
+  attendanceRecords,
+  classSeries,
+  classSessions,
+  workspaceSkipDates,
+} from './schedule-schema';
 import type { WorkspaceContext } from '../tenancy';
 import { classScope } from './classes.service';
 import type { Actor } from './classes.service';
@@ -243,7 +248,7 @@ export class ScheduleService {
   async setCancelled(
     ctx: WorkspaceContext,
     sessionId: string,
-    cancel: { reason: string } | null,
+    cancel: { reason: string; confirm?: boolean } | null,
     actor: Actor,
   ): Promise<void> {
     await this.db.inWorkspace(ctx.workspaceId, async (tx) => {
@@ -254,6 +259,14 @@ export class ScheduleService {
         .for('update');
       if (!session) throw notFound('Session not found');
       await this.managedClass(tx, ctx, session.classId);
+      // Records are kept and flagged; percentages leave the session out (REQ-ATT-002).
+      if (cancel && !cancel.confirm && (await this.sessionsWithAttendance(tx, [sessionId])).size) {
+        throw new AppError(
+          409,
+          'session_has_attendance',
+          'Confirm to cancel a session with attendance',
+        );
+      }
       await tx
         .update(classSessions)
         .set(
@@ -267,7 +280,9 @@ export class ScheduleService {
         workspaceId: ctx.workspaceId,
         actor: { type: 'user', userId: actor.userId },
         entity: { type: 'session', id: sessionId },
-        ...(cancel ? { reason: cancel.reason } : {}),
+        ...(cancel
+          ? { reason: cancel.reason, newValue: { confirmed: Boolean(cancel.confirm) } }
+          : {}),
         requestId: actor.requestId,
       });
     });
@@ -362,9 +377,12 @@ export class ScheduleService {
     }
   }
 
-  /** Overridden once attendance exists (Phase 3 task 3.4). */
-  protected sessionsWithAttendance(_tx: DbTx, _ids: string[]): Promise<Set<string>> {
-    return Promise.resolve(new Set());
+  private async sessionsWithAttendance(tx: DbTx, ids: string[]): Promise<Set<string>> {
+    const rows = await tx
+      .selectDistinct({ sessionId: attendanceRecords.sessionId })
+      .from(attendanceRecords)
+      .where(inArray(attendanceRecords.sessionId, ids));
+    return new Set(rows.map((r) => r.sessionId));
   }
 
   private async overlaps(tx: DbTx, newSessions: ReturnType<typeof sql>): Promise<OverlapWarning[]> {

@@ -35,3 +35,17 @@ export const classSessions = pgTable('class_sessions', {
   cancelReason: text('cancel_reason'),
   createdAt: tstz('created_at').notNull(),
 });
+
+/** Mirrors drizzle/0018_attendance.sql. */
+export const attendanceRecords = pgTable('attendance_records', {
+  workspaceId: uuid('workspace_id').notNull(),
+  id: uuid('id').primaryKey(),
+  sessionId: uuid('session_id').notNull(),
+  membershipId: uuid('membership_id').notNull(),
+  status: text('status', { enum: ['present', 'late', 'absent', 'excused'] }).notNull(),
+  method: text('method', { enum: ['manual', 'qr'] }).notNull(),
+  takenAt: tstz('taken_at').notNull(),
+  recordedBy: uuid('recorded_by').notNull(),
+  createdAt: tstz('created_at').notNull(),
+  updatedAt: tstz('updated_at').notNull(),
+});

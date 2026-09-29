@@ -2,6 +2,7 @@
 
 import { useFormatter, useTranslations } from 'next-intl';
 import { useCallback, useEffect, useState, type FormEvent } from 'react';
+import { Link } from '../../i18n/navigation';
 import { api } from '../../lib/api';
 import { ErrorMessage, Field, SubmitButton } from '../form';
 import { cairoToday, TIME_ZONE, type Session } from './class-schedule';
@@ -20,6 +21,7 @@ export function AgendaView() {
   const { workspace, permissions, membership } = useWorkspace();
   const base = `/w/${workspace.id}`;
   const canSkip = membership.role === 'owner';
+  const staff = membership.role === 'owner' || permissions.includes('attendance.mark');
   const [sessions, setSessions] = useState<Session[]>([]);
   const [skips, setSkips] = useState<{ date: string; reason: string | null }[]>([]);
   const [error, setError] = useState<unknown>(null);
@@ -92,9 +94,18 @@ export function AgendaView() {
                   key={s.id}
                   className={`rounded-xl bg-surface p-3 shadow-sm ${s.cancelled ? 'opacity-60' : ''}`}
                 >
-                  <p className={`font-semibold ${s.cancelled ? 'line-through' : ''}`}>
-                    {s.className}
-                  </p>
+                  {staff && !s.cancelled ? (
+                    <Link
+                      href={`${base}/sessions/${s.id}`}
+                      className="font-semibold text-brand underline"
+                    >
+                      {s.className}
+                    </Link>
+                  ) : (
+                    <p className={`font-semibold ${s.cancelled ? 'line-through' : ''}`}>
+                      {s.className}
+                    </p>
+                  )}
                   <p className="text-sm text-muted">
                     {t('timeRange', { from: time(s.startsAt), to: time(s.endsAt) })}
                     {s.cancelled ? ` · ${t('cancelled')}` : ''}

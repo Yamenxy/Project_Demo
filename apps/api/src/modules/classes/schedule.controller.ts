@@ -40,7 +40,10 @@ const seriesBody = z
   .refine((b) => !b.endsOn || b.endsOn >= b.startsOn, { message: 'ends before it starts' });
 const endBody = z.object({ endsOn: isoDate });
 const sessionBody = z.object({ date: isoDate, startTime: clockTime, durationMinutes: duration });
-const cancelBody = z.object({ reason: z.string().trim().min(3).max(300) });
+const cancelBody = z.object({
+  reason: z.string().trim().min(3).max(300),
+  confirm: z.boolean().optional(),
+});
 const agendaQuery = z.object({ from: isoDate, to: isoDate });
 const skipBody = z.object({ date: isoDate, reason: z.string().trim().max(120).optional() });
 
