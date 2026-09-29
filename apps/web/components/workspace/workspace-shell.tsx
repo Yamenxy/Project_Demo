@@ -81,7 +81,10 @@ export function WorkspaceShell({
     {
       href: `${base}/students`,
       label: t('nav.students'),
-      visible: (c) => c.membership.role === 'owner' || c.permissions.includes('enrollment.manage'),
+      visible: (c) =>
+        c.membership.role === 'owner' ||
+        c.permissions.includes('enrollment.manage') ||
+        c.permissions.includes('students.import'),
     },
     { href: `${base}/staff`, label: t('nav.staff'), visible: (c) => c.membership.role === 'owner' },
     {

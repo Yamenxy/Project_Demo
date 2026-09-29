@@ -11,6 +11,11 @@ import {
   type SessionContext,
 } from '../../common/policy';
 import type { WorkspaceContext } from './access.guard';
+import {
+  MAX_IMPORT_BYTES,
+  StudentImportService,
+  type ImportReport,
+} from './student-import.service';
 import { StudentsService, type JoinResult, type StudentRow } from './students.service';
 import { CurrentWorkspace } from './workspace.controller';
 
@@ -37,6 +42,16 @@ const removeBody = z.object({ reason: z.string().trim().min(3).max(300) });
 const settingsBody = z.object({
   rotateCode: z.boolean().optional(),
   autoApproveJoins: z.boolean().optional(),
+});
+
+const importBody = z.object({
+  fileName: z.string().trim().min(1).max(200),
+  // Base64 of at most 512 KB, so the request fits the default 1 MB body limit.
+  content: z
+    .string()
+    .max(Math.ceil(MAX_IMPORT_BYTES / 3) * 4 + 4)
+    .regex(/^[A-Za-z0-9+/]*={0,2}$/),
+  commit: z.boolean().default(false),
 });
 
 const uuidParam = new ZodPipe(z.uuid());
@@ -69,7 +84,10 @@ export class JoinController {
 
 @Controller('v1/w/:workspaceId')
 export class StudentsController {
-  constructor(private readonly students: StudentsService) {}
+  constructor(
+    private readonly students: StudentsService,
+    private readonly imports: StudentImportService,
+  ) {}
 
   @Get('students')
   @WorkspacePermission('enrollment.manage')
@@ -99,6 +117,24 @@ export class StudentsController {
       actorOf(session, request),
     );
     return { membershipId, link: claimLink(ctx.workspaceId, token) };
+  }
+
+  /** A preview unless `commit` is true; both return the same per-row report (REQ-USER-002). */
+  @Post('students/import')
+  @HttpCode(200)
+  @WorkspacePermission('students.import')
+  import(
+    @CurrentWorkspace() ctx: WorkspaceContext,
+    @CurrentSession() session: SessionContext,
+    @Body(new ZodPipe(importBody)) body: z.infer<typeof importBody>,
+    @Req() request: FastifyRequest,
+  ): Promise<ImportReport> {
+    return this.imports.import(
+      ctx.workspaceId,
+      { fileName: body.fileName, data: Buffer.from(body.content, 'base64') },
+      { commit: body.commit },
+      actorOf(session, request),
+    );
   }
 
   @Post('students/:membershipId/approve')

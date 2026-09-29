@@ -107,7 +107,11 @@
     "not_a_student_account": "Only students' devices can be reset.",
     "permission_not_grantable": "That permission can't be given to this role.",
     "join_code_invalid": "No workspace has this code. Check the code with your teacher.",
-    "internal_code_taken": "Another student already has this code."
+    "internal_code_taken": "Another student already has this code.",
+    "import_too_large": "The file is too large. The limit is 512 KB and 1000 students.",
+    "import_unreadable": "We couldn't read the file. Save it as xlsx or CSV and try again.",
+    "import_empty": "There are no students in the file.",
+    "import_conflict": "The student list changed during the import. Try again."
   },
   "notifications": {
     "title": "Notifications",
@@ -317,5 +321,28 @@
     "joined": "You joined {name}.",
     "open": "Open workspace",
     "backToAccount": "Back to my account"
+  },
+  "studentImport": {
+    "title": "Import students from a file",
+    "explain": "An Excel (xlsx) or CSV file, up to 1000 students. Columns: student name, their mobile number, and your own code (optional). We check the file first; nobody is added until you confirm.",
+    "choose": "Choose a file",
+    "ready": "{count, plural, =0 {No students ready to add out of {total} rows.} one {1 student ready to add out of {total} rows.} other {# students ready to add out of {total} rows.}}",
+    "added": "{count, plural, =0 {No students were added.} one {1 student added.} other {# students added.}}",
+    "confirm": "{count, plural, one {Add 1 student} other {Add # students}}",
+    "skipped": "{count, plural, one {1 row won't be added:} other {# rows won't be added:}}",
+    "next": "Send your join code to your students: when a student joins with the same number, they get their record straight away, without waiting for approval.",
+    "row": "Row",
+    "name": "Name",
+    "phone": "Number",
+    "reason": "Reason",
+    "status": {
+      "ok": "Ready",
+      "missing_name": "Name missing",
+      "missing_phone": "No student mobile number",
+      "invalid_phone": "Mobile number isn't valid",
+      "duplicate_in_file": "Number repeated in the file",
+      "already_member": "Number already in your workspace",
+      "code_taken": "Your code is already used"
+    }
   }
 }

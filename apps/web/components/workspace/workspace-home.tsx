@@ -26,7 +26,10 @@ export function WorkspaceHome() {
       href: `${base}/students`,
       title: t('nav.students'),
       text: t('cards.students'),
-      show: membership.role === 'owner' || permissions.includes('enrollment.manage'),
+      show:
+        membership.role === 'owner' ||
+        permissions.includes('enrollment.manage') ||
+        permissions.includes('students.import'),
     },
     {
       href: `${base}/staff`,

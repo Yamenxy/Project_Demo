@@ -90,6 +90,10 @@ export class StudentsService {
       if (existing && existing.status !== 'removed') {
         return { workspaceId, workspaceName: workspace.name, status: existing.status };
       }
+      if (!existing) {
+        const claimed = await this.claimManagedByPhone(tx, workspaceId, userId);
+        if (claimed) return { workspaceId, workspaceName: workspace.name, status: 'active' };
+      }
       const status: MembershipStatus = workspace.auto_approve ? 'active' : 'pending';
       let membershipId: string;
       if (existing) {
@@ -131,6 +135,62 @@ export class StudentsService {
       }
       return { workspaceId, workspaceName: workspace.name, status };
     });
+  }
+
+  /**
+   * A student record the teacher already made (by hand or by import) for this user's verified
+   * phone becomes theirs when they join: the teacher added them, so no approval is needed, and
+   * the record keeps its history (REQ-USER-002, REQ-USER-003).
+   */
+  private async claimManagedByPhone(
+    tx: DbTx,
+    workspaceId: string,
+    userId: string,
+  ): Promise<boolean> {
+    const [user] = await tx
+      .select({ phone: users.phoneE164, verifiedAt: users.phoneVerifiedAt })
+      .from(users)
+      .where(eq(users.id, userId));
+    if (!user?.phone || !user.verifiedAt) return false;
+    // Serializes with imports, so the record can't be created twice meanwhile.
+    await tx.select({ id: workspaceSettings.workspaceId }).from(workspaceSettings).for('update');
+    const [record] = await tx
+      .select({ id: memberships.id })
+      .from(memberships)
+      .where(
+        and(
+          isNull(memberships.userId),
+          eq(memberships.provisionalPhone, user.phone),
+          eq(memberships.status, 'active'),
+        ),
+      )
+      .orderBy(memberships.createdAt)
+      .limit(1)
+      .for('update');
+    if (!record) return false;
+    const now = this.clock.now();
+    await tx
+      .update(memberships)
+      .set({ userId, status: 'active', updatedAt: now })
+      .where(eq(memberships.id, record.id));
+    await tx
+      .update(workspaceInvitations)
+      .set({ revokedAt: now })
+      .where(
+        and(
+          eq(workspaceInvitations.membershipId, record.id),
+          isNull(workspaceInvitations.acceptedAt),
+          isNull(workspaceInvitations.revokedAt),
+        ),
+      );
+    await this.audit.record(tx, {
+      action: 'student.claimed',
+      workspaceId,
+      actor: { type: 'user', userId },
+      entity: { type: 'membership', id: record.id },
+      newValue: { via: 'join' },
+    });
+    return true;
   }
 
   async list(

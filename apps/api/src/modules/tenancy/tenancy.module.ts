@@ -12,6 +12,7 @@ import { PermissionsService } from './permissions.service';
 import { InvitationAcceptController, StaffController } from './staff.controller';
 import { StaffService } from './staff.service';
 import { JoinController, StudentsController } from './students.controller';
+import { StudentImportService } from './student-import.service';
 import { StudentsService } from './students.service';
 import { WorkspaceController } from './workspace.controller';
 import { WorkspacesService } from './workspaces.service';
@@ -40,6 +41,7 @@ import { WorkspacesService } from './workspaces.service';
     InvitationsService,
     StaffService,
     StudentsService,
+    StudentImportService,
     { provide: DeviceLimitPolicy, useClass: MembershipDeviceLimitPolicy },
     { provide: APP_GUARD, useClass: AccessGuard },
   ],

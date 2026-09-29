@@ -8,6 +8,7 @@ import { api } from '../../lib/api';
 import { Ltr } from '../../lib/bidi';
 import { ErrorMessage, Field, SubmitButton } from '../form';
 import { absoluteUrl, ShareLink } from './share-link';
+import { StudentImport } from './student-import';
 import { useWorkspace } from './workspace-shell';
 
 interface Student {
@@ -41,6 +42,8 @@ export function StudentsView() {
   const base = `/w/${workspace.id}`;
   const isOwner = membership.role === 'owner';
   const canReset = isOwner || permissions.includes('students.sessions_reset');
+  const canManage = isOwner || permissions.includes('enrollment.manage');
+  const canImport = isOwner || permissions.includes('students.import');
 
   const [filter, setFilter] = useState<'all' | 'pending'>(
     params.get('status') === 'pending' ? 'pending' : 'all',
@@ -56,6 +59,8 @@ export function StudentsView() {
 
   const load = useCallback(async () => {
     try {
+      if (isOwner) setJoining(await api<Joining>(`${base}/joining`));
+      if (!canManage) return;
       const search = new URLSearchParams();
       if (filter === 'pending') search.set('status', 'pending');
       if (query.trim()) search.set('q', toWesternDigits(query.trim()));
@@ -64,11 +69,10 @@ export function StudentsView() {
       );
       setStudents(data.students);
       setPendingCount(data.pendingCount);
-      if (isOwner) setJoining(await api<Joining>(`${base}/joining`));
     } catch (err) {
       setError(err);
     }
-  }, [base, filter, query, isOwner]);
+  }, [base, filter, query, isOwner, canManage]);
 
   useEffect(() => {
     const timer = setTimeout(() => void load(), 250);
@@ -182,153 +186,159 @@ export function StudentsView() {
         </section>
       ) : null}
 
-      <section className="flex flex-col gap-3">
-        <div className="flex flex-wrap items-center gap-2">
-          <button
-            type="button"
-            onClick={() => setFilter('all')}
-            className={`rounded-full px-3 py-1 text-sm ${filter === 'all' ? 'bg-brand text-brand-contrast' : 'border'}`}
-          >
-            {t('filterAll')}
-          </button>
-          <button
-            type="button"
-            onClick={() => setFilter('pending')}
-            className={`rounded-full px-3 py-1 text-sm ${filter === 'pending' ? 'bg-brand text-brand-contrast' : 'border'}`}
-          >
-            {t('filterPending', { count: pendingCount })}
-          </button>
-          <input
-            type="search"
-            value={query}
-            onChange={(event) => setQuery(event.target.value)}
-            placeholder={t('search')}
-            aria-label={t('search')}
-            className="min-w-0 flex-1 rounded-lg border px-3 py-2 text-sm"
-          />
-        </div>
+      {canManage ? (
+        <section className="flex flex-col gap-3">
+          <div className="flex flex-wrap items-center gap-2">
+            <button
+              type="button"
+              onClick={() => setFilter('all')}
+              className={`rounded-full px-3 py-1 text-sm ${filter === 'all' ? 'bg-brand text-brand-contrast' : 'border'}`}
+            >
+              {t('filterAll')}
+            </button>
+            <button
+              type="button"
+              onClick={() => setFilter('pending')}
+              className={`rounded-full px-3 py-1 text-sm ${filter === 'pending' ? 'bg-brand text-brand-contrast' : 'border'}`}
+            >
+              {t('filterPending', { count: pendingCount })}
+            </button>
+            <input
+              type="search"
+              value={query}
+              onChange={(event) => setQuery(event.target.value)}
+              placeholder={t('search')}
+              aria-label={t('search')}
+              className="min-w-0 flex-1 rounded-lg border px-3 py-2 text-sm"
+            />
+          </div>
 
-        {students.length === 0 ? <p className="text-muted">{t('empty')}</p> : null}
-        <ul className="flex flex-col gap-2">
-          {students.map((student) => (
-            <li key={student.membershipId} className="rounded-xl bg-surface p-4 shadow-sm">
-              <div className="flex flex-wrap items-start justify-between gap-2">
-                <div>
-                  <p className="font-semibold">{student.name}</p>
-                  <p className="text-sm text-muted">
-                    {student.platformCode ? <Ltr>{student.platformCode}</Ltr> : null}
-                    {student.internalCode ? (
-                      <>
-                        {' · '}
-                        <Ltr>{student.internalCode}</Ltr>
-                      </>
-                    ) : null}
-                    {student.phoneE164 ? (
-                      <>
-                        {' · '}
-                        <Ltr>{student.phoneE164}</Ltr>
-                      </>
-                    ) : null}
-                  </p>
-                </div>
-                <div className="flex flex-wrap gap-1">
-                  <span
-                    className={`rounded-full px-2 py-0.5 text-xs ${STATUS_STYLE[student.status]}`}
-                  >
-                    {t(`status.${student.status}`)}
-                  </span>
-                  {student.managed ? (
-                    <span className="rounded-full bg-gray-100 px-2 py-0.5 text-xs">
-                      {t('managed')}
-                    </span>
-                  ) : null}
-                  {student.paused ? (
-                    <span className="rounded-full bg-red-50 px-2 py-0.5 text-xs text-red-800">
-                      {t('paused')}
-                    </span>
-                  ) : null}
-                </div>
-              </div>
-              <div className="mt-3 flex flex-wrap gap-2 text-sm">
-                {student.status === 'pending' ? (
-                  <>
-                    <button
-                      type="button"
-                      disabled={busy}
-                      onClick={() =>
-                        void run(() =>
-                          api(`${base}/students/${student.membershipId}/approve`, {
-                            method: 'POST',
-                          }),
-                        )
-                      }
-                      className="rounded-lg bg-brand px-3 py-1 text-brand-contrast"
+          {students.length === 0 ? <p className="text-muted">{t('empty')}</p> : null}
+          <ul className="flex flex-col gap-2">
+            {students.map((student) => (
+              <li key={student.membershipId} className="rounded-xl bg-surface p-4 shadow-sm">
+                <div className="flex flex-wrap items-start justify-between gap-2">
+                  <div>
+                    <p className="font-semibold">{student.name}</p>
+                    <p className="text-sm text-muted">
+                      {student.platformCode ? <Ltr>{student.platformCode}</Ltr> : null}
+                      {student.internalCode ? (
+                        <>
+                          {' · '}
+                          <Ltr>{student.internalCode}</Ltr>
+                        </>
+                      ) : null}
+                      {student.phoneE164 ? (
+                        <>
+                          {' · '}
+                          <Ltr>{student.phoneE164}</Ltr>
+                        </>
+                      ) : null}
+                    </p>
+                  </div>
+                  <div className="flex flex-wrap gap-1">
+                    <span
+                      className={`rounded-full px-2 py-0.5 text-xs ${STATUS_STYLE[student.status]}`}
                     >
-                      {t('approve')}
-                    </button>
+                      {t(`status.${student.status}`)}
+                    </span>
+                    {student.managed ? (
+                      <span className="rounded-full bg-gray-100 px-2 py-0.5 text-xs">
+                        {t('managed')}
+                      </span>
+                    ) : null}
+                    {student.paused ? (
+                      <span className="rounded-full bg-red-50 px-2 py-0.5 text-xs text-red-800">
+                        {t('paused')}
+                      </span>
+                    ) : null}
+                  </div>
+                </div>
+                <div className="mt-3 flex flex-wrap gap-2 text-sm">
+                  {student.status === 'pending' ? (
+                    <>
+                      <button
+                        type="button"
+                        disabled={busy}
+                        onClick={() =>
+                          void run(() =>
+                            api(`${base}/students/${student.membershipId}/approve`, {
+                              method: 'POST',
+                            }),
+                          )
+                        }
+                        className="rounded-lg bg-brand px-3 py-1 text-brand-contrast"
+                      >
+                        {t('approve')}
+                      </button>
+                      <button
+                        type="button"
+                        disabled={busy}
+                        onClick={() =>
+                          void run(() =>
+                            api(`${base}/students/${student.membershipId}/reject`, {
+                              method: 'POST',
+                            }),
+                          )
+                        }
+                        className="rounded-lg border px-3 py-1"
+                      >
+                        {t('reject')}
+                      </button>
+                    </>
+                  ) : null}
+                  {student.managed ? (
                     <button
                       type="button"
                       disabled={busy}
-                      onClick={() =>
-                        void run(() =>
-                          api(`${base}/students/${student.membershipId}/reject`, {
-                            method: 'POST',
-                          }),
-                        )
-                      }
+                      onClick={() => claimLink(student)}
                       className="rounded-lg border px-3 py-1"
                     >
-                      {t('reject')}
+                      {t('newClaimLink')}
                     </button>
-                  </>
-                ) : null}
-                {student.managed ? (
-                  <button
-                    type="button"
-                    disabled={busy}
-                    onClick={() => claimLink(student)}
-                    className="rounded-lg border px-3 py-1"
-                  >
-                    {t('newClaimLink')}
-                  </button>
-                ) : null}
-                {canReset && !student.managed && student.status === 'active' ? (
-                  <button
-                    type="button"
-                    disabled={busy}
-                    onClick={() => resetDevices(student)}
-                    className="rounded-lg border px-3 py-1"
-                  >
-                    {t('resetDevices')}
-                  </button>
-                ) : null}
-                {isOwner && student.status !== 'pending' ? (
-                  <button
-                    type="button"
-                    disabled={busy}
-                    onClick={() => remove(student)}
-                    className="rounded-lg border px-3 py-1 text-red-700"
-                  >
-                    {t('remove')}
-                  </button>
-                ) : null}
-              </div>
-            </li>
-          ))}
-        </ul>
-      </section>
+                  ) : null}
+                  {canReset && !student.managed && student.status === 'active' ? (
+                    <button
+                      type="button"
+                      disabled={busy}
+                      onClick={() => resetDevices(student)}
+                      className="rounded-lg border px-3 py-1"
+                    >
+                      {t('resetDevices')}
+                    </button>
+                  ) : null}
+                  {isOwner && student.status !== 'pending' ? (
+                    <button
+                      type="button"
+                      disabled={busy}
+                      onClick={() => remove(student)}
+                      className="rounded-lg border px-3 py-1 text-red-700"
+                    >
+                      {t('remove')}
+                    </button>
+                  ) : null}
+                </div>
+              </li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
 
-      <section className="rounded-2xl bg-surface p-6 shadow-sm">
-        <h2 className="mb-1 font-semibold">{t('addTitle')}</h2>
-        <p className="mb-4 text-sm text-muted">{t('addExplain')}</p>
-        <form onSubmit={addManaged} noValidate>
-          <Field label={t('name')} name="name" required />
-          <Field label={t('phone')} name="phone" type="tel" inputMode="tel" dir="ltr" required />
-          <Field label={t('internalCode')} name="internalCode" dir="ltr" />
-          <SubmitButton busy={busy}>{t('add')}</SubmitButton>
-        </form>
-        {share ? <ShareLink url={share.url} message={share.message} /> : null}
-      </section>
+      {canImport ? <StudentImport workspaceId={workspace.id} onDone={() => void load()} /> : null}
+
+      {canManage ? (
+        <section className="rounded-2xl bg-surface p-6 shadow-sm">
+          <h2 className="mb-1 font-semibold">{t('addTitle')}</h2>
+          <p className="mb-4 text-sm text-muted">{t('addExplain')}</p>
+          <form onSubmit={addManaged} noValidate>
+            <Field label={t('name')} name="name" required />
+            <Field label={t('phone')} name="phone" type="tel" inputMode="tel" dir="ltr" required />
+            <Field label={t('internalCode')} name="internalCode" dir="ltr" />
+            <SubmitButton busy={busy}>{t('add')}</SubmitButton>
+          </form>
+          {share ? <ShareLink url={share.url} message={share.message} /> : null}
+        </section>
+      ) : null}
     </div>
   );
 }
