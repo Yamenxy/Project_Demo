@@ -150,7 +150,9 @@
     "file_too_large": "The file is larger than 20 MB.",
     "unsupported_media_type": "The file couldn't be uploaded.",
     "view_limit_reached": "You've used the view limit for this video.",
-    "invalid_playback_token": "Playback expired. Reload the page."
+    "invalid_playback_token": "Playback expired. Reload the page.",
+    "score_out_of_range": "A score is outside the allowed range.",
+    "invalid_score": "This score isn't valid."
   },
   "notifications": {
     "title": "Notifications",
@@ -283,7 +285,8 @@
     "mySchedule": "My schedule",
     "qrAlt": "Your attendance code",
     "myPayments": "My receipts",
-    "myLessons": "My lessons"
+    "myLessons": "My lessons",
+    "myGrades": "My grades"
   },
   "staff": {
     "title": "Staff",
@@ -489,7 +492,8 @@
     "search": "Search by student name, code or number",
     "add": "Add",
     "course": "Course:",
-    "noCourse": "No course"
+    "noCourse": "No course",
+    "gradebook": "Grades"
   },
   "schedule": {
     "title": "Schedule",
@@ -765,5 +769,30 @@
       "no_access": "This video isn't open for you.",
       "error": "The video couldn't be played."
     }
+  },
+  "grades": {
+    "title": "Grades",
+    "item": "Item",
+    "itemOption": "{title} (out of {max})",
+    "released": "Released to students",
+    "notReleased": "Not released",
+    "classAverage": "class average {value}%",
+    "release": "Release to students",
+    "unrelease": "Hide from students",
+    "noItems": "No grade items yet.",
+    "left": "moved out of the class",
+    "scoreFor": "{name}'s score",
+    "save": "Save scores",
+    "saved": "Saved.",
+    "reasonPrompt": "These grades are released. Why are you changing them?",
+    "newItem": "New item (paper exam or quiz)",
+    "itemTitle": "Item name",
+    "maxScore": "Maximum score",
+    "create": "Add",
+    "myTitle": "My grades",
+    "none": "No released grades yet.",
+    "average": "average {value}%",
+    "absent": "Absent",
+    "scoreOf": "{score} / {max}"
   }
 }

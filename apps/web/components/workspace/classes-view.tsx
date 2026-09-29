@@ -217,6 +217,14 @@ export function ClassView({ classId }: { classId: string }) {
         </Link>
         <h1 className="mt-2 text-xl font-semibold">{detail.name}</h1>
         <p className="text-sm text-muted">{t('responsible', { name: detail.responsible.name })}</p>
+        {isOwner || permissions.includes('grading.grade') ? (
+          <Link
+            href={`${base}/classes/${classId}/grades`}
+            className="mt-2 inline-block text-sm underline"
+          >
+            {t('gradebook')}
+          </Link>
+        ) : null}
         {isOwner && courses.length > 0 ? (
           <label className="mt-2 flex items-center gap-2 text-sm">
             {t('course')}

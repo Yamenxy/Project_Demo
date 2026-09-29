@@ -9,6 +9,7 @@ import { AuditModule } from './modules/audit';
 import { ClassesModule } from './modules/classes';
 import { ContentModule } from './modules/content';
 import { FilesModule } from './modules/files';
+import { GradingModule } from './modules/grading';
 import { IdentityModule } from './modules/identity';
 import { NotifyModule } from './modules/notify';
 import { PaymentsModule } from './modules/payments';
@@ -30,6 +31,7 @@ import { VideoModule } from './modules/video';
     ContentModule,
     FilesModule,
     VideoModule,
+    GradingModule,
     PaymentsModule,
     IdempotencyModule,
     PlatformAdminModule,

@@ -19,6 +19,7 @@ export {
   lessons,
 } from '../modules/content/schema';
 export { files } from '../modules/files/schema';
+export { gradeChanges, gradeEntries, gradeItems } from '../modules/grading/schema';
 export { notifications } from '../modules/notify/schema';
 export { lessonVideos, videoWatchTime } from '../modules/video/schema';
 export {

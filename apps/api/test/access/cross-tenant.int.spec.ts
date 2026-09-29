@@ -43,6 +43,12 @@ const SAMPLE_BODIES: Record<string, object> = {
   'POST /api/v1/w/:workspaceId/students/:membershipId/consent': {},
   'POST /api/v1/w/:workspaceId/classes/:classId': { name: 'تغيير' },
   'POST /api/v1/w/:workspaceId/price-items/:itemId': { name: 'تغيير' },
+  'POST /api/v1/w/:workspaceId/classes/:classId/grade-items': { title: 'بند', maxScore: 10 },
+  'POST /api/v1/w/:workspaceId/grade-items/:itemId': { title: 'تغيير' },
+  'POST /api/v1/w/:workspaceId/grade-items/:itemId/scores': {
+    scores: [{ membershipId: randomUUID(), score: 1 }],
+  },
+  'POST /api/v1/w/:workspaceId/grade-items/:itemId/release': { released: true },
   'POST /api/v1/w/:workspaceId/courses/:courseId': { title: 'تغيير' },
   'POST /api/v1/w/:workspaceId/courses/:courseId/lessons': { title: 'درس' },
   'POST /api/v1/w/:workspaceId/lessons/:lessonId': { title: 'تغيير' },

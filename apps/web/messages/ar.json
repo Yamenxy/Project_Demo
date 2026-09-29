@@ -150,7 +150,9 @@
     "file_too_large": "الملف أكبر من 20 ميجابايت.",
     "unsupported_media_type": "تعذر رفع الملف.",
     "view_limit_reached": "استهلكت حد المشاهدة لهذا الفيديو.",
-    "invalid_playback_token": "انتهت صلاحية التشغيل. أعد تحميل الصفحة."
+    "invalid_playback_token": "انتهت صلاحية التشغيل. أعد تحميل الصفحة.",
+    "score_out_of_range": "درجة خارج المدى المسموح.",
+    "invalid_score": "الدرجة غير صحيحة."
   },
   "notifications": {
     "title": "الإشعارات",
@@ -283,7 +285,8 @@
     "mySchedule": "مواعيدي",
     "qrAlt": "كود الحضور الخاص بك",
     "myPayments": "إيصالاتي",
-    "myLessons": "دروسي"
+    "myLessons": "دروسي",
+    "myGrades": "درجاتي"
   },
   "staff": {
     "title": "الفريق",
@@ -489,7 +492,8 @@
     "search": "ابحث باسم الطالب أو الكود أو الرقم",
     "add": "إضافة",
     "course": "المقرر:",
-    "noCourse": "بدون مقرر"
+    "noCourse": "بدون مقرر",
+    "gradebook": "الدرجات"
   },
   "schedule": {
     "title": "المواعيد",
@@ -765,5 +769,30 @@
       "no_access": "هذا الفيديو غير متاح لك.",
       "error": "تعذر تشغيل الفيديو."
     }
+  },
+  "grades": {
+    "title": "الدرجات",
+    "item": "البند",
+    "itemOption": "{title} (من {max})",
+    "released": "معلنة للطلاب",
+    "notReleased": "غير معلنة",
+    "classAverage": "متوسط الفصل {value}٪",
+    "release": "إعلان للطلاب",
+    "unrelease": "إخفاء عن الطلاب",
+    "noItems": "لا توجد بنود درجات بعد.",
+    "left": "نُقل من الفصل",
+    "scoreFor": "درجة {name}",
+    "save": "حفظ الدرجات",
+    "saved": "تم الحفظ.",
+    "reasonPrompt": "الدرجات معلنة. اكتب سبب التعديل:",
+    "newItem": "بند جديد (امتحان ورقي أو كويز)",
+    "itemTitle": "اسم البند",
+    "maxScore": "الدرجة العظمى",
+    "create": "إضافة",
+    "myTitle": "درجاتي",
+    "none": "لا توجد درجات معلنة بعد.",
+    "average": "المتوسط {value}٪",
+    "absent": "غائب",
+    "scoreOf": "{score} / {max}"
   }
 }
