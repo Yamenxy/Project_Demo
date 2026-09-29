@@ -39,7 +39,8 @@ describe('Drizzle schema matches the migrated database', () => {
         expect(rows.length, `table ${name} exists`).toBeGreaterThan(0);
         const actual = rows.map((r) => ({
           name: r.column_name,
-          type: r.data_type,
+          // Drizzle calls it `time`; PostgreSQL reports the same type by its long name.
+          type: r.data_type === 'time without time zone' ? 'time' : r.data_type,
           notNull: r.is_nullable === 'NO',
         }));
         const expected = getTableConfig(table)
