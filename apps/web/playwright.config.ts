@@ -1,3 +1,4 @@
+import os from 'node:os';
 import path from 'node:path';
 import { defineConfig, devices } from '@playwright/test';
 
@@ -43,7 +44,10 @@ export default defineConfig({
         WEB_ORIGINS: 'http://localhost:3100',
         OTP_PROVIDER: 'file',
         OTP_OUTBOX_FILE: OTP_OUTBOX,
-        STORAGE_DIR: path.resolve(__dirname, 'test-results', 'storage'),
+        // Outside the project: video segments end in .ts and would look like TypeScript.
+        STORAGE_DIR: path.join(os.tmpdir(), 'lms-e2e-storage'),
+        FFMPEG_PATH: process.env.FFMPEG_PATH ?? 'ffmpeg',
+        FFPROBE_PATH: process.env.FFPROBE_PATH ?? 'ffprobe',
         // Test-only key, for this throwaway local run.
         SECRET_ENCRYPTION_KEY: 'ZTJlLW9ubHkta2V5LWZvci1sb2NhbC1icm93c2VyLXQ=',
       },

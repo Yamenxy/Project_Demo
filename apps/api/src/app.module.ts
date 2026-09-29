@@ -14,6 +14,7 @@ import { NotifyModule } from './modules/notify';
 import { PaymentsModule } from './modules/payments';
 import { PlatformAdminModule } from './modules/platform-admin';
 import { TenancyModule } from './modules/tenancy';
+import { VideoModule } from './modules/video';
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { TenancyModule } from './modules/tenancy';
     ClassesModule,
     ContentModule,
     FilesModule,
+    VideoModule,
     PaymentsModule,
     IdempotencyModule,
     PlatformAdminModule,

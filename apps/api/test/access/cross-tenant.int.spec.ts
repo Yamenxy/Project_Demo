@@ -33,6 +33,7 @@ const victim = {
   lessonId: '',
   groupId: '',
   fileId: '',
+  videoId: '',
 };
 const attacker = { workspaceId: '', token: '', studentToken: '' };
 
@@ -50,6 +51,8 @@ const SAMPLE_BODIES: Record<string, object> = {
   'POST /api/v1/w/:workspaceId/access-groups/:groupId/members': { add: [randomUUID()] },
   'POST /api/v1/w/:workspaceId/access-groups/:groupId/add-class': { classId: randomUUID() },
   'POST /api/v1/w/:workspaceId/access/students/:membershipId/remove-all': { confirmation: 'x' },
+  'POST /api/v1/w/:workspaceId/lessons/:lessonId/video/limit': { limitMinutes: 10 },
+  'POST /api/v1/w/:workspaceId/video/:videoId/progress': { seconds: 10 },
   'POST /api/v1/w/:workspaceId/payments/:paymentId/reverse': { reason: 'cross-tenant test' },
   'POST /api/v1/w/:workspaceId/payment-requests/:requestId/reject': { reason: 'cross-tenant test' },
   'POST /api/v1/w/:workspaceId/classes/:classId/series': {
@@ -91,6 +94,8 @@ function victimParams(): Record<string, string> {
     lessonId: victim.lessonId,
     groupId: victim.groupId,
     fileId: victim.fileId,
+    videoId: victim.videoId,
+    file: 'master.m3u8',
     owner: 'lessons',
     ownerId: victim.lessonId,
     permission: 'attendance.mark',
@@ -162,6 +167,12 @@ beforeAll(async () => {
      values ($1, $2, 'lesson', $3, 'x.pdf', 'application/pdf', 10, repeat('a', 64), 'available',
              $4, now())`,
     [victim.workspaceId, victim.fileId, victim.lessonId, victimOwner],
+  );
+  victim.videoId = randomUUID();
+  await adminQuery(
+    `insert into lesson_videos (workspace_id, id, lesson_id, status, uploaded_by, created_at, updated_at)
+     values ($1, $2, $3, 'ready', $4, now(), now())`,
+    [victim.workspaceId, victim.videoId, victim.lessonId, victimOwner],
   );
   victim.seriesId = randomUUID();
   await adminQuery(

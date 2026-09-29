@@ -33,6 +33,8 @@ jobs:
         run: pnpm typecheck
       # Integration tests start their own PostgreSQL container through Testcontainers
       # (Docker is available on GitHub-hosted Ubuntu runners).
+      - name: Install ffmpeg (self-hls video)
+        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends ffmpeg
       - name: Test
         run: pnpm test
       - name: Build
@@ -77,6 +79,8 @@ jobs:
         run: pnpm --filter @lms/api db:dev-setup
       - name: Install browser
         run: pnpm --filter @lms/web exec playwright install --with-deps chromium
+      - name: Install ffmpeg (self-hls video)
+        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends ffmpeg
       - name: Browser tests
         run: pnpm --filter @lms/web test:e2e
 

@@ -20,6 +20,7 @@ export {
 } from '../modules/content/schema';
 export { files } from '../modules/files/schema';
 export { notifications } from '../modules/notify/schema';
+export { lessonVideos, videoWatchTime } from '../modules/video/schema';
 export {
   cashHandovers,
   paymentEntries,

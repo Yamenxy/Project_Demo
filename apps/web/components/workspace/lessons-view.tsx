@@ -6,6 +6,7 @@ import { Link } from '../../i18n/navigation';
 import { api, ApiError } from '../../lib/api';
 import { ErrorMessage } from '../form';
 import { FileList } from './file-list';
+import { VideoPlayer } from './video-player';
 import { useWorkspace } from './workspace-shell';
 
 export interface StudentLesson {
@@ -81,6 +82,7 @@ export function LessonView({ lessonId }: { lessonId: string }) {
     preview: boolean;
   } | null>(null);
   const [reason, setReason] = useState<string | null>(null);
+  const [watermark, setWatermark] = useState('');
   const [error, setError] = useState<unknown>(null);
 
   useEffect(() => {
@@ -95,6 +97,13 @@ export function LessonView({ lessonId }: { lessonId: string }) {
         } else setError(err);
       });
   }, [workspace.id, lessonId]);
+
+  // Platform code and first name only, never the phone (REQ-VIDEO-002).
+  useEffect(() => {
+    api<{ user: { platformCode: string; nameAr: string } }>('/auth/me')
+      .then((me) => setWatermark(`${me.user.platformCode} · ${me.user.nameAr.split(' ')[0] ?? ''}`))
+      .catch(() => setWatermark(''));
+  }, []);
 
   if (reason) {
     return (
@@ -111,6 +120,7 @@ export function LessonView({ lessonId }: { lessonId: string }) {
       {lesson.preview ? (
         <p className="rounded-lg bg-gray-100 px-3 py-1 text-xs">{t('preview')}</p>
       ) : null}
+      <VideoPlayer base={`/w/${workspace.id}`} lessonId={lessonId} watermark={watermark} />
       {lesson.body ? (
         <div className="whitespace-pre-line rounded-2xl bg-surface p-5 leading-relaxed shadow-sm">
           {lesson.body}

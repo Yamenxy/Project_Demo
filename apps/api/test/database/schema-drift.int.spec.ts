@@ -14,6 +14,7 @@ interface DbColumn {
   column_name: string;
   data_type: string;
   is_nullable: 'YES' | 'NO';
+  udt_name: string;
 }
 
 const tables: PgTable[] = (Object.values(schema) as unknown[]).filter((value): value is PgTable =>
@@ -32,7 +33,7 @@ describe('Drizzle schema matches the migrated database', () => {
       await client.connect();
       try {
         const { rows } = await client.query<DbColumn>(
-          `select column_name, data_type, is_nullable from information_schema.columns
+          `select column_name, data_type, is_nullable, udt_name from information_schema.columns
             where table_schema = 'public' and table_name = $1 order by column_name`,
           [name],
         );
@@ -40,7 +41,13 @@ describe('Drizzle schema matches the migrated database', () => {
         const actual = rows.map((r) => ({
           name: r.column_name,
           // Drizzle calls it `time`; PostgreSQL reports the same type by its long name.
-          type: r.data_type === 'time without time zone' ? 'time' : r.data_type,
+          type:
+            r.data_type === 'time without time zone'
+              ? 'time'
+              : // Arrays are reported as ARRAY, with the element type in udt_name (_text).
+                r.data_type === 'ARRAY'
+                ? `${r.udt_name.replace(/^_/, '')}[]`
+                : r.data_type,
           notNull: r.is_nullable === 'NO',
         }));
         const expected = getTableConfig(table)

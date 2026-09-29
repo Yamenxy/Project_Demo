@@ -6,6 +6,7 @@ import { Link } from '../../i18n/navigation';
 import { api } from '../../lib/api';
 import { ErrorMessage, Field, SubmitButton } from '../form';
 import { FileList } from './file-list';
+import { VideoEditor } from './video-editor';
 import { useWorkspace } from './workspace-shell';
 
 export interface CourseSummary {
@@ -190,6 +191,10 @@ export function CourseView({ courseId }: { courseId: string }) {
                   />
                 </div>
                 <SubmitButton busy={busy}>{t('save')}</SubmitButton>
+                <div className="mt-4">
+                  <p className="mb-1 text-sm font-semibold">{t('video')}</p>
+                  <VideoEditor base={base} lessonId={lesson.id} />
+                </div>
                 <div className="mt-4">
                   <p className="mb-1 text-sm font-semibold">{t('files')}</p>
                   <FileList

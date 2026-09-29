@@ -23,8 +23,14 @@ export interface HttpOptions {
 }
 
 /** Shared HTTP setup for main.ts and tests. */
-/** The largest upload accepted (REQ-FILE-001). */
+/** The largest file upload (REQ-FILE-001). */
 export const UPLOAD_LIMIT_BYTES = 20 * 1024 * 1024;
+
+/**
+ * The largest lesson video upload on the free setup. The body is held in memory, so this stays
+ * modest; production uploads go straight to object storage (paid-services.md).
+ */
+export const VIDEO_UPLOAD_LIMIT_BYTES = 200 * 1024 * 1024;
 
 export async function configureHttp(
   app: NestFastifyApplication,
@@ -39,7 +45,7 @@ export async function configureHttp(
   // send one without a preflight; the Origin check below still applies.
   fastify.addContentTypeParser(
     'application/octet-stream',
-    { parseAs: 'buffer', bodyLimit: UPLOAD_LIMIT_BYTES },
+    { parseAs: 'buffer', bodyLimit: VIDEO_UPLOAD_LIMIT_BYTES },
     (_request, body, done) => done(null, body),
   );
 

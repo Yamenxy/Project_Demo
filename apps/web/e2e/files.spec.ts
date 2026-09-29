@@ -21,7 +21,7 @@ test('a teacher attaches a PDF to a lesson; it becomes available after the check
   const page = await context.newPage();
   await page.goto(`/ar/w/${workspaceId}/courses/${course?.id ?? ''}`);
   await page.getByRole('button', { name: 'تعديل' }).click();
-  await page.locator('input[type=file]').setInputFiles({
+  await page.locator('input[type=file][accept*="pdf"]').setInputFiles({
     name: 'خريطة.pdf',
     mimeType: 'application/pdf',
     buffer: Buffer.from('%PDF-1.4\n%%EOF\n'),

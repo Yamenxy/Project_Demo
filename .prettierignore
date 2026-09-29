@@ -5,3 +5,5 @@ coverage
 docs
 CLAUDE.md
 next-env.d.ts
+apps/api/var
+apps/web/test-results

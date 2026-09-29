@@ -6,6 +6,8 @@ import tseslint from 'typescript-eslint';
 export default tseslint.config(
   {
     ignores: [
+      // Uploaded files and video renditions on the free setup (STORAGE_DIR).
+      '**/var/**',
       '**/dist/**',
       '**/.next/**',
       '**/coverage/**',

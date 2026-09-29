@@ -148,7 +148,9 @@
     "no_access": "This lesson isn't open for you.",
     "confirmation_mismatch": "The name you typed doesn't match the student.",
     "file_too_large": "The file is larger than 20 MB.",
-    "unsupported_media_type": "The file couldn't be uploaded."
+    "unsupported_media_type": "The file couldn't be uploaded.",
+    "view_limit_reached": "You've used the view limit for this video.",
+    "invalid_playback_token": "Playback expired. Reload the page."
   },
   "notifications": {
     "title": "Notifications",
@@ -687,7 +689,8 @@
     "confirmDelete": "Delete the lesson “{title}”? It can be restored for 30 days.",
     "addLesson": "New lesson",
     "add": "Add",
-    "files": "Lesson files"
+    "files": "Lesson files",
+    "video": "Lesson video"
   },
   "lessons": {
     "title": "My lessons",
@@ -743,6 +746,24 @@
       "quarantine": "Being checked",
       "available": "Available",
       "rejected": "Rejected: type not allowed"
+    }
+  },
+  "video": {
+    "quality": "Quality:",
+    "level": "{label} (about {mb} MB per hour)",
+    "noVideo": "No video.",
+    "upload": "Upload video",
+    "replace": "Replace video",
+    "uploading": "Uploading…",
+    "minutes": "{count, plural, one {1 minute} other {# minutes}}",
+    "limit": "View limit in minutes (optional):",
+    "status": {
+      "processing": "Preparing the video…",
+      "ready": "Video ready",
+      "failed": "The video couldn't be prepared. Try another file.",
+      "view_limit_reached": "You've used the view limit for this video. Contact your teacher.",
+      "no_access": "This video isn't open for you.",
+      "error": "The video couldn't be played."
     }
   }
 }

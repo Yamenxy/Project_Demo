@@ -29,6 +29,12 @@ export const QUEUES = {
     retryBackoff: true,
     deadLetter: FAILED_JOBS_QUEUE,
   },
+  'video.transcode': {
+    retryLimit: 2,
+    retryDelay: 60,
+    retryBackoff: true,
+    deadLetter: FAILED_JOBS_QUEUE,
+  },
   'files.scan': {
     retryLimit: 3,
     retryDelay: 30,

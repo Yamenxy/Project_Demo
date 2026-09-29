@@ -34,6 +34,9 @@ const envSchema = z
     // Uploaded files (REQ-FILE-001). Only local disk exists for the free setup (OD-09).
     STORAGE_PROVIDER: z.enum(['local']).default('local'),
     STORAGE_DIR: z.string().min(1).default('var/storage'),
+    // self-hls video (REQ-VIDEO-005): the ffmpeg and ffprobe programs, found on PATH by default.
+    FFMPEG_PATH: z.string().min(1).default('ffmpeg'),
+    FFPROBE_PATH: z.string().min(1).default('ffprobe'),
     SMTP_URL: z.url({ protocol: /^smtps?$/ }).optional(),
     EMAIL_FROM: z.string().min(3).default('LMS <no-reply@localhost>'),
     SECRET_ENCRYPTION_KEY: z
@@ -112,6 +115,7 @@ export interface AppConfig {
   databasePlatformUrl: string;
   databasePoolMax: number;
   storage: { provider: 'local'; dir: string };
+  video: { ffmpegPath: string; ffprobePath: string };
 }
 
 export class ConfigError extends Error {
@@ -154,5 +158,6 @@ export function loadConfig(env: Record<string, string | undefined>): AppConfig {
     databasePlatformUrl: e.DATABASE_PLATFORM_URL,
     databasePoolMax: e.DATABASE_POOL_MAX,
     storage: { provider: e.STORAGE_PROVIDER, dir: e.STORAGE_DIR },
+    video: { ffmpegPath: e.FFMPEG_PATH, ffprobePath: e.FFPROBE_PATH },
   };
 }
