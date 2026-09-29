@@ -61,3 +61,17 @@ export const paymentRequests = pgTable('payment_requests', {
   createdAt: tstz('created_at').notNull(),
   updatedAt: tstz('updated_at').notNull(),
 });
+
+/** Mirrors drizzle/0022_cash_handovers.sql. */
+export const cashHandovers = pgTable('cash_handovers', {
+  workspaceId: uuid('workspace_id').notNull(),
+  id: uuid('id').primaryKey(),
+  handedBy: uuid('handed_by').notNull(),
+  amountPiastres: bigint('amount_piastres', { mode: 'number' }).notNull(),
+  currency: text('currency').notNull().default('EGP'),
+  note: text('note'),
+  status: text('status', { enum: ['pending', 'confirmed', 'rejected'] }).notNull(),
+  decidedBy: uuid('decided_by'),
+  decidedAt: tstz('decided_at'),
+  createdAt: tstz('created_at').notNull(),
+});

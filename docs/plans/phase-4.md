@@ -16,6 +16,10 @@ Phase 5; until then a request carries method, reference and amount, and the proo
 The "resume access" and "add to group" shortcuts (REQ-PAY-009) need access groups (Phase 5);
 this phase shows "resume access" only where pausing already exists.
 
+**Status (2026-09-29):** tasks 4.1 to 4.4 are done on branch `phase-4/payments`. Not done:
+proof images on payment requests and the "resume access" / "add to group" shortcuts, which need
+file storage and access groups (Phase 5).
+
 Each task ships with tests (integration against Postgres, cross-tenant suite, concurrency tests
 for approvals and receipt numbers, browser flow where there's UI), audit events, translations in
 Arabic and English, and doc updates.

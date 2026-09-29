@@ -28,6 +28,7 @@ const victim = {
   itemId: '',
   paymentId: '',
   requestId: '',
+  handoverId: '',
 };
 const attacker = { workspaceId: '', token: '', studentToken: '' };
 
@@ -73,6 +74,7 @@ function victimParams(): Record<string, string> {
     itemId: victim.itemId,
     paymentId: victim.paymentId,
     requestId: victim.requestId,
+    handoverId: victim.handoverId,
     permission: 'attendance.mark',
   };
 }
@@ -110,6 +112,12 @@ beforeAll(async () => {
                                    method, reference, status, created_at, updated_at)
      values ($1, $2, $3, $4, 1000, 'wallet', 'REF-VICTIM', 'pending', now(), now())`,
     [victim.workspaceId, victim.requestId, victim.membershipId, victimOwner],
+  );
+  victim.handoverId = randomUUID();
+  await adminQuery(
+    `insert into cash_handovers (workspace_id, id, handed_by, amount_piastres, status, created_at)
+     values ($1, $2, $3, 1000, 'pending', now())`,
+    [victim.workspaceId, victim.handoverId, victimOwner],
   );
   victim.seriesId = randomUUID();
   await adminQuery(

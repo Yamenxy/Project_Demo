@@ -155,6 +155,13 @@
       "when": 1790711907015,
       "tag": "0021_payment_requests",
       "breakpoints": true
+    },
+    {
+      "idx": 22,
+      "version": "7",
+      "when": 1790712324839,
+      "tag": "0022_cash_handovers",
+      "breakpoints": true
     }
   ]
 }

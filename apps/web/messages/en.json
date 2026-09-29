@@ -141,7 +141,8 @@
     "not_reversible": "A reversal can't be reversed.",
     "request_not_pending": "This request was already reviewed.",
     "own_request": "You can't approve your own request.",
-    "not_rejected": "Only a rejected request can be sent again."
+    "not_rejected": "Only a rejected request can be sent again.",
+    "owner_holds_cash": "The owner keeps the cash; there's nothing to hand over."
   },
   "notifications": {
     "title": "Notifications",
@@ -164,7 +165,8 @@
       "payment_recorded": "Your payment was recorded. The receipt is available.",
       "payment_reversed": "A payment was reversed.",
       "payment_request_submitted": "A new payment request is waiting for review.",
-      "payment_request_rejected": "Your payment request was rejected. See the reason."
+      "payment_request_rejected": "Your payment request was rejected. See the reason.",
+      "cash_handed_over": "A staff member handed you cash. Confirm you received it."
     }
   },
   "platform": {
@@ -239,7 +241,8 @@
       "classes": "Classes",
       "schedule": "Schedule",
       "prices": "Prices",
-      "payments": "Payments"
+      "payments": "Payments",
+      "cash": "Cash"
     },
     "suspended": "This workspace is temporarily unavailable. You can still see your grades and attendance.",
     "suspendedOwner": "Your workspace is paused. You can see your subscription and renew it with the platform.",
@@ -624,5 +627,27 @@
     "approve": "Approve and issue receipt",
     "reject": "Reject",
     "rejectReason": "Why is {name}'s request rejected?"
+  },
+  "cash": {
+    "title": "Cash",
+    "holding": "Cash held by each person",
+    "noCash": "No cash recorded.",
+    "pendingAmount": "{amount} waiting for confirmation",
+    "handOverTitle": "Hand cash to the owner",
+    "handOverExplain": "Record the amount you gave the teacher. They confirm when they receive it.",
+    "amount": "Amount in pounds",
+    "handOver": "Record handover",
+    "handovers": "Handovers",
+    "confirm": "Confirm received",
+    "reject": "Not received",
+    "status": {
+      "pending": "Waiting for confirmation",
+      "confirmed": "Received",
+      "rejected": "Rejected"
+    },
+    "today": "Collected today",
+    "dayLine": "{name} ({count, plural, one {1 payment} other {# payments}})",
+    "month": "Income this month",
+    "net": "Net of reversals"
   }
 }

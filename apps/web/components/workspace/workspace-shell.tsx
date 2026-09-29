@@ -106,6 +106,14 @@ export function WorkspaceShell({
         c.permissions.includes('payments.view'),
     },
     {
+      href: `${base}/cash`,
+      label: t('nav.cash'),
+      visible: (c) =>
+        c.membership.role === 'owner' ||
+        c.permissions.includes('payments.record') ||
+        c.permissions.includes('finance.view'),
+    },
+    {
       href: `${base}/prices`,
       label: t('nav.prices'),
       visible: (c) => c.membership.role === 'owner',

@@ -12,6 +12,7 @@ export {
 } from '../modules/classes/schedule-schema';
 export { notifications } from '../modules/notify/schema';
 export {
+  cashHandovers,
   paymentEntries,
   paymentRequests,
   priceItems,
