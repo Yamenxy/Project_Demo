@@ -98,6 +98,14 @@ export function WorkspaceShell({
         c.permissions.includes('students.import'),
     },
     {
+      href: `${base}/payments`,
+      label: t('nav.payments'),
+      visible: (c) =>
+        c.membership.role === 'owner' ||
+        c.permissions.includes('payments.record') ||
+        c.permissions.includes('payments.view'),
+    },
+    {
       href: `${base}/prices`,
       label: t('nav.prices'),
       visible: (c) => c.membership.role === 'owner',

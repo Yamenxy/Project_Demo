@@ -1,4 +1,4 @@
-import { bigint, pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core';
+import { bigint, integer, pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core';
 
 const tstz = (name: string) => timestamp(name, { withTimezone: true });
 
@@ -13,4 +13,31 @@ export const priceItems = pgTable('price_items', {
   archivedAt: tstz('archived_at'),
   createdAt: tstz('created_at').notNull(),
   updatedAt: tstz('updated_at').notNull(),
+});
+
+/** Mirrors drizzle/0020_payment_ledger.sql. */
+export const receiptCounters = pgTable('receipt_counters', {
+  workspaceId: uuid('workspace_id').primaryKey(),
+  lastNumber: integer('last_number').notNull(),
+});
+
+/** Append-only (REQ-PAY-007): the runtime role has no UPDATE or DELETE. */
+export const paymentEntries = pgTable('payment_entries', {
+  workspaceId: uuid('workspace_id').notNull(),
+  id: uuid('id').primaryKey(),
+  membershipId: uuid('membership_id').notNull(),
+  kind: text('kind', { enum: ['payment', 'reversal'] }).notNull(),
+  amountPiastres: bigint('amount_piastres', { mode: 'number' }).notNull(),
+  currency: text('currency').notNull().default('EGP'),
+  method: text('method', { enum: ['cash', 'transfer', 'wallet', 'other'] }).notNull(),
+  collectedBy: uuid('collected_by'),
+  priceItemId: uuid('price_item_id'),
+  itemName: text('item_name'),
+  itemPricePiastres: bigint('item_price_piastres', { mode: 'number' }),
+  note: text('note'),
+  reversesId: uuid('reverses_id'),
+  requestId: uuid('request_id'),
+  receiptNumber: integer('receipt_number').notNull(),
+  recordedBy: uuid('recorded_by').notNull(),
+  recordedAt: tstz('recorded_at').notNull(),
 });

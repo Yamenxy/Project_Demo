@@ -136,7 +136,9 @@
     "attendance_locked": "More than 48 hours have passed. Changing it needs the late-edit permission.",
     "reason_required": "Give a reason for the change.",
     "session_has_attendance": "Attendance was taken in this session.",
-    "invalid_amount": "This amount isn't valid. Use a number with at most two decimals."
+    "invalid_amount": "This amount isn't valid. Use a number with at most two decimals.",
+    "already_reversed": "This payment is already reversed.",
+    "not_reversible": "A reversal can't be reversed."
   },
   "notifications": {
     "title": "Notifications",
@@ -155,7 +157,9 @@
       "unknown": "New notification.",
       "staff_joined": "A new member joined your team.",
       "student_join_requested": "A new student asked to join.",
-      "student_join_approved": "You were accepted. You can open the workspace now."
+      "student_join_approved": "You were accepted. You can open the workspace now.",
+      "payment_recorded": "Your payment was recorded. The receipt is available.",
+      "payment_reversed": "A payment was reversed."
     }
   },
   "platform": {
@@ -229,7 +233,8 @@
       "billing": "Subscription",
       "classes": "Classes",
       "schedule": "Schedule",
-      "prices": "Prices"
+      "prices": "Prices",
+      "payments": "Payments"
     },
     "suspended": "This workspace is temporarily unavailable. You can still see your grades and attendance.",
     "suspendedOwner": "Your workspace is paused. You can see your subscription and renew it with the platform.",
@@ -258,7 +263,8 @@
       "managed": "Not activated yet"
     },
     "mySchedule": "My schedule",
-    "qrAlt": "Your attendance code"
+    "qrAlt": "Your attendance code",
+    "myPayments": "My receipts"
   },
   "staff": {
     "title": "Staff",
@@ -554,5 +560,42 @@
     "amountHint": "For example 150 or 150.50",
     "description": "Description (optional)",
     "add": "Add"
+  },
+  "payments": {
+    "title": "Payments",
+    "recordTitle": "Record a payment",
+    "recordExplain": "Record what you actually received. Recording a payment doesn't change the student's access to lessons.",
+    "recorded": "Recorded: receipt {number}.",
+    "openReceipt": "Open receipt",
+    "change": "Change",
+    "findStudent": "Find the student by name or code",
+    "item": "Item",
+    "noItem": "No item",
+    "amount": "Amount received, in pounds",
+    "method": "Method",
+    "note": "Note",
+    "record": "Record payment",
+    "ledgerTitle": "Ledger",
+    "empty": "No payments yet.",
+    "receiptNo": "Receipt {number}",
+    "collectedBy": "collected by {name}",
+    "minus": "− {amount}",
+    "reverse": "Reverse",
+    "reversed": "Reversed",
+    "reverseReason": "Why reverse receipt {number}? (A reversal entry is added; the original stays.)",
+    "student": "Student",
+    "collector": "Collected by",
+    "date": "Date",
+    "receiptTitle": "Receipt",
+    "reversalTitle": "Reversal",
+    "print": "Print",
+    "myTitle": "My receipts",
+    "methods": {
+      "cash": "Cash",
+      "transfer": "Transfer",
+      "wallet": "Mobile wallet",
+      "other": "Other"
+    },
+    "itemOption": "{name} — {price}"
   }
 }

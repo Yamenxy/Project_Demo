@@ -136,7 +136,9 @@
     "attendance_locked": "مر أكثر من 48 ساعة. التعديل يحتاج صلاحية التعديل المتأخر.",
     "reason_required": "اكتب سببًا للتعديل.",
     "session_has_attendance": "سُجل حضور في هذه الحصة.",
-    "invalid_amount": "المبلغ غير صحيح. اكتب رقمًا بحد أقصى خانتين عشريتين."
+    "invalid_amount": "المبلغ غير صحيح. اكتب رقمًا بحد أقصى خانتين عشريتين.",
+    "already_reversed": "هذه الدفعة أُلغيت بالفعل.",
+    "not_reversible": "لا يمكن إلغاء قيد عكسي."
   },
   "notifications": {
     "title": "الإشعارات",
@@ -155,7 +157,9 @@
       "unknown": "إشعار جديد.",
       "staff_joined": "انضم عضو جديد إلى فريقك.",
       "student_join_requested": "طالب جديد يطلب الانضمام.",
-      "student_join_approved": "تم قبولك. يمكنك الآن فتح المساحة."
+      "student_join_approved": "تم قبولك. يمكنك الآن فتح المساحة.",
+      "payment_recorded": "تم تسجيل دفعتك. الإيصال متاح.",
+      "payment_reversed": "تم إلغاء دفعة بقيد عكسي."
     }
   },
   "platform": {
@@ -229,7 +233,8 @@
       "billing": "الاشتراك",
       "classes": "الفصول",
       "schedule": "المواعيد",
-      "prices": "الأسعار"
+      "prices": "الأسعار",
+      "payments": "المدفوعات"
     },
     "suspended": "هذه المساحة غير متاحة مؤقتًا. يمكنك رؤية درجاتك وحضورك.",
     "suspendedOwner": "مساحتك موقوفة. يمكنك رؤية الاشتراك وتجديده مع إدارة المنصة.",
@@ -258,7 +263,8 @@
       "managed": "لم يفعّلوا حساباتهم"
     },
     "mySchedule": "مواعيدي",
-    "qrAlt": "كود الحضور الخاص بك"
+    "qrAlt": "كود الحضور الخاص بك",
+    "myPayments": "إيصالاتي"
   },
   "staff": {
     "title": "الفريق",
@@ -554,5 +560,42 @@
     "amountHint": "مثال: 150 أو 150.50",
     "description": "وصف (اختياري)",
     "add": "إضافة"
+  },
+  "payments": {
+    "title": "المدفوعات",
+    "recordTitle": "تسجيل دفعة",
+    "recordExplain": "سجّل ما استلمته فعلًا. تسجيل الدفعة لا يغير وصول الطالب للدروس.",
+    "recorded": "تم التسجيل: إيصال رقم {number}.",
+    "openReceipt": "عرض الإيصال",
+    "change": "تغيير",
+    "findStudent": "ابحث عن الطالب بالاسم أو الكود",
+    "item": "البند",
+    "noItem": "بدون بند",
+    "amount": "المبلغ المستلم بالجنيه",
+    "method": "طريقة الدفع",
+    "note": "ملاحظة",
+    "record": "تسجيل الدفعة",
+    "ledgerTitle": "السجل",
+    "empty": "لا توجد مدفوعات بعد.",
+    "receiptNo": "إيصال {number}",
+    "collectedBy": "استلمها {name}",
+    "minus": "− {amount}",
+    "reverse": "إلغاء بقيد عكسي",
+    "reversed": "أُلغيت بقيد عكسي",
+    "reverseReason": "سبب إلغاء الإيصال {number} (يُسجل قيد عكسي ويبقى الأصل):",
+    "student": "الطالب",
+    "collector": "المستلم",
+    "date": "التاريخ",
+    "receiptTitle": "إيصال استلام",
+    "reversalTitle": "قيد عكسي",
+    "print": "طباعة",
+    "myTitle": "إيصالاتي",
+    "methods": {
+      "cash": "نقدًا",
+      "transfer": "تحويل",
+      "wallet": "محفظة إلكترونية",
+      "other": "أخرى"
+    },
+    "itemOption": "{name} — {price}"
   }
 }

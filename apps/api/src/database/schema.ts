@@ -11,7 +11,7 @@ export {
   workspaceSkipDates,
 } from '../modules/classes/schedule-schema';
 export { notifications } from '../modules/notify/schema';
-export { priceItems } from '../modules/payments/schema';
+export { paymentEntries, priceItems, receiptCounters } from '../modules/payments/schema';
 export {
   platformPayments,
   subscriptionReminders,

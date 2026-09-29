@@ -26,6 +26,7 @@ const victim = {
   seriesId: '',
   sessionId: '',
   itemId: '',
+  paymentId: '',
 };
 const attacker = { workspaceId: '', token: '' };
 
@@ -35,6 +36,7 @@ const SAMPLE_BODIES: Record<string, object> = {
   'POST /api/v1/w/:workspaceId/students/:membershipId/consent': {},
   'POST /api/v1/w/:workspaceId/classes/:classId': { name: 'تغيير' },
   'POST /api/v1/w/:workspaceId/price-items/:itemId': { name: 'تغيير' },
+  'POST /api/v1/w/:workspaceId/payments/:paymentId/reverse': { reason: 'cross-tenant test' },
   'POST /api/v1/w/:workspaceId/classes/:classId/series': {
     weekday: 6,
     startTime: '17:00',
@@ -67,6 +69,7 @@ function victimParams(): Record<string, string> {
     sessionId: victim.sessionId,
     date: '2026-12-25',
     itemId: victim.itemId,
+    paymentId: victim.paymentId,
     permission: 'attendance.mark',
   };
 }
@@ -90,6 +93,13 @@ beforeAll(async () => {
     `insert into price_items (workspace_id, id, name, amount_piastres, created_at, updated_at)
      values ($1, $2, 'بند الضحية', 1000, now(), now())`,
     [victim.workspaceId, victim.itemId],
+  );
+  victim.paymentId = randomUUID();
+  await adminQuery(
+    `insert into payment_entries (workspace_id, id, membership_id, kind, amount_piastres, method,
+                                  receipt_number, recorded_by, recorded_at)
+     values ($1, $2, $3, 'payment', 1000, 'transfer', 1, $4, now())`,
+    [victim.workspaceId, victim.paymentId, victim.membershipId, victimOwner],
   );
   victim.seriesId = randomUUID();
   await adminQuery(

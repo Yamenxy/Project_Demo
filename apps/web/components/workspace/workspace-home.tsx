@@ -81,6 +81,12 @@ function StudentHome() {
       >
         {t('mySchedule')}
       </Link>
+      <Link
+        href={`/w/${workspace.id}/my-payments`}
+        className="rounded-2xl bg-surface p-4 text-center font-semibold shadow-sm"
+      >
+        {t('myPayments')}
+      </Link>
       <Link href="/join" className="text-center text-sm underline">
         {t('joinAnother')}
       </Link>
