@@ -1,4 +1,5 @@
 import { expect, test } from '@playwright/test';
+import { adminQuery } from './fixtures';
 import { latestOtp, randomPhone, totp } from './support';
 
 const PASSWORD = 'نجمة-الصباح-2026';
@@ -7,6 +8,8 @@ test('register, confirm the phone, turn on 2FA, sign back in and sign out everyw
   page,
 }) => {
   const phone = randomPhone();
+  // Browser tests all sign up from one local address (test database only).
+  await adminQuery('delete from rate_limit_counters');
 
   // Register.
   await page.goto('/ar/register');
@@ -53,7 +56,7 @@ test('register, confirm the phone, turn on 2FA, sign back in and sign out everyw
   await page.getByLabel('رقم الموبايل أو البريد الإلكتروني').fill(phone);
   await page.getByLabel('كلمة المرور').fill(PASSWORD);
   await page.getByRole('button', { name: 'دخول' }).click();
-  await expect(page).toHaveURL(/\/ar\/two-factor$/);
+  await expect(page).toHaveURL(/\/ar\/two-factor(\?|$)/);
   await page.getByLabel('الكود').fill(recoveryCode);
   await page.getByRole('button', { name: 'تأكيد' }).click();
   await expect(page).toHaveURL(/\/ar\/account$/);

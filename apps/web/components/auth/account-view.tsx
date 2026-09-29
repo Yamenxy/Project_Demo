@@ -8,6 +8,13 @@ import { api, ApiError, type DeviceSummary, type UserSummary } from '../../lib/a
 import { Ltr } from '../../lib/bidi';
 import { ErrorMessage, Field, SubmitButton } from '../form';
 
+interface MyWorkspace {
+  workspaceId: string;
+  name: string;
+  role: 'owner' | 'class_teacher' | 'assistant' | 'student';
+  status: string;
+}
+
 interface Me {
   user: UserSummary;
   secondFactorPending: boolean;
@@ -21,6 +28,7 @@ export function AccountView() {
   const [devices, setDevices] = useState<DeviceSummary[]>([]);
   const [unread, setUnread] = useState(0);
   const [platformOwner, setPlatformOwner] = useState(false);
+  const [workspaces, setWorkspaces] = useState<MyWorkspace[]>([]);
   const [error, setError] = useState<unknown>(null);
 
   const load = useCallback(async () => {
@@ -33,7 +41,11 @@ export function AccountView() {
       setMe(current);
       setDevices((await api<{ devices: DeviceSummary[] }>('/auth/devices')).devices);
       setUnread((await api<{ unread: number }>('/notifications')).unread);
-      setPlatformOwner((await api<{ platformOwner: boolean }>('/me/workspaces')).platformOwner);
+      const mine = await api<{ platformOwner: boolean; workspaces: MyWorkspace[] }>(
+        '/me/workspaces',
+      );
+      setPlatformOwner(mine.platformOwner);
+      setWorkspaces(mine.workspaces);
     } catch (err) {
       if (err instanceof ApiError && err.status === 401) router.replace('/login');
       else setError(err);
@@ -89,6 +101,25 @@ export function AccountView() {
           </Link>
         )}
       </section>
+
+      {workspaces.length > 0 ? (
+        <section className="rounded-2xl bg-surface p-6 shadow-sm">
+          <h2 className="mb-3 font-semibold">{t('myWorkspaces')}</h2>
+          <ul className="flex flex-col gap-2">
+            {workspaces.map((w) => (
+              <li key={w.workspaceId}>
+                <Link
+                  href={`/w/${w.workspaceId}`}
+                  className="flex items-center justify-between rounded-lg border px-3 py-2 hover:border-brand"
+                >
+                  <span>{w.name}</span>
+                  <span className="text-sm text-muted">{t(`roles.${w.role}`)}</span>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
 
       {platformOwner ? (
         <Link

@@ -1,6 +1,7 @@
 import type { NestFastifyApplication } from '@nestjs/platform-fastify';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
-import { insertMembership, insertUser, insertWorkspace } from '../support/fixtures';
+import { randomUUID } from 'node:crypto';
+import { adminQuery, insertMembership, insertUser, insertWorkspace } from '../support/fixtures';
 import { createIntegrationApp } from '../support/integration-app';
 import { fillPath, listRoutes, type RouteInfo } from '../support/routes';
 import { signIn } from '../support/sessions';
@@ -17,7 +18,7 @@ import { signIn } from '../support/sessions';
 let app: NestFastifyApplication;
 let routes: RouteInfo[];
 
-const victim = { workspaceId: '', membershipId: '' };
+const victim = { workspaceId: '', membershipId: '', invitationId: '' };
 const attacker = { workspaceId: '', token: '' };
 
 /** Plausible request bodies, keyed by "METHOD path". Empty for routes without a body. */
@@ -27,6 +28,7 @@ const SAMPLE_BODIES: Record<string, object> = {};
 function victimParams(): Record<string, string> {
   return {
     membershipId: victim.membershipId,
+    invitationId: victim.invitationId,
     permission: 'attendance.mark',
   };
 }
@@ -38,6 +40,13 @@ beforeAll(async () => {
   const victimOwner = await insertUser();
   victim.workspaceId = await insertWorkspace(victimOwner);
   victim.membershipId = await insertMembership(victim.workspaceId, await insertUser(), 'assistant');
+  victim.invitationId = randomUUID();
+  await adminQuery(
+    `insert into workspace_invitations (workspace_id, id, phone_e164, role, token_hash, invited_by,
+                                        created_at, expires_at)
+     values ($1, $2, '+201012340000', 'assistant', $3, $4, now(), now() + interval '7 days')`,
+    [victim.workspaceId, victim.invitationId, randomUUID(), victimOwner],
+  );
 
   const attackerOwner = await insertUser();
   attacker.workspaceId = await insertWorkspace(attackerOwner);

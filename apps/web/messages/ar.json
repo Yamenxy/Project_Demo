@@ -59,7 +59,14 @@
     "notifications": "{count, plural, =0 {الإشعارات} other {الإشعارات (#)}}",
     "twoFactorQrAlt": "كود QR لإضافة الحساب إلى تطبيق المصادقة",
     "twoFactorKeyLabel": "أو اكتب هذا المفتاح يدويًا:",
-    "platformConsole": "لوحة المنصة"
+    "platformConsole": "لوحة المنصة",
+    "myWorkspaces": "مساحاتي",
+    "roles": {
+      "owner": "المعلّم (المالك)",
+      "class_teacher": "معلّم فصل",
+      "assistant": "مساعد",
+      "student": "طالب"
+    }
   },
   "errors": {
     "generic": "حدث خطأ. حاول مرة أخرى.",
@@ -92,7 +99,12 @@
     "forbidden": "ليست لديك صلاحية لهذا الإجراء.",
     "two_factor_setup_required": "فعّل التحقق بخطوتين من صفحة حسابك أولًا.",
     "not_found": "غير موجود.",
-    "account_not_active": "أكِّد رقم الموبايل أولًا."
+    "account_not_active": "أكِّد رقم الموبايل أولًا.",
+    "invitation_invalid": "هذه الدعوة غير صالحة أو انتهت صلاحيتها.",
+    "invitation_phone_mismatch": "سجّل الدخول بنفس الرقم الذي وصلته الدعوة.",
+    "already_member": "أنت عضو في هذه المساحة بالفعل.",
+    "not_a_student_account": "يمكن إعادة ضبط أجهزة الطلاب فقط.",
+    "permission_not_grantable": "لا يمكن منح هذه الصلاحية لهذا الدور."
   },
   "notifications": {
     "title": "الإشعارات",
@@ -108,7 +120,8 @@
       "billing_reminder_before_end": "ينتهي اشتراكك قريبًا ({until}).",
       "billing_reminder_on_end": "انتهى اشتراكك اليوم. لديك فترة سماح 7 أيام.",
       "billing_reminder_after_end": "انتهى اشتراكك. جدِّد قبل انتهاء فترة السماح.",
-      "unknown": "إشعار جديد."
+      "unknown": "إشعار جديد.",
+      "staff_joined": "انضم عضو جديد إلى فريقك."
     }
   },
   "platform": {
@@ -143,15 +156,112 @@
     "note": "السبب",
     "suspend": "إيقاف",
     "restore": "إعادة التفعيل",
-    "status": { "trial": "تجريبي", "active": "مدفوع", "grace": "فترة سماح", "lapsed": "منتهي" },
-    "plan": { "starter": "الأساسية", "growth": "النمو", "pro": "الاحترافية" },
-    "suspension": { "billing": "موقوفة لعدم السداد", "admin": "موقوفة إداريًا" },
+    "status": {
+      "trial": "تجريبي",
+      "active": "مدفوع",
+      "grace": "فترة سماح",
+      "lapsed": "منتهي"
+    },
+    "plan": {
+      "starter": "الأساسية",
+      "growth": "النمو",
+      "pro": "الاحترافية"
+    },
+    "suspension": {
+      "billing": "موقوفة لعدم السداد",
+      "admin": "موقوفة إداريًا"
+    },
     "methods": {
       "cash": "نقدي",
       "instapay": "إنستاباي",
       "wallet": "محفظة إلكترونية",
       "bank_transfer": "تحويل بنكي",
       "fawry": "فوري"
+    }
+  },
+  "workspace": {
+    "backToAccount": "العودة إلى حسابي",
+    "myAccount": "حسابي",
+    "roles": {
+      "owner": "المعلّم (المالك)",
+      "class_teacher": "معلّم فصل",
+      "assistant": "مساعد",
+      "student": "طالب"
+    },
+    "nav": {
+      "home": "الرئيسية",
+      "students": "الطلاب",
+      "staff": "الفريق",
+      "billing": "الاشتراك"
+    },
+    "suspended": "هذه المساحة غير متاحة مؤقتًا. يمكنك رؤية درجاتك وحضورك.",
+    "suspendedOwner": "مساحتك موقوفة. يمكنك رؤية الاشتراك وتجديده مع إدارة المنصة.",
+    "studentWelcome": "أهلًا بك في {name}",
+    "studentSoon": "ستظهر هنا دروسك وواجباتك ومواعيدك.",
+    "studentPaused": "وصولك للدروس متوقف حاليًا. تواصل مع المعلّم.",
+    "staffWelcome": "لوحة المساحة",
+    "cards": {
+      "staff": "ادعُ المساعدين ومعلمي الفصول وحدد صلاحياتهم.",
+      "billing": "باقتك وتاريخ التجديد والمدفوعات.",
+      "students": "الطلاب وطلبات الانضمام."
+    },
+    "billingTitle": "الاشتراك",
+    "billingHowToRenew": "للتجديد، ادفع لإدارة المنصة وسيتم تسجيل الدفعة هنا."
+  },
+  "staff": {
+    "title": "الفريق",
+    "inviteTitle": "دعوة عضو",
+    "inviteExplain": "اكتب رقم موبايل الشخص، ثم أرسل له الرابط. يقبل الدعوة بعد تسجيل الدخول بنفس الرقم. الرابط صالح 7 أيام.",
+    "phone": "رقم الموبايل",
+    "role": "الدور",
+    "roles": {
+      "assistant": "مساعد",
+      "class_teacher": "معلّم فصل"
+    },
+    "createLink": "إنشاء رابط الدعوة",
+    "linkReady": "الرابط جاهز. أرسله للشخص المدعو:",
+    "copy": "نسخ الرابط",
+    "shareWhatsApp": "إرسال عبر واتساب",
+    "whatsappText": "دعوة للانضمام إلى فريق {name}:",
+    "members": "أعضاء الفريق",
+    "noStaff": "لا يوجد أعضاء بعد.",
+    "remove": "إزالة",
+    "permissionsTitle": "الصلاحيات",
+    "pendingInvitations": "دعوات لم تُقبل بعد",
+    "expires": "تنتهي {date}",
+    "cancelInvitation": "إلغاء",
+    "permissions": {
+      "enrollment_manage": "قبول الطلاب وتسجيلهم في الفصول",
+      "students_edit": "تعديل بيانات الطلاب",
+      "students_import": "استيراد الطلاب",
+      "students_sessions_reset": "إعادة ضبط أجهزة الطلاب",
+      "attendance_mark": "تسجيل الحضور",
+      "attendance_edit_late": "تعديل الحضور القديم",
+      "grading_grade": "تصحيح الواجبات وإدخال الدرجات",
+      "grading_release": "إعلان الدرجات",
+      "content_edit": "إضافة الدروس وتعديلها",
+      "content_publish": "نشر الدروس",
+      "assessment_edit": "الأسئلة والاختبارات",
+      "schedule_manage": "إدارة المواعيد",
+      "access_grants": "فتح الدروس لطلاب محددين",
+      "access_groups": "إدارة مجموعات الوصول",
+      "access_pause": "إيقاف وصول الطلاب واستئنافه",
+      "payments_record": "تسجيل المدفوعات النقدية",
+      "payments_confirm": "تأكيد طلبات الدفع",
+      "payments_view": "عرض مدفوعات الطلاب",
+      "finance_view": "عرض الإيرادات",
+      "announcements_post": "نشر الإعلانات",
+      "reports_academic": "التقارير الدراسية",
+      "data_export": "تصدير البيانات"
+    }
+  },
+  "join": {
+    "title": "دعوة للانضمام",
+    "invitedAs": "تمت دعوتك للانضمام إلى {workspace} بدور {role}.",
+    "accept": "قبول الدعوة",
+    "roles": {
+      "assistant": "مساعد",
+      "class_teacher": "معلّم فصل"
     }
   }
 }

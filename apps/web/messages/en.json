@@ -59,7 +59,14 @@
     "notifications": "{count, plural, =0 {Notifications} other {Notifications (#)}}",
     "twoFactorQrAlt": "QR code to add this account to an authenticator app",
     "twoFactorKeyLabel": "Or type this key by hand:",
-    "platformConsole": "Platform console"
+    "platformConsole": "Platform console",
+    "myWorkspaces": "My workspaces",
+    "roles": {
+      "owner": "Teacher (owner)",
+      "class_teacher": "Class teacher",
+      "assistant": "Helper",
+      "student": "Student"
+    }
   },
   "errors": {
     "generic": "Something went wrong. Please try again.",
@@ -92,7 +99,12 @@
     "forbidden": "You don't have permission for this.",
     "two_factor_setup_required": "Turn on two-step verification from your account page first.",
     "not_found": "Not found.",
-    "account_not_active": "Confirm your mobile number first."
+    "account_not_active": "Confirm your mobile number first.",
+    "invitation_invalid": "This invitation is invalid or has expired.",
+    "invitation_phone_mismatch": "Sign in with the number the invitation was sent to.",
+    "already_member": "You're already a member of this workspace.",
+    "not_a_student_account": "Only students' devices can be reset.",
+    "permission_not_grantable": "That permission can't be given to this role."
   },
   "notifications": {
     "title": "Notifications",
@@ -108,7 +120,8 @@
       "billing_reminder_before_end": "Your subscription ends soon ({until}).",
       "billing_reminder_on_end": "Your subscription ended today. You have a 7-day grace period.",
       "billing_reminder_after_end": "Your subscription has ended. Renew before the grace period is over.",
-      "unknown": "New notification."
+      "unknown": "New notification.",
+      "staff_joined": "A new member joined your team."
     }
   },
   "platform": {
@@ -143,15 +156,112 @@
     "note": "Reason",
     "suspend": "Suspend",
     "restore": "Restore",
-    "status": { "trial": "Trial", "active": "Paid", "grace": "Grace period", "lapsed": "Lapsed" },
-    "plan": { "starter": "Starter", "growth": "Growth", "pro": "Pro" },
-    "suspension": { "billing": "Suspended: unpaid", "admin": "Suspended by the platform" },
+    "status": {
+      "trial": "Trial",
+      "active": "Paid",
+      "grace": "Grace period",
+      "lapsed": "Lapsed"
+    },
+    "plan": {
+      "starter": "Starter",
+      "growth": "Growth",
+      "pro": "Pro"
+    },
+    "suspension": {
+      "billing": "Suspended: unpaid",
+      "admin": "Suspended by the platform"
+    },
     "methods": {
       "cash": "Cash",
       "instapay": "InstaPay",
       "wallet": "Mobile wallet",
       "bank_transfer": "Bank transfer",
       "fawry": "Fawry"
+    }
+  },
+  "workspace": {
+    "backToAccount": "Back to my account",
+    "myAccount": "My account",
+    "roles": {
+      "owner": "Teacher (owner)",
+      "class_teacher": "Class teacher",
+      "assistant": "Helper",
+      "student": "Student"
+    },
+    "nav": {
+      "home": "Home",
+      "students": "Students",
+      "staff": "Staff",
+      "billing": "Subscription"
+    },
+    "suspended": "This workspace is temporarily unavailable. You can still see your grades and attendance.",
+    "suspendedOwner": "Your workspace is paused. You can see your subscription and renew it with the platform.",
+    "studentWelcome": "Welcome to {name}",
+    "studentSoon": "Your lessons, homework and sessions will appear here.",
+    "studentPaused": "Your access to lessons is paused. Contact your teacher.",
+    "staffWelcome": "Workspace dashboard",
+    "cards": {
+      "staff": "Invite helpers and class teachers and set their permissions.",
+      "billing": "Your plan, renewal date and payments.",
+      "students": "Students and join requests."
+    },
+    "billingTitle": "Subscription",
+    "billingHowToRenew": "To renew, pay the platform owners and the payment will show here."
+  },
+  "staff": {
+    "title": "Staff",
+    "inviteTitle": "Invite someone",
+    "inviteExplain": "Enter the person's mobile number, then send them the link. They accept after signing in with that same number. The link works for 7 days.",
+    "phone": "Mobile number",
+    "role": "Role",
+    "roles": {
+      "assistant": "Helper",
+      "class_teacher": "Class teacher"
+    },
+    "createLink": "Create invitation link",
+    "linkReady": "The link is ready. Send it to the person you invited:",
+    "copy": "Copy link",
+    "shareWhatsApp": "Send on WhatsApp",
+    "whatsappText": "You're invited to join the team at {name}:",
+    "members": "Team members",
+    "noStaff": "No one yet.",
+    "remove": "Remove",
+    "permissionsTitle": "Permissions",
+    "pendingInvitations": "Invitations not yet accepted",
+    "expires": "expires {date}",
+    "cancelInvitation": "Cancel",
+    "permissions": {
+      "enrollment_manage": "Approve and enrol students",
+      "students_edit": "Edit student details",
+      "students_import": "Import students",
+      "students_sessions_reset": "Reset students' devices",
+      "attendance_mark": "Take attendance",
+      "attendance_edit_late": "Edit older attendance",
+      "grading_grade": "Grade work and enter scores",
+      "grading_release": "Release grades",
+      "content_edit": "Add and edit lessons",
+      "content_publish": "Publish lessons",
+      "assessment_edit": "Questions and exams",
+      "schedule_manage": "Manage the schedule",
+      "access_grants": "Open lessons for specific students",
+      "access_groups": "Manage access groups",
+      "access_pause": "Pause and resume students",
+      "payments_record": "Record cash payments",
+      "payments_confirm": "Confirm payment requests",
+      "payments_view": "See students' payments",
+      "finance_view": "See income",
+      "announcements_post": "Post announcements",
+      "reports_academic": "Academic reports",
+      "data_export": "Export data"
+    }
+  },
+  "join": {
+    "title": "Invitation",
+    "invitedAs": "You're invited to join {workspace} as {role}.",
+    "accept": "Accept invitation",
+    "roles": {
+      "assistant": "Helper",
+      "class_teacher": "Class teacher"
     }
   }
 }

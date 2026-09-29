@@ -1,13 +1,13 @@
 import { setRequestLocale } from 'next-intl/server';
 import { Suspense, use } from 'react';
-import { TwoFactorForm } from '../../../components/auth/forms';
+import { AcceptInvitation } from '../../../../components/workspace/accept-invitation';
 
 export default function Page({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = use(params);
   setRequestLocale(locale);
   return (
     <Suspense>
-      <TwoFactorForm />
+      <AcceptInvitation />
     </Suspense>
   );
 }

@@ -52,6 +52,7 @@ CLAUDE.md requires a written justification for every new dependency. Add a row w
 | next-intl | Locale routing, ICU messages with Arabic plural rules, and the Cairo time zone (architecture §9) | Phase 1, task 15 |
 | tailwindcss, @tailwindcss/postcss (dev) | Styling with logical properties that mirror for RTL (architecture §9) | Phase 1, task 15 |
 | qrcode, @types/qrcode (dev) | QR code for 2FA setup, generated in the browser and loaded only on that screen | Phase 1 follow-up |
+| pg, @types/pg (dev) | Browser-test fixtures only: creating a workspace directly, as a platform owner would in the console | Phase 2, task 2.2 |
 | @playwright/test (dev) | Browser checks on a phone viewport: direction, locales, no horizontal scroll (review TEST-07) | Phase 1, task 15 |
 | next, react, react-dom | The web client chosen in architecture §9 | Phase 1, task 1 |
 | @types/react, @types/react-dom, @types/node (dev) | Type definitions | Phase 1, task 1 |

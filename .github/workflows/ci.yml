@@ -63,6 +63,7 @@ jobs:
       DATABASE_PLATFORM_URL: postgres://lms_platform:lms_platform_ci_only@localhost:5432/lms_e2e
       E2E_DATABASE_URL: postgres://lms_app:lms_app_ci_only@localhost:5432/lms_e2e
       E2E_DATABASE_PLATFORM_URL: postgres://lms_platform:lms_platform_ci_only@localhost:5432/lms_e2e
+      E2E_ADMIN_DATABASE_URL: postgres://lms_admin:lms_admin_ci_only@localhost:5432/lms_e2e
       NEXT_TELEMETRY_DISABLED: '1'
     steps:
       - uses: actions/checkout@v5

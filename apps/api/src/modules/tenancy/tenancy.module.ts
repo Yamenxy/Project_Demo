@@ -3,11 +3,14 @@ import { APP_GUARD } from '@nestjs/core';
 import { DeviceLimitPolicy, IdentityModule } from '../identity';
 import { AccessGuard } from './access.guard';
 import { MembershipDeviceLimitPolicy } from './device-limit.policy';
+import { InvitationsService } from './invitations.service';
 import { MeController } from './me.controller';
 import { MembersController } from './members.controller';
 import { MembersService } from './members.service';
 import { MembershipsService } from './memberships.service';
 import { PermissionsService } from './permissions.service';
+import { InvitationAcceptController, StaffController } from './staff.controller';
+import { StaffService } from './staff.service';
 import { WorkspaceController } from './workspace.controller';
 import { WorkspacesService } from './workspaces.service';
 
@@ -18,12 +21,20 @@ import { WorkspacesService } from './workspaces.service';
 @Global()
 @Module({
   imports: [IdentityModule],
-  controllers: [WorkspaceController, MembersController, MeController],
+  controllers: [
+    WorkspaceController,
+    MembersController,
+    MeController,
+    StaffController,
+    InvitationAcceptController,
+  ],
   providers: [
     MembershipsService,
     WorkspacesService,
     PermissionsService,
     MembersService,
+    InvitationsService,
+    StaffService,
     { provide: DeviceLimitPolicy, useClass: MembershipDeviceLimitPolicy },
     { provide: APP_GUARD, useClass: AccessGuard },
   ],

@@ -2,6 +2,7 @@
 
 import { toWesternDigits } from '@lms/shared';
 import { useTranslations } from 'next-intl';
+import { useSearchParams } from 'next/navigation';
 import { useState, type FormEvent } from 'react';
 import { useRouter } from '../../i18n/navigation';
 import { api } from '../../lib/api';
@@ -22,6 +23,12 @@ function useSubmit() {
     }
   };
   return { busy, error, run };
+}
+
+/** Where to go after signing in: a same-site path only, never another site (open redirect). */
+function useNext(fallback: string): string {
+  const next = useSearchParams().get('next');
+  return next && next.startsWith('/') && !next.startsWith('//') ? next : fallback;
 }
 
 function value(form: HTMLFormElement, name: string): string {
@@ -139,6 +146,7 @@ export function VerifyPhoneForm() {
 export function LoginForm() {
   const t = useTranslations('auth');
   const router = useRouter();
+  const next = useNext('/account');
   const { busy, error, run } = useSubmit();
 
   const submit = (event: FormEvent<HTMLFormElement>) => {
@@ -154,7 +162,9 @@ export function LoginForm() {
           rememberMe: remember instanceof HTMLInputElement && remember.checked,
         },
       });
-      router.push(result.secondFactorRequired ? '/two-factor' : '/account');
+      router.push(
+        result.secondFactorRequired ? `/two-factor?next=${encodeURIComponent(next)}` : next,
+      );
     });
   };
 
@@ -191,6 +201,7 @@ export function LoginForm() {
 export function TwoFactorForm() {
   const t = useTranslations('auth');
   const router = useRouter();
+  const next = useNext('/account');
   const { busy, error, run } = useSubmit();
 
   const submit = (event: FormEvent<HTMLFormElement>) => {
@@ -201,7 +212,7 @@ export function TwoFactorForm() {
         method: 'POST',
         body: { code: toWesternDigits(value(form, 'code')) },
       });
-      router.push('/account');
+      router.push(next);
     });
   };
 
