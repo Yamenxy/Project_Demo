@@ -29,6 +29,7 @@ test('register, confirm the phone, turn on 2FA, sign back in and sign out everyw
 
   // Turn on two-step verification and keep a recovery code.
   await page.getByRole('button', { name: 'تفعيل التحقق بخطوتين' }).click();
+  await expect(page.getByRole('img', { name: /QR/ })).toBeVisible();
   const secret = (await page.locator('p.font-mono').textContent())?.trim() ?? '';
   expect(secret).toMatch(/^[A-Z2-7]+$/);
   await page.getByLabel('الكود من التطبيق').fill(totp(secret));
@@ -37,6 +38,14 @@ test('register, confirm the phone, turn on 2FA, sign back in and sign out everyw
   expect(recoveryCode).toMatch(/^[A-Z2-9]{4}-[A-Z2-9]{4}$/);
   await page.getByRole('button', { name: 'حفظتُ الأكواد' }).click();
   await expect(page.getByText('مفعَّل')).toBeVisible();
+  await expect(page.getByRole('img', { name: /QR/ })).toHaveCount(0);
+
+  // The security notification is waiting.
+  await page.getByRole('link', { name: 'الإشعارات (1)' }).click();
+  await expect(page.getByText('تم تفعيل التحقق بخطوتين على حسابك.')).toBeVisible();
+  await page.getByRole('button', { name: 'تعليم الكل كمقروء' }).click();
+  await expect(page.getByRole('button', { name: 'تعليم الكل كمقروء' })).toHaveCount(0);
+  await page.getByRole('link', { name: 'العودة إلى حسابي' }).click();
 
   // Sign out, and back in: the second step accepts a recovery code.
   await page.getByRole('button', { name: 'تسجيل الخروج', exact: true }).click();

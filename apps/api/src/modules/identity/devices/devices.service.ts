@@ -149,6 +149,11 @@ export class DevicesService {
    */
   async resetForUser(tx: DbTx, userId: string, by: 'staff' | 'support'): Promise<number> {
     const count = await this.revokeDevices(tx, userId, by);
+    // Sessions from before device tracking, or without a device, end too.
+    await tx
+      .update(sessions)
+      .set({ revokedAt: this.clock.now(), revokeReason: 'device_revoked' })
+      .where(and(eq(sessions.userId, userId), isNull(sessions.revokedAt)));
     await tx
       .update(users)
       .set({ devicesResetAt: this.clock.now(), updatedAt: this.clock.now() })

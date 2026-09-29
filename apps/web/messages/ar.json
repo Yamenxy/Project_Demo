@@ -51,11 +51,14 @@
     "twoFactorTitle": "التحقق بخطوتين",
     "twoFactorOn": "مفعَّل",
     "twoFactorStart": "تفعيل التحقق بخطوتين",
-    "twoFactorSetupExplain": "أضف هذا المفتاح إلى تطبيق المصادقة، ثم اكتب الكود الذي يظهر.",
+    "twoFactorSetupExplain": "امسح الكود بتطبيق المصادقة (مثل Google Authenticator)، ثم اكتب الكود الذي يظهر.",
     "twoFactorCode": "الكود من التطبيق",
     "twoFactorConfirm": "تفعيل",
     "recoveryCodesExplain": "احفظ أكواد الاسترداد هذه في مكان آمن. كل كود يُستخدم مرة واحدة إذا فقدت هاتفك.",
-    "recoveryCodesSaved": "حفظتُ الأكواد"
+    "recoveryCodesSaved": "حفظتُ الأكواد",
+    "notifications": "{count, plural, =0 {الإشعارات} other {الإشعارات (#)}}",
+    "twoFactorQrAlt": "كود QR لإضافة الحساب إلى تطبيق المصادقة",
+    "twoFactorKeyLabel": "أو اكتب هذا المفتاح يدويًا:"
   },
   "errors": {
     "generic": "حدث خطأ. حاول مرة أخرى.",
@@ -81,5 +84,17 @@
     "unauthenticated": "سجّل الدخول أولًا.",
     "two_factor_already_enabled": "التحقق بخطوتين مفعَّل بالفعل.",
     "two_factor_not_set_up": "ابدأ إعداد التحقق بخطوتين أولًا."
+  },
+  "notifications": {
+    "title": "الإشعارات",
+    "empty": "لا توجد إشعارات.",
+    "markAllRead": "تعليم الكل كمقروء",
+    "back": "العودة إلى حسابي",
+    "types": {
+      "account_two_factor_enabled": "تم تفعيل التحقق بخطوتين على حسابك.",
+      "account_password_reset": "تم تغيير كلمة المرور وتسجيل خروجك من كل الأجهزة.",
+      "account_devices_reset": "أعاد المعلّم ضبط أجهزتك. يمكنك تسجيل الدخول من جهاز جديد.",
+      "unknown": "إشعار جديد."
+    }
   }
 }

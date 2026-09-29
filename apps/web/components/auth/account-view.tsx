@@ -19,6 +19,7 @@ export function AccountView() {
   const router = useRouter();
   const [me, setMe] = useState<Me | null>(null);
   const [devices, setDevices] = useState<DeviceSummary[]>([]);
+  const [unread, setUnread] = useState(0);
   const [error, setError] = useState<unknown>(null);
 
   const load = useCallback(async () => {
@@ -30,6 +31,7 @@ export function AccountView() {
       }
       setMe(current);
       setDevices((await api<{ devices: DeviceSummary[] }>('/auth/devices')).devices);
+      setUnread((await api<{ unread: number }>('/notifications')).unread);
     } catch (err) {
       if (err instanceof ApiError && err.status === 401) router.replace('/login');
       else setError(err);
@@ -68,7 +70,12 @@ export function AccountView() {
     <main className="mx-auto flex max-w-md flex-col gap-6 px-4 py-10">
       <ErrorMessage error={error} />
       <section className="rounded-2xl bg-surface p-6 shadow-sm">
-        <h1 className="mb-2 text-xl font-semibold">{me.user.nameAr}</h1>
+        <div className="mb-2 flex items-start justify-between gap-3">
+          <h1 className="text-xl font-semibold">{me.user.nameAr}</h1>
+          <Link href="/notifications" className="shrink-0 rounded-lg border px-3 py-1 text-sm">
+            {t('notifications', { count: unread })}
+          </Link>
+        </div>
         <p className="text-muted">
           {t('platformCode')} <Ltr>{me.user.platformCode}</Ltr>
         </p>
@@ -143,7 +150,7 @@ function TwoFactorSection({
   onChange: () => Promise<void>;
 }) {
   const t = useTranslations('account');
-  const [setup, setSetup] = useState<{ secret: string } | null>(null);
+  const [setup, setSetup] = useState<{ secret: string; qr: string } | null>(null);
   const [codes, setCodes] = useState<string[] | null>(null);
   const [error, setError] = useState<unknown>(null);
   const [busy, setBusy] = useState(false);
@@ -151,7 +158,15 @@ function TwoFactorSection({
   const start = async () => {
     setError(null);
     try {
-      setSetup(await api<{ secret: string }>('/auth/2fa/setup', { method: 'POST' }));
+      const result = await api<{ secret: string; otpauthUri: string }>('/auth/2fa/setup', {
+        method: 'POST',
+      });
+      // Loaded only here, so the QR library stays out of every other page's bundle.
+      const { toDataURL } = await import('qrcode');
+      setSetup({
+        secret: result.secret,
+        qr: await toDataURL(result.otpauthUri, { margin: 1, width: 200 }),
+      });
     } catch (err) {
       setError(err);
     }
@@ -205,6 +220,14 @@ function TwoFactorSection({
       ) : setup ? (
         <form onSubmit={(event) => void confirm(event)} noValidate>
           <p className="mb-2 text-sm">{t('twoFactorSetupExplain')}</p>
+          <img
+            src={setup.qr}
+            alt={t('twoFactorQrAlt')}
+            width={200}
+            height={200}
+            className="mx-auto mb-3"
+          />
+          <p className="mb-1 text-sm text-muted">{t('twoFactorKeyLabel')}</p>
           <p className="mb-4 break-all rounded-lg bg-gray-100 p-3 font-mono text-sm" dir="ltr">
             {setup.secret}
           </p>
