@@ -29,6 +29,8 @@ const victim = {
   paymentId: '',
   requestId: '',
   handoverId: '',
+  courseId: '',
+  lessonId: '',
 };
 const attacker = { workspaceId: '', token: '', studentToken: '' };
 
@@ -38,6 +40,9 @@ const SAMPLE_BODIES: Record<string, object> = {
   'POST /api/v1/w/:workspaceId/students/:membershipId/consent': {},
   'POST /api/v1/w/:workspaceId/classes/:classId': { name: 'تغيير' },
   'POST /api/v1/w/:workspaceId/price-items/:itemId': { name: 'تغيير' },
+  'POST /api/v1/w/:workspaceId/courses/:courseId': { title: 'تغيير' },
+  'POST /api/v1/w/:workspaceId/courses/:courseId/lessons': { title: 'درس' },
+  'POST /api/v1/w/:workspaceId/lessons/:lessonId': { title: 'تغيير' },
   'POST /api/v1/w/:workspaceId/payments/:paymentId/reverse': { reason: 'cross-tenant test' },
   'POST /api/v1/w/:workspaceId/payment-requests/:requestId/reject': { reason: 'cross-tenant test' },
   'POST /api/v1/w/:workspaceId/classes/:classId/series': {
@@ -75,6 +80,8 @@ function victimParams(): Record<string, string> {
     paymentId: victim.paymentId,
     requestId: victim.requestId,
     handoverId: victim.handoverId,
+    courseId: victim.courseId,
+    lessonId: victim.lessonId,
     permission: 'attendance.mark',
   };
 }
@@ -118,6 +125,18 @@ beforeAll(async () => {
     `insert into cash_handovers (workspace_id, id, handed_by, amount_piastres, status, created_at)
      values ($1, $2, $3, 1000, 'pending', now())`,
     [victim.workspaceId, victim.handoverId, victimOwner],
+  );
+  victim.courseId = randomUUID();
+  victim.lessonId = randomUUID();
+  await adminQuery(
+    `insert into courses (workspace_id, id, title, created_at, updated_at)
+     values ($1, $2, 'مقرر الضحية', now(), now())`,
+    [victim.workspaceId, victim.courseId],
+  );
+  await adminQuery(
+    `insert into lessons (workspace_id, id, course_id, title, position, created_at, updated_at)
+     values ($1, $2, $3, 'درس الضحية', 0, now(), now())`,
+    [victim.workspaceId, victim.lessonId, victim.courseId],
   );
   victim.seriesId = randomUUID();
   await adminQuery(

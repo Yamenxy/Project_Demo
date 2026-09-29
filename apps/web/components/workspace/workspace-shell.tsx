@@ -88,6 +88,11 @@ export function WorkspaceShell({
   const nav: NavItem[] = [
     { href: base, label: t('nav.home'), visible: () => true },
     { href: `${base}/classes`, label: t('nav.classes'), visible: () => true },
+    {
+      href: `${base}/courses`,
+      label: t('nav.courses'),
+      visible: (c) => c.membership.role === 'owner' || c.permissions.includes('content.edit'),
+    },
     { href: `${base}/schedule`, label: t('nav.schedule'), visible: () => true },
     {
       href: `${base}/students`,

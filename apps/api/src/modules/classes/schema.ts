@@ -8,6 +8,7 @@ export const classes = pgTable('classes', {
   id: uuid('id').primaryKey(),
   name: text('name').notNull(),
   responsibleMembershipId: uuid('responsible_membership_id').notNull(),
+  courseId: uuid('course_id'),
   archivedAt: tstz('archived_at'),
   createdAt: tstz('created_at').notNull(),
   updatedAt: tstz('updated_at').notNull(),

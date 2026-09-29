@@ -7,6 +7,7 @@ import { IdempotencyModule } from './idempotency';
 import { JobsModule } from './jobs';
 import { AuditModule } from './modules/audit';
 import { ClassesModule } from './modules/classes';
+import { ContentModule } from './modules/content';
 import { IdentityModule } from './modules/identity';
 import { NotifyModule } from './modules/notify';
 import { PaymentsModule } from './modules/payments';
@@ -24,6 +25,7 @@ import { TenancyModule } from './modules/tenancy';
     IdentityModule,
     TenancyModule,
     ClassesModule,
+    ContentModule,
     PaymentsModule,
     IdempotencyModule,
     PlatformAdminModule,

@@ -13,15 +13,24 @@ import { ClassesService, type ClassDetail, type ClassSummary } from './classes.s
 
 const uuidParam = new ZodPipe(z.uuid());
 const name = z.string().trim().min(2).max(80);
-const createBody = z.object({ name, responsibleMembershipId: z.uuid().optional() });
+const createBody = z.object({
+  name,
+  responsibleMembershipId: z.uuid().optional(),
+  courseId: z.uuid().optional(),
+});
 const updateBody = z
   .object({
     name: name.optional(),
     responsibleMembershipId: z.uuid().optional(),
     archived: z.boolean().optional(),
+    courseId: z.uuid().nullable().optional(),
   })
   .refine((b) => Object.keys(b).length > 0, { message: 'nothing to change' });
-const enrollBody = z.object({ membershipIds: z.array(z.uuid()).min(1).max(500) });
+const enrollBody = z.object({
+  membershipIds: z.array(z.uuid()).min(1).max(500),
+  /** Enrol even when a student is already in a class of the same course (audited). */
+  override: z.boolean().optional(),
+});
 const transferBody = z.object({ toClassId: z.uuid() });
 const candidatesQuery = z.object({ q: z.string().trim().max(80).default('') });
 const listQuery = z.object({ archived: z.enum(['true', 'false']).optional() });
@@ -102,7 +111,13 @@ export class ClassesController {
     @Body(new ZodPipe(enrollBody)) body: z.infer<typeof enrollBody>,
     @Req() request: FastifyRequest,
   ): Promise<{ added: number }> {
-    return this.classes.enroll(ctx, classId, body.membershipIds, actorOf(session, request));
+    return this.classes.enroll(
+      ctx,
+      classId,
+      body.membershipIds,
+      actorOf(session, request),
+      body.override ?? false,
+    );
   }
 
   @Post(':classId/students/:membershipId/remove')

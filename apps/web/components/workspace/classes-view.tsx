@@ -16,6 +16,7 @@ interface ClassSummary {
   responsible: { membershipId: string; name: string };
   studentCount: number;
   archived: boolean;
+  courseId: string | null;
 }
 
 interface ClassStudent {
@@ -156,6 +157,7 @@ export function ClassView({ classId }: { classId: string }) {
   const canManage = isOwner || permissions.includes('enrollment.manage');
   const [detail, setDetail] = useState<(ClassSummary & { students: ClassStudent[] }) | null>(null);
   const [others, setOthers] = useState<ClassSummary[]>([]);
+  const [courses, setCourses] = useState<{ id: string; title: string }[]>([]);
   const [query, setQuery] = useState('');
   const [found, setFound] = useState<{ membershipId: string; name: string }[]>([]);
   const [error, setError] = useState<unknown>(null);
@@ -166,10 +168,15 @@ export function ClassView({ classId }: { classId: string }) {
       setDetail(await api(`${base}/classes/${classId}`));
       const list = await api<{ classes: ClassSummary[] }>(`${base}/classes`);
       setOthers(list.classes.filter((c) => c.id !== classId));
+      if (isOwner) {
+        setCourses(
+          (await api<{ courses: { id: string; title: string }[] }>(`${base}/courses`)).courses,
+        );
+      }
     } catch (err) {
       setError(err);
     }
-  }, [base, classId]);
+  }, [base, classId, isOwner]);
 
   useEffect(() => {
     void load();
@@ -210,6 +217,24 @@ export function ClassView({ classId }: { classId: string }) {
         </Link>
         <h1 className="mt-2 text-xl font-semibold">{detail.name}</h1>
         <p className="text-sm text-muted">{t('responsible', { name: detail.responsible.name })}</p>
+        {isOwner && courses.length > 0 ? (
+          <label className="mt-2 flex items-center gap-2 text-sm">
+            {t('course')}
+            <select
+              value={detail.courseId ?? ''}
+              disabled={busy}
+              onChange={(event) => run('', { courseId: event.target.value || null })}
+              className="rounded-lg border px-2 py-1"
+            >
+              <option value="">{t('noCourse')}</option>
+              {courses.map((c) => (
+                <option key={c.id} value={c.id}>
+                  {c.title}
+                </option>
+              ))}
+            </select>
+          </label>
+        ) : null}
         {isOwner ? (
           <button
             type="button"

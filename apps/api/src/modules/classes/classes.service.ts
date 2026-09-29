@@ -19,6 +19,7 @@ export interface ClassSummary {
   responsible: { membershipId: string; name: string };
   studentCount: number;
   archived: boolean;
+  courseId: string | null;
 }
 
 export interface ClassStudent {
@@ -72,6 +73,7 @@ export class ClassesService {
           id: classes.id,
           name: classes.name,
           archivedAt: classes.archivedAt,
+          courseId: classes.courseId,
           responsibleId: classes.responsibleMembershipId,
           responsibleName: nameOf,
           studentCount: sql<number>`(select count(*)::int from ${classEnrollments}
@@ -93,6 +95,7 @@ export class ClassesService {
         responsible: { membershipId: row.responsibleId, name: row.responsibleName },
         studentCount: row.studentCount,
         archived: row.archivedAt !== null,
+        courseId: row.courseId,
       }));
     });
   }
@@ -127,7 +130,7 @@ export class ClassesService {
   /** Owner only. Without a responsible teacher, the owner is responsible. */
   async create(
     ctx: WorkspaceContext,
-    input: { name: string; responsibleMembershipId?: string },
+    input: { name: string; responsibleMembershipId?: string; courseId?: string },
     actor: Actor,
   ): Promise<{ id: string }> {
     const id = this.ids.newId();
@@ -142,6 +145,7 @@ export class ClassesService {
         id,
         name: input.name.trim(),
         responsibleMembershipId: responsible,
+        courseId: input.courseId ? await this.course(tx, input.courseId) : null,
         createdAt: now,
         updatedAt: now,
       });
@@ -161,7 +165,12 @@ export class ClassesService {
   async update(
     ctx: WorkspaceContext,
     classId: string,
-    change: { name?: string; responsibleMembershipId?: string; archived?: boolean },
+    change: {
+      name?: string;
+      responsibleMembershipId?: string;
+      archived?: boolean;
+      courseId?: string | null;
+    },
     actor: Actor,
   ): Promise<void> {
     await this.write(async (tx) => {
@@ -177,6 +186,9 @@ export class ClassesService {
           ...(change.name === undefined ? {} : { name: change.name.trim() }),
           ...(responsible === undefined ? {} : { responsibleMembershipId: responsible }),
           ...(change.archived === undefined ? {} : { archivedAt: change.archived ? now : null }),
+          ...(change.courseId === undefined
+            ? {}
+            : { courseId: change.courseId ? await this.course(tx, change.courseId) : null }),
           updatedAt: now,
           version: current.version + 1,
         })
@@ -207,6 +219,7 @@ export class ClassesService {
     classId: string,
     membershipIds: string[],
     actor: Actor,
+    override = false,
   ): Promise<{ added: number }> {
     return this.db.inWorkspace(ctx.workspaceId, async (tx) => {
       const current = await this.lockClass(tx, ctx, classId, 'enrollment.manage');
@@ -228,6 +241,7 @@ export class ClassesService {
       );
       const now = this.clock.now();
       const toAdd = students.filter((id) => !enrolled.has(id));
+      await this.checkSameCourse(tx, ctx, current, toAdd, override, actor);
       for (const membershipId of toAdd) {
         const id = this.ids.newId();
         await tx.insert(classEnrollments).values({
@@ -287,6 +301,7 @@ export class ClassesService {
       const target = await this.lockClass(tx, ctx, toClassId, 'enrollment.manage');
       if (target.archivedAt) throw new AppError(409, 'class_archived', 'The class is archived');
       await this.end(tx, fromClassId, membershipId, 'transferred', actor.userId);
+      await this.checkSameCourse(tx, ctx, target, [membershipId], false, actor);
       const now = this.clock.now();
       await tx.insert(classEnrollments).values({
         workspaceId: ctx.workspaceId,
@@ -408,6 +423,59 @@ export class ClassesService {
       .for('update');
     if (!row) throw notFound('Class not found');
     return row;
+  }
+
+  /**
+   * REQ-CLASS-001: a student can't be in two active classes of the same course unless a teacher
+   * overrides it, and the override is audited.
+   */
+  private async checkSameCourse(
+    tx: DbTx,
+    ctx: WorkspaceContext,
+    target: { id: string; courseId: string | null },
+    membershipIds: string[],
+    override: boolean,
+    actor: Actor,
+  ): Promise<void> {
+    if (!target.courseId || membershipIds.length === 0) return;
+    const clashes = await tx
+      .select({ membershipId: classEnrollments.membershipId, classId: classes.id })
+      .from(classEnrollments)
+      .innerJoin(classes, eq(classes.id, classEnrollments.classId))
+      .where(
+        and(
+          inArray(classEnrollments.membershipId, membershipIds),
+          isNull(classEnrollments.endedAt),
+          isNull(classes.archivedAt),
+          eq(classes.courseId, target.courseId),
+          sql`${classes.id} <> ${target.id}`,
+        ),
+      );
+    if (clashes.length === 0) return;
+    if (!override) {
+      throw new AppError(409, 'same_course_enrolled', 'Already in a class of this course', {
+        membershipIds: [...new Set(clashes.map((c) => c.membershipId))],
+      });
+    }
+    for (const clash of clashes) {
+      await this.audit.record(tx, {
+        action: 'class.enrollment_override',
+        workspaceId: ctx.workspaceId,
+        actor: { type: 'user', userId: actor.userId },
+        entity: { type: 'membership', id: clash.membershipId },
+        newValue: { classId: target.id, alsoInClassId: clash.classId, courseId: target.courseId },
+        requestId: actor.requestId,
+      });
+    }
+  }
+
+  /** The course must exist and not be deleted (the content module owns the table). */
+  private async course(tx: DbTx, courseId: string): Promise<string> {
+    const found = await tx.execute<{ id: string }>(
+      sql`select id from courses where id = ${courseId} and deleted_at is null`,
+    );
+    if (found.rows.length === 0) throw notFound('Course not found');
+    return courseId;
   }
 
   /** A responsible teacher must be the owner or an active class teacher. */

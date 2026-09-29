@@ -142,7 +142,9 @@
     "request_not_pending": "This request was already reviewed.",
     "own_request": "You can't approve your own request.",
     "not_rejected": "Only a rejected request can be sent again.",
-    "owner_holds_cash": "The owner keeps the cash; there's nothing to hand over."
+    "owner_holds_cash": "The owner keeps the cash; there's nothing to hand over.",
+    "same_course_enrolled": "The student is already in another class of this course.",
+    "restore_window_over": "More than 30 days have passed since it was deleted."
   },
   "notifications": {
     "title": "Notifications",
@@ -242,7 +244,8 @@
       "schedule": "Schedule",
       "prices": "Prices",
       "payments": "Payments",
-      "cash": "Cash"
+      "cash": "Cash",
+      "courses": "Content"
     },
     "suspended": "This workspace is temporarily unavailable. You can still see your grades and attendance.",
     "suspendedOwner": "Your workspace is paused. You can see your subscription and renew it with the platform.",
@@ -475,7 +478,9 @@
     "remove": "Remove from class",
     "addTitle": "Add students",
     "search": "Search by student name, code or number",
-    "add": "Add"
+    "add": "Add",
+    "course": "Course:",
+    "noCourse": "No course"
   },
   "schedule": {
     "title": "Schedule",
@@ -649,5 +654,30 @@
     "dayLine": "{name} ({count, plural, one {1 payment} other {# payments}})",
     "month": "Income this month",
     "net": "Net of reversals"
+  },
+  "courses": {
+    "title": "Courses",
+    "empty": "No courses yet.",
+    "lessonCount": "{count, plural, =0 {No lessons} one {1 lesson} other {# lessons}}",
+    "createTitle": "New course",
+    "courseTitle": "Course name",
+    "create": "Create",
+    "back": "All courses",
+    "lessonTitle": "Lesson title",
+    "body": "Lesson text",
+    "save": "Save",
+    "published": "Published",
+    "draft": "Draft",
+    "moveUp": "Move up",
+    "moveDown": "Move down",
+    "up": "↑",
+    "down": "↓",
+    "edit": "Edit",
+    "publish": "Publish",
+    "unpublish": "Unpublish",
+    "delete": "Delete",
+    "confirmDelete": "Delete the lesson “{title}”? It can be restored for 30 days.",
+    "addLesson": "New lesson",
+    "add": "Add"
   }
 }
