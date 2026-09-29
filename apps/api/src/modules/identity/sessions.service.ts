@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { and, eq, isNull, ne } from 'drizzle-orm';
 import { Clock, IdGenerator } from '../../common';
 import { TenantDb, type DbTx } from '../../database';
+import { consentState, type ConsentState } from './consent';
 import { sessions, users, type SessionRevokeReason, type UserStatus } from './schema';
 import { generateSessionToken, hashToken } from './tokens';
 
@@ -29,6 +30,8 @@ export interface ResolvedSession {
   twoFactorEnabled: boolean;
   /** Signed in with a password but the second factor isn't checked yet (REQ-AUTH-007). */
   secondFactorPending: boolean;
+  /** Guardian consent (REQ-PRIV-001); enforced for student memberships only. */
+  consent: ConsentState;
 }
 
 /** Opaque server-side sessions (REQ-AUTH-004). */
@@ -90,6 +93,9 @@ export class SessionsService {
           createdAt: sessions.createdAt,
           secondFactorAt: sessions.secondFactorAt,
           totpEnabledAt: users.totpEnabledAt,
+          dateOfBirth: users.dateOfBirth,
+          userCreatedAt: users.createdAt,
+          guardianConsentAt: users.guardianConsentAt,
         })
         .from(sessions)
         .innerJoin(users, eq(users.id, sessions.userId))
@@ -112,6 +118,14 @@ export class SessionsService {
         userStatus: row.userStatus,
         twoFactorEnabled,
         secondFactorPending: twoFactorEnabled && row.secondFactorAt === null,
+        consent: consentState(
+          {
+            dateOfBirth: row.dateOfBirth,
+            createdAt: row.userCreatedAt,
+            consentAt: row.guardianConsentAt,
+          },
+          now,
+        ),
       };
     });
   }

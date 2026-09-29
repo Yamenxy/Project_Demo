@@ -65,6 +65,14 @@ export function WorkspaceShell({
     return (
       <main className="mx-auto max-w-3xl px-4 py-10">
         <ErrorMessage error={error} />
+        {error instanceof ApiError && error.code === 'guardian_consent_required' ? (
+          <Link
+            href="/consent"
+            className="mb-4 block rounded-lg bg-brand px-4 py-3 text-center font-semibold text-brand-contrast"
+          >
+            {t('giveConsent')}
+          </Link>
+        ) : null}
         {error ? (
           <Link href="/account" className="text-sm underline">
             {t('backToAccount')}

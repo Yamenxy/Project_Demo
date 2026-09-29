@@ -29,6 +29,7 @@ const joinBody = z
 const listQuery = z.object({
   status: z.enum(['active', 'pending', 'suspended']).optional(),
   q: z.string().max(80).optional(),
+  consent: z.literal('missing').optional(),
 });
 
 const managedBody = z.object({
@@ -36,6 +37,8 @@ const managedBody = z.object({
   phone: z.string().min(1).max(40),
   internalCode: z.string().trim().max(40).optional(),
 });
+
+const paperConsentBody = z.object({ note: z.string().trim().max(300).optional() });
 
 const removeBody = z.object({ reason: z.string().trim().min(3).max(300) });
 
@@ -94,10 +97,11 @@ export class StudentsController {
   list(
     @CurrentWorkspace() ctx: WorkspaceContext,
     @Query(new ZodPipe(listQuery)) query: z.infer<typeof listQuery>,
-  ): Promise<{ students: StudentRow[]; pendingCount: number }> {
+  ): Promise<{ students: StudentRow[]; pendingCount: number; missingConsentCount: number }> {
     return this.students.list(ctx.workspaceId, {
-      ...query,
+      status: query.status,
       query: query.q,
+      missingConsent: query.consent === 'missing',
       showPhones: ctx.permissions.has('enrollment.manage') || ctx.permissions.has('students.edit'),
     });
   }
@@ -176,6 +180,24 @@ export class StudentsController {
       actorOf(session, request),
     );
     return { link: claimLink(ctx.workspaceId, token) };
+  }
+
+  @Post('students/:membershipId/consent')
+  @HttpCode(204)
+  @WorkspacePermission('enrollment.manage')
+  async paperConsent(
+    @CurrentWorkspace() ctx: WorkspaceContext,
+    @CurrentSession() session: SessionContext,
+    @Param('membershipId', uuidParam) membershipId: string,
+    @Body(new ZodPipe(paperConsentBody)) body: z.infer<typeof paperConsentBody>,
+    @Req() request: FastifyRequest,
+  ): Promise<void> {
+    await this.students.recordPaperConsent(
+      ctx.workspaceId,
+      membershipId,
+      body.note || null,
+      actorOf(session, request),
+    );
   }
 
   /** Owner only (Appendix A.3: removing a student isn't delegated in the MVP). */

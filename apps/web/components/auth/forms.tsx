@@ -51,6 +51,7 @@ export function RegisterForm() {
           nameAr: value(form, 'name'),
           phone: toWesternDigits(value(form, 'phone')),
           password: value(form, 'password'),
+          ...(value(form, 'dateOfBirth') ? { dateOfBirth: value(form, 'dateOfBirth') } : {}),
         },
       });
       router.push('/verify-phone');
@@ -80,6 +81,14 @@ export function RegisterForm() {
           autoComplete="new-password"
           hint={t('passwordHint')}
           required
+        />
+        <Field
+          label={t('dateOfBirth')}
+          name="dateOfBirth"
+          type="date"
+          dir="ltr"
+          autoComplete="bday"
+          hint={t('dateOfBirthHint')}
         />
         <SubmitButton busy={busy}>{t('registerSubmit')}</SubmitButton>
       </form>

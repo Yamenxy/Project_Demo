@@ -1,6 +1,7 @@
 import { randomUUID } from 'node:crypto';
 import type { Pool, PoolClient } from 'pg';
 import { SecretBox } from '../common/secret-box';
+import { CONSENT_VERSION } from '../modules/identity/consent';
 import { hashPassword } from '../modules/identity/password';
 import { generatePlatformCode } from '../modules/identity/tokens';
 import { base32Encode, generateTotpSecret } from '../modules/identity/two-factor/totp';
@@ -31,6 +32,9 @@ interface PersonSpec {
   name: string;
   phoneSuffix: string;
   twoFactor?: boolean;
+  dateOfBirth?: string;
+  /** Students under 18: the guardian's number, and whether they already consented. */
+  guardian?: { phoneSuffix: string; consented: boolean };
 }
 
 const PEOPLE: PersonSpec[] = [
@@ -39,12 +43,42 @@ const PEOPLE: PersonSpec[] = [
   { key: 'chemistry', name: 'أ. سارة عبد الرحمن', phoneSuffix: '0003', twoFactor: true },
   { key: 'classTeacher', name: 'أ. كريم حسن', phoneSuffix: '0004', twoFactor: true },
   { key: 'helper', name: 'مساعد: يوسف علي', phoneSuffix: '0005' },
-  { key: 's1', name: 'مريم أحمد', phoneSuffix: '0101' },
-  { key: 's2', name: 'عمر خالد', phoneSuffix: '0102' },
-  { key: 's3', name: 'نور محمود', phoneSuffix: '0103' },
-  { key: 's4', name: 'آدم إبراهيم', phoneSuffix: '0104' },
-  { key: 's5', name: 'فاطمة الزهراء سعيد', phoneSuffix: '0105' },
-  { key: 's6', name: 'زياد مصطفى', phoneSuffix: '0106' },
+  {
+    key: 's1',
+    name: 'مريم أحمد',
+    phoneSuffix: '0101',
+    dateOfBirth: '2010-03-14',
+    guardian: { phoneSuffix: '0201', consented: true },
+  },
+  {
+    key: 's2',
+    name: 'عمر خالد',
+    phoneSuffix: '0102',
+    dateOfBirth: '2009-11-02',
+    guardian: { phoneSuffix: '0202', consented: true },
+  },
+  {
+    key: 's3',
+    name: 'نور محمود',
+    phoneSuffix: '0103',
+    dateOfBirth: '2010-07-21',
+    guardian: { phoneSuffix: '0203', consented: true },
+  },
+  {
+    key: 's4',
+    name: 'آدم إبراهيم',
+    phoneSuffix: '0104',
+    dateOfBirth: '2011-01-09',
+    guardian: { phoneSuffix: '0204', consented: true },
+  },
+  { key: 's5', name: 'فاطمة الزهراء سعيد', phoneSuffix: '0105', dateOfBirth: '2006-05-30' },
+  {
+    key: 's6',
+    name: 'زياد مصطفى',
+    phoneSuffix: '0106',
+    dateOfBirth: '2011-09-17',
+    guardian: { phoneSuffix: '0206', consented: false },
+  },
 ];
 
 export async function seedDemoData(
@@ -78,8 +112,9 @@ export async function seedDemoData(
       await client.query(
         `insert into users (id, platform_code, name_ar, phone_e164, phone_verified_at, status,
                             password_hash, password_changed_at, created_at, updated_at,
-                            totp_secret_encrypted, totp_enabled_at)
-         values ($1, $2, $3, $4, now(), 'active', $5, now(), now(), now(), $6, $7)`,
+                            totp_secret_encrypted, totp_enabled_at, date_of_birth,
+                            guardian_phone_e164, guardian_consent_at)
+         values ($1, $2, $3, $4, now(), 'active', $5, now(), now(), now(), $6, $7, $8, $9, $10)`,
         [
           id,
           generatePlatformCode(),
@@ -88,8 +123,18 @@ export async function seedDemoData(
           passwordHash,
           sealed,
           sealed ? new Date() : null,
+          person.dateOfBirth ?? '1990-01-01',
+          person.guardian ? `${DEMO_PHONE_PREFIX}${person.guardian.phoneSuffix}` : null,
+          person.guardian?.consented ? new Date() : null,
         ],
       );
+      if (person.guardian?.consented) {
+        await client.query(
+          `insert into guardian_consents (id, user_id, method, version, guardian_phone_e164, created_at)
+           values ($1, $2, 'otp', $3, $4, now())`,
+          [randomUUID(), id, CONSENT_VERSION, `${DEMO_PHONE_PREFIX}${person.guardian.phoneSuffix}`],
+        );
+      }
       logins.push({
         role: person.key,
         name: person.name,

@@ -22,6 +22,8 @@ export const users = pgTable('users', {
   email: text('email'),
   emailVerifiedAt: tstz('email_verified_at'),
   dateOfBirth: date('date_of_birth'),
+  guardianPhoneE164: text('guardian_phone_e164'),
+  guardianConsentAt: tstz('guardian_consent_at'),
   status: text('status', {
     enum: ['pending', 'active', 'suspended', 'archived', 'anonymized'],
   }).notNull(),
@@ -87,12 +89,27 @@ export const otpChallenges = pgTable('otp_challenges', {
   id: uuid('id').primaryKey(),
   userId: uuid('user_id').notNull(),
   phoneE164: text('phone_e164').notNull(),
-  purpose: text('purpose', { enum: ['verify_phone', 'password_reset'] }).notNull(),
+  purpose: text('purpose', {
+    enum: ['verify_phone', 'password_reset', 'guardian_consent'],
+  }).notNull(),
   codeHash: text('code_hash').notNull(),
   createdAt: tstz('created_at').notNull(),
   expiresAt: tstz('expires_at').notNull(),
   attempts: integer('attempts').notNull(),
   consumedAt: tstz('consumed_at'),
+});
+
+/** Mirrors drizzle/0013_guardian_consent.sql. Append-only. */
+export const guardianConsents = pgTable('guardian_consents', {
+  id: uuid('id').primaryKey(),
+  userId: uuid('user_id').notNull(),
+  method: text('method', { enum: ['otp', 'paper'] }).notNull(),
+  version: text('version').notNull(),
+  guardianPhoneE164: text('guardian_phone_e164'),
+  workspaceId: uuid('workspace_id'),
+  recordedBy: uuid('recorded_by'),
+  note: text('note'),
+  createdAt: tstz('created_at').notNull(),
 });
 
 export const rateLimitCounters = pgTable(

@@ -35,7 +35,9 @@
     "loginSubmit": "Sign in",
     "twoFactorTitle": "Two-step verification",
     "twoFactorExplain": "Enter the code shown in your authenticator app.",
-    "recoveryHint": "Or enter one of your recovery codes."
+    "recoveryHint": "Or enter one of your recovery codes.",
+    "dateOfBirth": "Date of birth",
+    "dateOfBirthHint": "For students: we need it to know whether guardian consent is required."
   },
   "account": {
     "platformCode": "Your code:",
@@ -67,7 +69,9 @@
       "assistant": "Helper",
       "student": "Student"
     },
-    "joinTeacher": "Join a teacher with a code"
+    "joinTeacher": "Join a teacher with a code",
+    "consentNeeded": "Guardian consent is needed. Tap here to complete it.",
+    "consentOverdue": "The guardian consent deadline has passed and your access is paused. Tap here to complete it."
   },
   "errors": {
     "generic": "Something went wrong. Please try again.",
@@ -111,7 +115,14 @@
     "import_too_large": "The file is too large. The limit is 512 KB and 1000 students.",
     "import_unreadable": "We couldn't read the file. Save it as xlsx or CSV and try again.",
     "import_empty": "There are no students in the file.",
-    "import_conflict": "The student list changed during the import. Try again."
+    "import_conflict": "The student list changed during the import. Try again.",
+    "guardian_consent_required": "A guardian needs to consent before you can open this workspace.",
+    "guardian_phone_is_own": "Enter your guardian's own number, not yours. If they have none, ask your teacher for the paper consent form.",
+    "date_of_birth_locked": "Your date of birth can't be changed here. Contact support.",
+    "date_of_birth_required": "Enter your date of birth first.",
+    "guardian_phone_required": "Enter your guardian's number first.",
+    "consent_not_needed": "Consent is already recorded or not needed.",
+    "invalid_date_of_birth": "This date of birth isn't valid."
   },
   "notifications": {
     "title": "Notifications",
@@ -215,7 +226,8 @@
       "students": "Students and join requests."
     },
     "billingTitle": "Subscription",
-    "billingHowToRenew": "To renew, pay the platform owners and the payment will show here."
+    "billingHowToRenew": "To renew, pay the platform owners and the payment will show here.",
+    "giveConsent": "Complete guardian consent"
   },
   "staff": {
     "title": "Staff",
@@ -310,7 +322,15 @@
     "phone": "Student's mobile number",
     "internalCode": "Your own code (optional)",
     "add": "Add",
-    "claimMessage": "Activate your account with {name} from this link:"
+    "claimMessage": "Activate your account with {name} from this link:",
+    "filterConsent": "{count, plural, =0 {Guardian consent} other {Missing guardian consent (#)}}",
+    "consent": {
+      "needed": "Waiting for guardian consent",
+      "overdue": "Guardian consent overdue"
+    },
+    "paperConsent": "Record paper consent",
+    "paperConsentNote": "Did you receive a consent form signed by {name}'s guardian? Add a note (optional), then press OK:",
+    "paperConsentSaved": "Consent for {name} recorded."
   },
   "joinTeacher": {
     "title": "Join a teacher",
@@ -344,5 +364,25 @@
       "already_member": "Number already in your workspace",
       "code_taken": "Your code is already used"
     }
+  },
+  "consent": {
+    "title": "Guardian consent",
+    "explain": "Students under 18 need their guardian's consent. We send a code to the guardian's mobile, and you enter it here.",
+    "dueBy": "Your account is limited until consent arrives. Complete it before {date}; after that you can't open teachers' workspaces.",
+    "overdue": "The deadline has passed. You can't open teachers' workspaces until your guardian consents.",
+    "dateOfBirth": "Date of birth",
+    "guardianPhone": "Guardian's mobile number",
+    "guardianPhoneHint": "Your guardian's own number, not yours.",
+    "save": "Save",
+    "sendCode": "Send the code to my guardian",
+    "resend": "Send a new code",
+    "codeSent": "We sent a code to your guardian's mobile. Enter it here.",
+    "code": "Code",
+    "confirm": "Confirm consent",
+    "granted": "Your guardian's consent is recorded. Thank you!",
+    "notRequired": "You don't need guardian consent.",
+    "backToAccount": "Back to my account",
+    "paperOption": "If your guardian has no number of their own, ask your teacher for the paper consent form.",
+    "dateOfBirthIs": "Date of birth:"
   }
 }

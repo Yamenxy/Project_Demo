@@ -21,6 +21,7 @@ interface Student {
   status: 'active' | 'pending' | 'suspended';
   paused: boolean;
   managed: boolean;
+  consent: 'not_required' | 'granted' | 'needed' | 'overdue' | null;
 }
 
 interface Joining {
@@ -45,12 +46,17 @@ export function StudentsView() {
   const canManage = isOwner || permissions.includes('enrollment.manage');
   const canImport = isOwner || permissions.includes('students.import');
 
-  const [filter, setFilter] = useState<'all' | 'pending'>(
-    params.get('status') === 'pending' ? 'pending' : 'all',
+  const [filter, setFilter] = useState<'all' | 'pending' | 'consent'>(
+    params.get('status') === 'pending'
+      ? 'pending'
+      : params.get('consent') === 'missing'
+        ? 'consent'
+        : 'all',
   );
   const [query, setQuery] = useState('');
   const [students, setStudents] = useState<Student[]>([]);
   const [pendingCount, setPendingCount] = useState(0);
+  const [missingConsentCount, setMissingConsentCount] = useState(0);
   const [joining, setJoining] = useState<Joining | null>(null);
   const [share, setShare] = useState<{ url: string; message: string } | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
@@ -63,12 +69,16 @@ export function StudentsView() {
       if (!canManage) return;
       const search = new URLSearchParams();
       if (filter === 'pending') search.set('status', 'pending');
+      if (filter === 'consent') search.set('consent', 'missing');
       if (query.trim()) search.set('q', toWesternDigits(query.trim()));
-      const data = await api<{ students: Student[]; pendingCount: number }>(
-        `${base}/students?${search.toString()}`,
-      );
+      const data = await api<{
+        students: Student[];
+        pendingCount: number;
+        missingConsentCount: number;
+      }>(`${base}/students?${search.toString()}`);
       setStudents(data.students);
       setPendingCount(data.pendingCount);
+      setMissingConsentCount(data.missingConsentCount);
     } catch (err) {
       setError(err);
     }
@@ -134,6 +144,18 @@ export function StudentsView() {
         body: { reason: reason.trim() },
       }),
     );
+  };
+
+  const paperConsent = (student: Student) => {
+    const note = window.prompt(t('paperConsentNote', { name: student.name }));
+    if (note === null) return;
+    void run(async () => {
+      await api(`${base}/students/${student.membershipId}/consent`, {
+        method: 'POST',
+        body: note.trim() ? { note: note.trim() } : {},
+      });
+      setNotice(t('paperConsentSaved', { name: student.name }));
+    });
   };
 
   const resetDevices = (student: Student) =>
@@ -203,6 +225,13 @@ export function StudentsView() {
             >
               {t('filterPending', { count: pendingCount })}
             </button>
+            <button
+              type="button"
+              onClick={() => setFilter('consent')}
+              className={`rounded-full px-3 py-1 text-sm ${filter === 'consent' ? 'bg-brand text-brand-contrast' : 'border'}`}
+            >
+              {t('filterConsent', { count: missingConsentCount })}
+            </button>
             <input
               type="search"
               value={query}
@@ -245,6 +274,13 @@ export function StudentsView() {
                     {student.managed ? (
                       <span className="rounded-full bg-gray-100 px-2 py-0.5 text-xs">
                         {t('managed')}
+                      </span>
+                    ) : null}
+                    {student.consent === 'needed' || student.consent === 'overdue' ? (
+                      <span
+                        className={`rounded-full px-2 py-0.5 text-xs ${student.consent === 'overdue' ? 'bg-red-50 text-red-800' : 'bg-amber-50 text-amber-800'}`}
+                      >
+                        {t(`consent.${student.consent}`)}
                       </span>
                     ) : null}
                     {student.paused ? (
@@ -295,6 +331,16 @@ export function StudentsView() {
                       className="rounded-lg border px-3 py-1"
                     >
                       {t('newClaimLink')}
+                    </button>
+                  ) : null}
+                  {student.consent === 'needed' || student.consent === 'overdue' ? (
+                    <button
+                      type="button"
+                      disabled={busy}
+                      onClick={() => paperConsent(student)}
+                      className="rounded-lg border px-3 py-1"
+                    >
+                      {t('paperConsent')}
                     </button>
                   ) : null}
                   {canReset && !student.managed && student.status === 'active' ? (

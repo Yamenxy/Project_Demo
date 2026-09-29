@@ -9,6 +9,8 @@ export interface SessionContext {
   userStatus: string;
   twoFactorEnabled: boolean;
   secondFactorPending: boolean;
+  /** Guardian consent state (REQ-PRIV-001); enforced for student memberships only. */
+  consent: 'not_required' | 'granted' | 'needed' | 'overdue';
 }
 
 declare module 'fastify' {

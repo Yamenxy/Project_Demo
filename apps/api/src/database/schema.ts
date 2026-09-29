@@ -11,6 +11,7 @@ export {
 } from '../modules/platform-admin/schema';
 export {
   deviceRegistrations,
+  guardianConsents,
   otpChallenges,
   rateLimitCounters,
   recoveryCodes,

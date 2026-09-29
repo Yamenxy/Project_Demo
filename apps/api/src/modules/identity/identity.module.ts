@@ -3,12 +3,15 @@ import { ContactDirectory } from '../notify';
 import { JobsRuntime } from '../../jobs';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
+import { ConsentController } from './consent.controller';
+import { ConsentService } from './consent.service';
 import { UserContactDirectory } from './contact-directory';
 import { DevicesController } from './devices/devices.controller';
 import { DevicesService } from './devices/devices.service';
 import { APP_CONFIG, type AppConfig } from '../../config';
 import { FileOtpSender } from './otp/file-otp-sender';
 import { ConsoleOtpSender, OtpSender } from './otp/otp-sender';
+import { OtpLimits } from './otp/otp-limits';
 import { OtpService } from './otp/otp.service';
 import { RateLimiter } from './rate-limiter';
 import { RecoveryController } from './recovery.controller';
@@ -20,12 +23,20 @@ import { SessionsService } from './sessions.service';
 /** Global: provides the contact directory notify uses without importing identity. */
 @Global()
 @Module({
-  controllers: [AuthController, RecoveryController, DevicesController, TwoFactorController],
+  controllers: [
+    AuthController,
+    RecoveryController,
+    DevicesController,
+    TwoFactorController,
+    ConsentController,
+  ],
   providers: [
     AuthService,
     SessionsService,
     RateLimiter,
     OtpService,
+    OtpLimits,
+    ConsentService,
     RecoveryService,
     DevicesService,
     TwoFactorService,
@@ -38,7 +49,7 @@ import { SessionsService } from './sessions.service';
         config.otpProvider === 'file' ? new FileOtpSender(config) : new ConsoleOtpSender(),
     },
   ],
-  exports: [SessionsService, RateLimiter, DevicesService, ContactDirectory],
+  exports: [SessionsService, RateLimiter, DevicesService, ContactDirectory, ConsentService],
 })
 export class IdentityModule implements OnModuleInit {
   constructor(

@@ -4,6 +4,7 @@ import { toWesternDigits } from '@lms/shared';
 import { useFormatter, useTranslations } from 'next-intl';
 import { useCallback, useEffect, useState, type FormEvent } from 'react';
 import { Link, useRouter } from '../../i18n/navigation';
+import type { ConsentStatus } from './consent-view';
 import { api, ApiError, type DeviceSummary, type UserSummary } from '../../lib/api';
 import { Ltr } from '../../lib/bidi';
 import { ErrorMessage, Field, SubmitButton } from '../form';
@@ -30,6 +31,7 @@ export function AccountView() {
   const [platformOwner, setPlatformOwner] = useState(false);
   const [workspaces, setWorkspaces] = useState<MyWorkspace[]>([]);
   const [error, setError] = useState<unknown>(null);
+  const [consent, setConsent] = useState<ConsentStatus | null>(null);
 
   const load = useCallback(async () => {
     try {
@@ -46,6 +48,9 @@ export function AccountView() {
       );
       setPlatformOwner(mine.platformOwner);
       setWorkspaces(mine.workspaces);
+      if (mine.workspaces.some((w) => w.role === 'student')) {
+        setConsent(await api<ConsentStatus>('/auth/consent'));
+      }
     } catch (err) {
       if (err instanceof ApiError && err.status === 401) router.replace('/login');
       else setError(err);
@@ -101,6 +106,15 @@ export function AccountView() {
           </Link>
         )}
       </section>
+
+      {consent && (consent.state === 'needed' || consent.state === 'overdue') ? (
+        <Link
+          href="/consent"
+          className={`rounded-2xl p-4 text-sm font-semibold ${consent.state === 'overdue' ? 'bg-red-50 text-red-800' : 'bg-amber-50 text-amber-800'}`}
+        >
+          {consent.state === 'overdue' ? t('consentOverdue') : t('consentNeeded')}
+        </Link>
+      ) : null}
 
       {workspaces.length > 0 ? (
         <section className="rounded-2xl bg-surface p-6 shadow-sm">

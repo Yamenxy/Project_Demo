@@ -8,21 +8,16 @@ import { NotificationsService } from '../notify';
 import type { UserSummary } from './auth.schemas';
 import type { RequestMeta } from './request-meta';
 import { OtpSender } from './otp/otp-sender';
-import { OtpService, type OtpCheck } from './otp/otp.service';
+import { OtpLimits } from './otp/otp-limits';
+import { OtpService } from './otp/otp.service';
 import { checkPassword, hashPassword } from './password';
-import { RateLimiter, type RateLimitRule } from './rate-limiter';
 import { sessions, users } from './schema';
 import { SessionsService } from './sessions.service';
 
 /** Activity inside this window means OTP alone can't take the account over (REQ-AUTH-003). */
 const RECENT_ACTIVITY_MS = 365 * 24 * 3600 * 1000;
 
-export const OTP_RATE_LIMITS = {
-  sendPerPhone: { scope: 'otp.send.phone', limit: 5, windowSeconds: 3600 },
-  sendPerIp: { scope: 'otp.send.ip', limit: 20, windowSeconds: 3600 },
-  // 5 wrong codes, then a 15-minute lockout (REQ-AUTH-001).
-  wrongCodes: { scope: 'otp.wrong', limit: 5, windowSeconds: 15 * 60 },
-} satisfies Record<string, RateLimitRule>;
+export { OTP_RATE_LIMITS } from './otp/otp-limits';
 
 type UserRow = typeof users.$inferSelect;
 
@@ -34,7 +29,7 @@ export class RecoveryService {
     private readonly otp: OtpService,
     private readonly sender: OtpSender,
     private readonly sessions: SessionsService,
-    private readonly rateLimiter: RateLimiter,
+    private readonly limits: OtpLimits,
     private readonly audit: AuditService,
     private readonly notifications: NotificationsService,
     private readonly clock: Clock,
@@ -45,7 +40,7 @@ export class RecoveryService {
     if (user.phoneVerifiedAt) {
       throw new AppError(409, 'phone_already_verified', 'Phone number is already verified');
     }
-    await this.limitSends(user.phoneE164, meta.ip);
+    await this.limits.limitSends(user.phoneE164, meta.ip);
     const { code, expiresInSeconds } = await this.db.transaction((tx) =>
       this.otp.issue(tx, user.id, user.phoneE164, 'verify_phone'),
     );
@@ -61,7 +56,7 @@ export class RecoveryService {
    */
   async verifyPhone(userId: string, rawCode: string, meta: RequestMeta): Promise<UserSummary> {
     const lockKey = `verify_phone:${userId}`;
-    await this.assertNotLocked(lockKey);
+    await this.limits.assertNotLocked(lockKey);
     const code = toWesternDigits(rawCode.trim());
 
     const outcome = await this.db
@@ -129,7 +124,8 @@ export class RecoveryService {
     if (outcome.check === 'phone_in_use') {
       throw new AppError(409, 'phone_in_use', 'This number belongs to another active account');
     }
-    if (outcome.check !== 'ok' || !outcome.user) await this.codeFailure(outcome.check, lockKey);
+    if (outcome.check !== 'ok' || !outcome.user)
+      await this.limits.codeFailure(outcome.check, lockKey);
     const user = outcome.user as UserRow;
     return {
       id: user.id,
@@ -148,7 +144,7 @@ export class RecoveryService {
   async requestPasswordReset(rawPhone: string, meta: RequestMeta): Promise<void> {
     const phone = normalizePhone(rawPhone);
     if (!phone) return;
-    await this.limitSends(phone, meta.ip);
+    await this.limits.limitSends(phone, meta.ip);
     const holder = await this.findVerifiedHolder(phone);
     if (!holder || holder.status === 'anonymized' || holder.status === 'archived') return;
     const { code } = await this.db.transaction((tx) =>
@@ -172,7 +168,7 @@ export class RecoveryService {
     const holder = phone ? await this.findVerifiedHolder(phone) : undefined;
     if (!phone || !holder) throw new AppError(400, 'invalid_code', 'The code is not valid');
     const lockKey = `password_reset:${holder.id}`;
-    await this.assertNotLocked(lockKey);
+    await this.limits.assertNotLocked(lockKey);
     const problem = checkPassword(newPassword, phone);
     if (problem) throw new AppError(400, problem, 'Password does not meet the policy');
     const passwordHash = await hashPassword(newPassword);
@@ -229,41 +225,7 @@ export class RecoveryService {
         'Contact support to recover this account',
       );
     }
-    if (outcome !== 'ok') await this.codeFailure(outcome, lockKey);
-  }
-
-  private async codeFailure(check: OtpCheck | 'phone_in_use', lockKey: string): Promise<never> {
-    if (check === 'invalid' || check === 'too_many_attempts') {
-      await this.rateLimiter.hit(OTP_RATE_LIMITS.wrongCodes, lockKey);
-    }
-    if (check === 'too_many_attempts') {
-      throw new AppError(429, 'code_attempts_exceeded', 'Request a new code');
-    }
-    if (check === 'expired') throw new AppError(400, 'code_expired', 'The code has expired');
-    throw new AppError(400, 'invalid_code', 'The code is not valid');
-  }
-
-  private async assertNotLocked(lockKey: string): Promise<void> {
-    const state = await this.rateLimiter.peek(OTP_RATE_LIMITS.wrongCodes, lockKey);
-    if (state.limited) {
-      throw new AppError(429, 'rate_limited', 'Too many attempts', {
-        retryAfterSeconds: state.retryAfterSeconds,
-      });
-    }
-  }
-
-  private async limitSends(phone: string, ip: string): Promise<void> {
-    for (const [rule, subject] of [
-      [OTP_RATE_LIMITS.sendPerPhone, phone],
-      [OTP_RATE_LIMITS.sendPerIp, ip],
-    ] as const) {
-      const state = await this.rateLimiter.hit(rule, subject);
-      if (state.limited) {
-        throw new AppError(429, 'rate_limited', 'Too many codes requested', {
-          retryAfterSeconds: state.retryAfterSeconds,
-        });
-      }
-    }
+    if (outcome !== 'ok') await this.limits.codeFailure(outcome, lockKey);
   }
 
   private async hasRecentActivity(tx: DbTx, user: UserRow): Promise<boolean> {

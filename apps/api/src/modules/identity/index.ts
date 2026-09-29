@@ -1,3 +1,5 @@
+export { consentState, isLimited, type ConsentState } from './consent';
+export { ConsentService } from './consent.service';
 export { DeviceLimitPolicy } from './devices/device-limit-policy';
 export { DevicesService } from './devices/devices.service';
 export { IdentityModule } from './identity.module';

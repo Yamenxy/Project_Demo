@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 
-export type OtpPurpose = 'verify_phone' | 'password_reset';
+export type OtpPurpose = 'verify_phone' | 'password_reset' | 'guardian_consent';
 
 /**
  * Delivers one-time codes (REQ-AUTH-001: WhatsApp first, SMS fallback). Selected by OTP_PROVIDER.

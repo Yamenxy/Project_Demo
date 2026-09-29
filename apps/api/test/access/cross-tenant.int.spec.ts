@@ -24,6 +24,7 @@ const attacker = { workspaceId: '', token: '' };
 /** Plausible request bodies, keyed by "METHOD path". Empty for routes without a body. */
 const SAMPLE_BODIES: Record<string, object> = {
   'POST /api/v1/w/:workspaceId/students/:membershipId/remove': { reason: 'cross-tenant test' },
+  'POST /api/v1/w/:workspaceId/students/:membershipId/consent': {},
 };
 
 /** Victim resource IDs by route parameter name. */

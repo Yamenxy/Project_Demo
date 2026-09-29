@@ -1,11 +1,23 @@
 import { createHash, randomBytes } from 'node:crypto';
 import { Injectable } from '@nestjs/common';
 import { normalizePhone } from '@lms/shared';
-import { and, desc, eq, ilike, inArray, isNull, or, sql, type SQL } from 'drizzle-orm';
+import {
+  and,
+  desc,
+  eq,
+  gt,
+  ilike,
+  inArray,
+  isNotNull,
+  isNull,
+  or,
+  sql,
+  type SQL,
+} from 'drizzle-orm';
 import { AppError, Clock, IdGenerator, notFound } from '../../common';
 import { isUniqueViolation, TenantDb, type DbTx } from '../../database';
 import { AuditService } from '../audit';
-import { users } from '../identity';
+import { ConsentService, consentState, users, type ConsentState } from '../identity';
 import { NotificationsService } from '../notify';
 import { generateJoinCode } from './join-code';
 import {
@@ -33,6 +45,8 @@ export interface StudentRow {
   paused: boolean;
   managed: boolean;
   joinedAt: Date;
+  /** Guardian consent (REQ-PRIV-001); null for managed records. The date of birth isn't shown. */
+  consent: ConsentState | null;
 }
 
 export interface JoinResult {
@@ -60,6 +74,7 @@ export class StudentsService {
     private readonly notifications: NotificationsService,
     private readonly ids: IdGenerator,
     private readonly clock: Clock,
+    private readonly consent: ConsentService,
   ) {}
 
   /**
@@ -195,8 +210,13 @@ export class StudentsService {
 
   async list(
     workspaceId: string,
-    options: { status?: MembershipStatus; query?: string; showPhones: boolean },
-  ): Promise<{ students: StudentRow[]; pendingCount: number }> {
+    options: {
+      status?: MembershipStatus;
+      query?: string;
+      missingConsent?: boolean;
+      showPhones: boolean;
+    },
+  ): Promise<{ students: StudentRow[]; pendingCount: number; missingConsentCount: number }> {
     return this.db.inWorkspace(workspaceId, async (tx) => {
       const filters: SQL[] = [eq(memberships.role, 'student')];
       filters.push(
@@ -204,6 +224,9 @@ export class StudentsService {
           ? eq(memberships.status, options.status)
           : inArray(memberships.status, ['active', 'pending', 'suspended']),
       );
+      const now = this.clock.now();
+      const missingConsent = this.missingConsentFilter(now);
+      if (options.missingConsent) filters.push(missingConsent);
       const q = options.query?.trim();
       if (q) {
         const like = `%${q.replace(/[%_\\]/g, (c) => `\\${c}`)}%`;
@@ -231,6 +254,9 @@ export class StudentsService {
           status: memberships.status,
           pausedAt: memberships.pausedAt,
           createdAt: memberships.createdAt,
+          dateOfBirth: users.dateOfBirth,
+          userCreatedAt: users.createdAt,
+          guardianConsentAt: users.guardianConsentAt,
         })
         .from(memberships)
         .leftJoin(users, eq(users.id, memberships.userId))
@@ -241,6 +267,17 @@ export class StudentsService {
         .select({ n: sql<number>`count(*)::int` })
         .from(memberships)
         .where(and(eq(memberships.role, 'student'), eq(memberships.status, 'pending')));
+      const [missing] = await tx
+        .select({ n: sql<number>`count(*)::int` })
+        .from(memberships)
+        .innerJoin(users, eq(users.id, memberships.userId))
+        .where(
+          and(
+            eq(memberships.role, 'student'),
+            inArray(memberships.status, ['active', 'pending', 'suspended']),
+            missingConsent,
+          ),
+        );
       return {
         students: rows.map((row) => ({
           membershipId: row.membershipId,
@@ -253,9 +290,60 @@ export class StudentsService {
           paused: row.pausedAt !== null,
           managed: row.userId === null,
           joinedAt: row.createdAt,
+          consent: row.userCreatedAt
+            ? consentState(
+                {
+                  dateOfBirth: row.dateOfBirth,
+                  createdAt: row.userCreatedAt,
+                  consentAt: row.guardianConsentAt,
+                },
+                now,
+              )
+            : null,
         })),
         pendingCount: pending?.n ?? 0,
+        missingConsentCount: missing?.n ?? 0,
       };
+    });
+  }
+
+  /** Students with an account, under 18 or of unknown age, and no guardian consent yet. */
+  private missingConsentFilter(now: Date): SQL {
+    const cutoff = `${String(now.getUTCFullYear() - 18)}-${now.toISOString().slice(5, 10)}`;
+    return and(
+      isNotNull(memberships.userId),
+      isNull(users.guardianConsentAt),
+      or(isNull(users.dateOfBirth), gt(users.dateOfBirth, cutoff)),
+    ) as SQL;
+  }
+
+  /** Staff saw a signed paper consent form for this student (REQ-PRIV-001). */
+  async recordPaperConsent(
+    workspaceId: string,
+    membershipId: string,
+    note: string | null,
+    actor: Actor,
+  ): Promise<void> {
+    const [member] = await this.db.inWorkspace(workspaceId, (tx) =>
+      tx
+        .select({ userId: memberships.userId })
+        .from(memberships)
+        .where(
+          and(
+            eq(memberships.id, membershipId),
+            eq(memberships.role, 'student'),
+            isNotNull(memberships.userId),
+            inArray(memberships.status, ['active', 'pending', 'suspended']),
+          ),
+        ),
+    );
+    if (!member?.userId) throw notFound('Student not found');
+    await this.consent.recordPaper({
+      userId: member.userId,
+      workspaceId,
+      recordedBy: actor.userId,
+      note,
+      requestId: actor.requestId,
     });
   }
 

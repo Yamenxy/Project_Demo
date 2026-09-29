@@ -95,6 +95,10 @@ export class AccessGuard implements CanActivate {
     if (TWO_FACTOR_ROLES.has(resolved.role) && !session.twoFactorEnabled) {
       throw twoFactorSetupRequired();
     }
+    // A student under 18 without guardian consent after the grace period (REQ-PRIV-001).
+    if (resolved.role === 'student' && session.consent === 'overdue') {
+      throw new AppError(403, 'guardian_consent_required', 'A guardian needs to give consent');
+    }
     if (resolved.workspaceSuspended && !policy.allowWhenSuspended.includes(resolved.role)) {
       throw new AppError(403, 'workspace_suspended', 'This workspace is temporarily unavailable');
     }
