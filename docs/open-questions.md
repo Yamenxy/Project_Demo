@@ -1,6 +1,6 @@
 # Open questions and owner tasks
 
-Last updated 2026-09-28. Every item has a **default** that development follows until the item is answered. When an item is answered, move it to [decisions.md](decisions.md) and update [requirements.md](requirements.md).
+Last updated 2026-09-29. Paid services are listed separately in [paid-services.md](paid-services.md): the product is a free sales demo for now. Every item has a **default** that development follows until the item is answered. When an item is answered, move it to [decisions.md](decisions.md) and update [requirements.md](requirements.md).
 
 "Blocks" says what can't happen until the item is resolved. Unless stated otherwise, **nothing here blocks development** (OD-07).
 
