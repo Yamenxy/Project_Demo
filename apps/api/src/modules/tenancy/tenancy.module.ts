@@ -11,6 +11,8 @@ import { MembershipsService } from './memberships.service';
 import { PermissionsService } from './permissions.service';
 import { InvitationAcceptController, StaffController } from './staff.controller';
 import { StaffService } from './staff.service';
+import { JoinController, StudentsController } from './students.controller';
+import { StudentsService } from './students.service';
 import { WorkspaceController } from './workspace.controller';
 import { WorkspacesService } from './workspaces.service';
 
@@ -27,6 +29,8 @@ import { WorkspacesService } from './workspaces.service';
     MeController,
     StaffController,
     InvitationAcceptController,
+    JoinController,
+    StudentsController,
   ],
   providers: [
     MembershipsService,
@@ -35,6 +39,7 @@ import { WorkspacesService } from './workspaces.service';
     MembersService,
     InvitationsService,
     StaffService,
+    StudentsService,
     { provide: DeviceLimitPolicy, useClass: MembershipDeviceLimitPolicy },
     { provide: APP_GUARD, useClass: AccessGuard },
   ],

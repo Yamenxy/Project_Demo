@@ -157,7 +157,7 @@ export class InvitationsService {
   async preview(
     workspaceId: string,
     token: string,
-  ): Promise<{ workspaceName: string; role: StaffRole }> {
+  ): Promise<{ workspaceName: string; role: StaffRole | 'student' }> {
     if (!isUuid(workspaceId)) throw invalidInvitation();
     return this.db.inWorkspace(workspaceId, async (tx) => {
       const invitation = await this.findUsable(tx, token);
@@ -165,7 +165,7 @@ export class InvitationsService {
         .select({ name: workspaces.name })
         .from(workspaces)
         .where(eq(workspaces.id, workspaceId));
-      return { workspaceName: workspace?.name ?? '', role: invitation.role as StaffRole };
+      return { workspaceName: workspace?.name ?? '', role: invitation.role };
     });
   }
 
@@ -194,6 +194,33 @@ export class InvitationsService {
         .select({ id: memberships.id, status: memberships.status })
         .from(memberships)
         .where(eq(memberships.userId, userId));
+
+      if (invitation.role === 'student') {
+        // Claiming a managed record (REQ-USER-003): the record becomes the student's, with its
+        // history. Someone already in the workspace can't claim a second record.
+        if (!invitation.membershipId) throw invalidInvitation();
+        if (existing && existing.status !== 'removed') {
+          throw new AppError(409, 'already_member', 'Already a member of this workspace');
+        }
+        const claimed = await tx
+          .update(memberships)
+          .set({ userId, status: 'active', updatedAt: now })
+          .where(and(eq(memberships.id, invitation.membershipId), isNull(memberships.userId)))
+          .returning({ id: memberships.id });
+        if (claimed.length === 0) throw invalidInvitation();
+        await tx
+          .update(workspaceInvitations)
+          .set({ acceptedAt: now, acceptedBy: userId })
+          .where(eq(workspaceInvitations.id, invitation.id));
+        await this.audit.record(tx, {
+          action: 'student.claimed',
+          workspaceId,
+          actor: { type: 'user', userId },
+          entity: { type: 'membership', id: invitation.membershipId },
+        });
+        return invitation.membershipId;
+      }
+
       let membershipId: string;
       if (existing && existing.status !== 'removed') {
         throw new AppError(409, 'already_member', 'Already a member of this workspace');

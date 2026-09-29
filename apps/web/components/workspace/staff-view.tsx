@@ -6,6 +6,7 @@ import { useCallback, useEffect, useState, type FormEvent } from 'react';
 import { api } from '../../lib/api';
 import { Ltr } from '../../lib/bidi';
 import { ErrorMessage, Field, Select, SubmitButton } from '../form';
+import { absoluteUrl, ShareLink } from './share-link';
 import { useWorkspace } from './workspace-shell';
 
 type StaffRole = 'class_teacher' | 'assistant';
@@ -78,7 +79,7 @@ export function StaffView() {
         method: 'POST',
         body: { phone: toWesternDigits(phone), role },
       });
-      setNewLink(`${window.location.origin}/${document.documentElement.lang}${link}`);
+      setNewLink(absoluteUrl(link));
       form.reset();
     });
   };
@@ -111,29 +112,7 @@ export function StaffView() {
           <SubmitButton busy={busy}>{t('createLink')}</SubmitButton>
         </form>
         {newLink ? (
-          <div className="mt-4 rounded-lg bg-green-50 p-3">
-            <p className="mb-2 text-sm">{t('linkReady')}</p>
-            <p className="mb-3 break-all font-mono text-xs" dir="ltr">
-              {newLink}
-            </p>
-            <div className="flex gap-2">
-              <button
-                type="button"
-                onClick={() => void navigator.clipboard.writeText(newLink)}
-                className="rounded-lg border px-3 py-2 text-sm"
-              >
-                {t('copy')}
-              </button>
-              <a
-                href={`https://wa.me/?text=${encodeURIComponent(`${t('whatsappText', { name: workspace.name })} ${newLink}`)}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="rounded-lg bg-green-600 px-3 py-2 text-sm text-white"
-              >
-                {t('shareWhatsApp')}
-              </a>
-            </div>
-          </div>
+          <ShareLink url={newLink} message={t('whatsappText', { name: workspace.name })} />
         ) : null}
       </section>
 

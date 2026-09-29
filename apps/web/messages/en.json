@@ -66,7 +66,8 @@
       "class_teacher": "Class teacher",
       "assistant": "Helper",
       "student": "Student"
-    }
+    },
+    "joinTeacher": "Join a teacher with a code"
   },
   "errors": {
     "generic": "Something went wrong. Please try again.",
@@ -104,7 +105,9 @@
     "invitation_phone_mismatch": "Sign in with the number the invitation was sent to.",
     "already_member": "You're already a member of this workspace.",
     "not_a_student_account": "Only students' devices can be reset.",
-    "permission_not_grantable": "That permission can't be given to this role."
+    "permission_not_grantable": "That permission can't be given to this role.",
+    "join_code_invalid": "No workspace has this code. Check the code with your teacher.",
+    "internal_code_taken": "Another student already has this code."
   },
   "notifications": {
     "title": "Notifications",
@@ -121,7 +124,9 @@
       "billing_reminder_on_end": "Your subscription ended today. You have a 7-day grace period.",
       "billing_reminder_after_end": "Your subscription has ended. Renew before the grace period is over.",
       "unknown": "New notification.",
-      "staff_joined": "A new member joined your team."
+      "staff_joined": "A new member joined your team.",
+      "student_join_requested": "A new student asked to join.",
+      "student_join_approved": "You were accepted. You can open the workspace now."
     }
   },
   "platform": {
@@ -261,7 +266,56 @@
     "accept": "Accept invitation",
     "roles": {
       "assistant": "Helper",
-      "class_teacher": "Class teacher"
+      "class_teacher": "Class teacher",
+      "student": "Student"
     }
+  },
+  "share": {
+    "ready": "The link is ready. Send it to the person:",
+    "copy": "Copy link",
+    "whatsApp": "Send on WhatsApp"
+  },
+  "students": {
+    "title": "Students",
+    "joiningTitle": "Join code",
+    "joiningExplain": "Share this code or link with your students. They enter it after signing in to ask to join.",
+    "joinMessage": "Join {name} on the platform:",
+    "autoApprove": "Approve requests automatically",
+    "rotateCode": "Change code",
+    "filterAll": "All students",
+    "filterPending": "{count, plural, =0 {Join requests} other {Join requests (#)}}",
+    "search": "Search by name, code or number",
+    "empty": "No students here.",
+    "status": {
+      "active": "Active",
+      "pending": "Waiting for approval",
+      "suspended": "Suspended"
+    },
+    "managed": "Account not activated",
+    "paused": "Access paused",
+    "approve": "Approve",
+    "reject": "Reject",
+    "newClaimLink": "New activation link",
+    "resetDevices": "Reset devices",
+    "remove": "Remove",
+    "removeReason": "Reason for removing {name} from the workspace:",
+    "devicesReset": "{name}'s devices were reset.",
+    "addTitle": "Add a student yourself",
+    "addExplain": "For a student who hasn't signed up yet. They get a link to activate their account with the same number, keeping everything you recorded.",
+    "name": "Student's name",
+    "phone": "Student's mobile number",
+    "internalCode": "Your own code (optional)",
+    "add": "Add",
+    "claimMessage": "Activate your account with {name} from this link:"
+  },
+  "joinTeacher": {
+    "title": "Join a teacher",
+    "explain": "Enter the join code your teacher gave you.",
+    "code": "Join code",
+    "submit": "Send request",
+    "pending": "Your request was sent to {name}. You'll be notified when it's approved.",
+    "joined": "You joined {name}.",
+    "open": "Open workspace",
+    "backToAccount": "Back to my account"
   }
 }

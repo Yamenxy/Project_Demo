@@ -1,4 +1,4 @@
-import { integer, pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core';
+import { boolean, integer, pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core';
 
 const tstz = (name: string) => timestamp(name, { withTimezone: true });
 
@@ -64,4 +64,11 @@ export const permissionGrants = pgTable('permission_grants', {
   permission: text('permission').notNull(),
   grantedBy: uuid('granted_by').notNull(),
   createdAt: tstz('created_at').notNull(),
+});
+
+export const workspaceSettings = pgTable('workspace_settings', {
+  workspaceId: uuid('workspace_id').primaryKey(),
+  joinCode: text('join_code').notNull(),
+  autoApproveJoins: boolean('auto_approve_joins').notNull(),
+  updatedAt: tstz('updated_at').notNull(),
 });

@@ -175,6 +175,11 @@ async function insertWorkspace(
     [id, slug, name, ownerUserId],
   );
   await insertMembership(client, id, ownerUserId, 'owner');
+  await client.query(
+    `insert into workspace_settings (workspace_id, join_code, auto_approve_joins, updated_at)
+     values ($1, app.random_join_code(), false, now())`,
+    [id],
+  );
   return id;
 }
 

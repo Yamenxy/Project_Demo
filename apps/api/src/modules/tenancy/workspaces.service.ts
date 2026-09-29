@@ -5,7 +5,8 @@ import { isUniqueViolation, type DbTx } from '../../database';
 import { PlatformDb } from '../../database/platform-db';
 import { AuditService } from '../audit';
 import { users } from '../identity';
-import { memberships, workspaces } from './schema';
+import { generateJoinCode } from './join-code';
+import { memberships, workspaces, workspaceSettings } from './schema';
 
 export interface CreateWorkspaceInput {
   slug: string;
@@ -64,6 +65,12 @@ export class WorkspacesService {
           createdAt: now,
           updatedAt: now,
           version: 1,
+        });
+        await tx.insert(workspaceSettings).values({
+          workspaceId,
+          joinCode: generateJoinCode(),
+          autoApproveJoins: false,
+          updatedAt: now,
         });
         await this.audit.record(tx, {
           action: 'workspace.created',

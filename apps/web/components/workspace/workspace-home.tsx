@@ -7,7 +7,7 @@ import { useWorkspace } from './workspace-shell';
 /** Workspace home. Richer dashboards arrive with classes, attendance and content. */
 export function WorkspaceHome() {
   const t = useTranslations('workspace');
-  const { workspace, membership } = useWorkspace();
+  const { workspace, membership, permissions } = useWorkspace();
   const base = `/w/${workspace.id}`;
 
   if (membership.role === 'student') {
@@ -22,6 +22,12 @@ export function WorkspaceHome() {
   }
 
   const cards = [
+    {
+      href: `${base}/students`,
+      title: t('nav.students'),
+      text: t('cards.students'),
+      show: membership.role === 'owner' || permissions.includes('enrollment.manage'),
+    },
     {
       href: `${base}/staff`,
       title: t('nav.staff'),

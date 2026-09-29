@@ -23,4 +23,5 @@ export {
   platformOwners,
   workspaceInvitations,
   workspaces,
+  workspaceSettings,
 } from '../modules/tenancy/schema';

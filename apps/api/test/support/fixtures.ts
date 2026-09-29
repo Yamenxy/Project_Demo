@@ -42,6 +42,11 @@ export async function insertWorkspace(ownerUserId: string): Promise<string> {
     [id, `ws-${id.slice(0, 8)}`, ownerUserId],
   );
   await insertMembership(id, ownerUserId, 'owner');
+  await adminQuery(
+    `insert into workspace_settings (workspace_id, join_code, updated_at)
+     values ($1, app.random_join_code(), now())`,
+    [id],
+  );
   return id;
 }
 

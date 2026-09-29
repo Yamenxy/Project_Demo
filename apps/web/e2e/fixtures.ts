@@ -74,5 +74,19 @@ export async function createWorkspace(ownerUserId: string, name: string): Promis
      values ($1, 'starter', now() + interval '14 days', 7, now(), now())`,
     [id],
   );
+  await adminQuery(
+    `insert into workspace_settings (workspace_id, join_code, auto_approve_joins, updated_at)
+     values ($1, app.random_join_code(), false, now())`,
+    [id],
+  );
   return id;
+}
+
+/** The workspace's current join code, as the teacher sees it. */
+export async function joinCodeOf(workspaceId: string): Promise<string> {
+  const [row] = await adminQuery<{ join_code: string }>(
+    'select join_code from workspace_settings where workspace_id = $1',
+    [workspaceId],
+  );
+  return row!.join_code;
 }

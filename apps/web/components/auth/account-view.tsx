@@ -121,6 +121,10 @@ export function AccountView() {
         </section>
       ) : null}
 
+      <Link href="/join" className="rounded-lg border px-4 py-3 text-center font-semibold">
+        {t('joinTeacher')}
+      </Link>
+
       {platformOwner ? (
         <Link
           href="/platform"
