@@ -14,6 +14,11 @@ lesson, file and video request. Everything free; paid items stay in
 
 Task 5.4 needs ffmpeg on the worker machine; the free demo setup documents how to install it.
 
+**Status (2026-09-29):** tasks 5.1 to 5.3 are done on branch `phase-5/content`. Task 5.4 (video)
+is not started: it needs ffmpeg on the machine, which isn't installed in this environment. Also
+not done: image re-encoding and the separate file origin (paid-services.md), and purging content
+deleted more than 30 days ago (a maintenance job).
+
 Each task ships with tests (integration against Postgres, cross-tenant suite, browser flow where
 there's UI), audit events, translations in Arabic and English, and doc updates.
 
