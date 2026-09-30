@@ -58,6 +58,7 @@ CLAUDE.md requires a written justification for every new dependency. Add a row w
 | next, react, react-dom | The web client chosen in architecture §9 | Phase 1, task 1 |
 | @types/react, @types/react-dom, @types/node (dev) | Type definitions | Phase 1, task 1 |
 | vitest (dev) | Unit tests for web utilities | Phase 1, task 1 |
+| @axe-core/playwright (dev) | Runs the axe accessibility checks in the browser tests (REQ-A11Y-001 names axe); the standard Playwright integration. Tests only | Phase 9, task 9.5 |
 
 ## Local development services (`docker-compose.yml`, not shipped)
 

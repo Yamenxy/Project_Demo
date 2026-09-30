@@ -87,7 +87,9 @@ export class LedgerController {
   }
 
   @Get('payments/:paymentId')
-  @WorkspaceRoles(['owner', 'class_teacher', 'assistant', 'student'])
+  @WorkspaceRoles(['owner', 'class_teacher', 'assistant', 'student'], {
+    allowWhenSuspended: ['student'],
+  })
   receipt(
     @CurrentWorkspace() ctx: WorkspaceContext,
     @Param('paymentId', uuidParam) paymentId: string,
@@ -96,7 +98,7 @@ export class LedgerController {
   }
 
   @Get('my/payments')
-  @WorkspaceRoles(['student'])
+  @WorkspaceRoles(['student'], { allowWhenSuspended: ['student'] })
   async mine(@CurrentWorkspace() ctx: WorkspaceContext): Promise<{ entries: LedgerEntry[] }> {
     return { entries: await this.ledger.mine(ctx) };
   }

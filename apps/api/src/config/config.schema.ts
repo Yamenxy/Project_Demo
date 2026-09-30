@@ -12,6 +12,15 @@ export type DeployTier = (typeof DEPLOY_TIERS)[number];
 /** OTP senders that don't reach real phones; never allowed in production. */
 const DEVELOPMENT_OTP_PROVIDERS = new Set(['console', 'file']);
 
+/**
+ * Encryption keys published in this repository (apps/api/.env.example and the browser tests'
+ * config). The repository is public, so these may only encrypt local synthetic data.
+ */
+const PUBLISHED_KEYS = new Set([
+  'o3hXB9+v6AqwIa1TSiAi1uWPBqZDpnNRpv86ftWbdxw=',
+  'ZTJlLW9ubHkta2V5LWZvci1sb2NhbC1icm93c2VyLXQ=',
+]);
+
 const envSchema = z
   .object({
     NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
@@ -67,6 +76,13 @@ const envSchema = z
         code: 'custom',
         path: ['DATA_CLASS'],
         message: `tier "${env.DEPLOY_TIER}" may only run with DATA_CLASS=synthetic`,
+      });
+    }
+    if (env.DEPLOY_TIER !== 'local' && PUBLISHED_KEYS.has(env.SECRET_ENCRYPTION_KEY)) {
+      ctx.addIssue({
+        code: 'custom',
+        path: ['SECRET_ENCRYPTION_KEY'],
+        message: 'this key is published in the repository; generate a new one for this tier',
       });
     }
     if (env.EMAIL_PROVIDER === 'smtp' && !env.SMTP_URL) {

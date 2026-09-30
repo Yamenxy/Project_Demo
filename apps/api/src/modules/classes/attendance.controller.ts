@@ -83,7 +83,7 @@ export class AttendanceController {
   }
 
   @Get('my/attendance')
-  @WorkspaceRoles(['student'])
+  @WorkspaceRoles(['student'], { allowWhenSuspended: ['student'] })
   mine(@CurrentWorkspace() ctx: WorkspaceContext): Promise<{
     records: {
       sessionId: string;

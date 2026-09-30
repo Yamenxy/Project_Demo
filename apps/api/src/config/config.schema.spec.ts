@@ -37,6 +37,24 @@ describe('loadConfig', () => {
     ]);
   });
 
+  it.each(['demo', 'staging'])('refuses the published example key on the %s tier', (tier) => {
+    expect(
+      issuesOf({
+        ...base,
+        DEPLOY_TIER: tier,
+        SECRET_ENCRYPTION_KEY: 'o3hXB9+v6AqwIa1TSiAi1uWPBqZDpnNRpv86ftWbdxw=',
+      }),
+    ).toEqual([
+      'SECRET_ENCRYPTION_KEY: this key is published in the repository; generate a new one for this tier',
+    ]);
+  });
+
+  it('accepts the published example key locally', () => {
+    expect(
+      issuesOf({ ...base, SECRET_ENCRYPTION_KEY: 'o3hXB9+v6AqwIa1TSiAi1uWPBqZDpnNRpv86ftWbdxw=' }),
+    ).toEqual([]);
+  });
+
   it('requires production to declare real data explicitly', () => {
     expect(issuesOf({ ...base, DEPLOY_TIER: 'production', DATA_CLASS: 'synthetic' })).toContain(
       'DATA_CLASS: production must declare DATA_CLASS=real',

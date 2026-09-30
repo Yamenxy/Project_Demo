@@ -13,6 +13,13 @@ done here; they stay on the launch checklist.
 | 9.4 | Retention: the retention table in the docs, and a nightly job that applies the rules the free setup has data for; each run is audited | REQ-PRIV-002, REQ-DATA-004 | jobs, files, notify |
 | 9.5 | Checks: the suspended-workspace matrix over every route; config refuses the example encryption key outside local development; accessibility checks on key pages; a local restore drill | REQ-RBAC-004, REQ-A11Y-001, REQ-OPS-005 | tests, config, docs |
 
+**Status (2026-09-30):** tasks 9.1 to 9.5 are done on branch `phase-9/hardening`. Found and fixed
+on the way: the platform role couldn't enqueue jobs (notifications written through the platform
+handle would fail once push is on), and suspended workspaces blocked students' grades,
+attendance and payment history, which REQ-RBAC-004 keeps. Not done here: the external penetration
+test (REQ-SEC-002), backups and alerts of the paid setup (REQ-OPS-001, -002), and the retention
+rules that need a "cancelled workspace" state (see retention.md).
+
 Each task ships with tests, audit events, translations in Arabic and English, and doc updates.
 
 **Risks:** support access becoming a back door (read-only enforced in the guard, time-boxed, every

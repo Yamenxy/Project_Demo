@@ -109,7 +109,16 @@ export class AccessGuard implements CanActivate {
     if (resolved.role === 'student' && session.consent === 'overdue') {
       throw new AppError(403, 'guardian_consent_required', 'A guardian needs to give consent');
     }
-    if (resolved.workspaceSuspended && !policy.allowWhenSuspended.includes(resolved.role)) {
+    // Suspended (REQ-RBAC-004): the owner keeps read-only views, exports included, plus what a
+    // route allows explicitly (billing and renewal); students keep what routes allow them (their
+    // grades, attendance and payment history); class teachers and helpers get nothing.
+    const ownerReading =
+      resolved.role === 'owner' && (request.method === 'GET' || request.method === 'HEAD');
+    if (
+      resolved.workspaceSuspended &&
+      !ownerReading &&
+      !policy.allowWhenSuspended.includes(resolved.role)
+    ) {
       throw new AppError(403, 'workspace_suspended', 'This workspace is temporarily unavailable');
     }
     const { requirement } = policy;

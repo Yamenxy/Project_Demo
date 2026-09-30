@@ -115,7 +115,7 @@ export class GradingController {
   }
 
   @Get('my/grades')
-  @WorkspaceRoles(['student'])
+  @WorkspaceRoles(['student'], { allowWhenSuspended: ['student'] })
   mine(@CurrentWorkspace() ctx: WorkspaceContext): Promise<MyGrades> {
     return this.grading.mine(ctx);
   }
