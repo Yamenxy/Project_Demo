@@ -4,7 +4,7 @@ import { useFormatter, useTranslations } from 'next-intl';
 import { useCallback, useEffect, useState, type FormEvent } from 'react';
 import { Link } from '../../i18n/navigation';
 import { api } from '../../lib/api';
-import { ErrorMessage, Field, SubmitButton } from '../form';
+import { ErrorMessage, Field, Select, SubmitButton, TextArea } from '../form';
 import { cairoLocalToIso } from './exams-admin';
 import { FileList } from './file-list';
 import { useWorkspace } from './workspace-shell';
@@ -150,10 +150,7 @@ export function CourseHomeworkView({ courseId }: { courseId: string }) {
         <h2 className="mb-4 font-semibold">{t('newTitle')}</h2>
         <form onSubmit={create} noValidate className="flex flex-col gap-1 text-sm">
           <Field label={t('homeworkTitle')} name="title" required />
-          <label className="mb-3 flex flex-col gap-1">
-            {t('instructions')}
-            <textarea name="instructions" rows={3} className="rounded-lg border px-2 py-1" />
-          </label>
+          <TextArea label={t('instructions')} name="instructions" rows={3} />
           <Field label={t('dueAt')} name="due" type="datetime-local" dir="ltr" required />
           <Field
             label={t('max')}
@@ -165,13 +162,14 @@ export function CourseHomeworkView({ courseId }: { courseId: string }) {
             dir="ltr"
             required
           />
-          <label className="mb-3 flex items-center gap-2">
-            {t('latePolicy')}
-            <select name="latePolicy" className="rounded-lg border px-2 py-1">
-              <option value="accept_flagged">{t('acceptFlagged')}</option>
-              <option value="reject">{t('reject')}</option>
-            </select>
-          </label>
+          <Select
+            label={t('latePolicy')}
+            name="latePolicy"
+            options={[
+              { value: 'accept_flagged', label: t('acceptFlagged') },
+              { value: 'reject', label: t('reject') },
+            ]}
+          />
           <label className="mb-3 flex items-center gap-2">
             <input type="checkbox" name="allowResubmission" className="size-4" />{' '}
             {t('allowResubmission')}

@@ -152,7 +152,15 @@ export function QuestionsView({ courseId }: { courseId: string }) {
               className="rounded-lg border px-3 py-2 font-normal"
             />
           </label>
-          <p className="text-xs text-muted">{t('mathHint')}</p>
+          <p className="text-xs text-muted">
+            {t.rich('mathHint', {
+              example: (chunks) => (
+                <code dir="ltr" className="inline-block">
+                  {chunks}
+                </code>
+              ),
+            })}
+          </p>
           {body ? (
             <div className="rounded-lg border border-dashed p-3">
               <p className="mb-1 text-xs text-muted">{t('preview')}</p>

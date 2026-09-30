@@ -161,7 +161,9 @@ export function WorkspaceShell({
                     key={item.href}
                     href={item.href}
                     className={
-                      pathname === item.href ? 'font-semibold text-brand underline' : 'text-muted'
+                      pathname === item.href
+                        ? 'shrink-0 whitespace-nowrap font-semibold text-brand underline'
+                        : 'shrink-0 whitespace-nowrap text-muted'
                     }
                   >
                     {item.label}

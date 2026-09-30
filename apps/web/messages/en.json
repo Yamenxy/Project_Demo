@@ -827,7 +827,7 @@
     "newTitle": "New question",
     "kind": "Type",
     "body": "Question text",
-    "mathHint": "Write maths between $ signs, for example: $x^2 + 1$",
+    "mathHint": "Write maths between $ signs, for example: <example>$x^2 + 1$</example>",
     "preview": "Preview",
     "choices": "Choices (one per line)",
     "correct": "Number of the correct choice:",
