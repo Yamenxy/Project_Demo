@@ -1,17 +1,26 @@
 import { Module, type OnModuleInit } from '@nestjs/common';
 import { JobsRuntime } from '../../jobs';
+import { FilesModule } from '../files';
 import { BillingController } from './billing.controller';
 import { PlatformController } from './platform.controller';
 import { AnonymizeService } from './anonymize.service';
 import { PlatformService } from './platform.service';
 import { CommentReportsController } from './reports.controller';
 import { CommentReportsService } from './reports.service';
+import { RetentionService } from './retention.service';
 import { SupportController } from './support.controller';
 import { SupportService } from './support.service';
 
 @Module({
+  imports: [FilesModule],
   controllers: [PlatformController, BillingController, CommentReportsController, SupportController],
-  providers: [PlatformService, CommentReportsService, SupportService, AnonymizeService],
+  providers: [
+    PlatformService,
+    CommentReportsService,
+    SupportService,
+    AnonymizeService,
+    RetentionService,
+  ],
   exports: [PlatformService],
 })
 export class PlatformAdminModule implements OnModuleInit {
@@ -19,6 +28,7 @@ export class PlatformAdminModule implements OnModuleInit {
     private readonly jobs: JobsRuntime,
     private readonly platform: PlatformService,
     private readonly anonymizer: AnonymizeService,
+    private readonly retention: RetentionService,
   ) {}
 
   onModuleInit(): void {
@@ -33,6 +43,12 @@ export class PlatformAdminModule implements OnModuleInit {
       'privacy.anonymize',
       () => this.anonymizer.run().then(() => undefined),
       '30 0 * * *',
+    );
+    // Nightly (01:00 UTC): the retention table (REQ-PRIV-002, docs/retention.md).
+    this.jobs.register(
+      'retention.run',
+      () => this.retention.run().then(() => undefined),
+      '0 1 * * *',
     );
   }
 }

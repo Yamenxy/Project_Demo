@@ -260,6 +260,13 @@
       "when": 1790781211134,
       "tag": "0036_account_deletion",
       "breakpoints": true
+    },
+    {
+      "idx": 37,
+      "version": "7",
+      "when": 1790781951263,
+      "tag": "0037_retention",
+      "breakpoints": true
     }
   ]
 }

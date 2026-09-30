@@ -1,6 +1,6 @@
 import { createHash } from 'node:crypto';
 import { Injectable } from '@nestjs/common';
-import { and, asc, eq, isNull, sql } from 'drizzle-orm';
+import { and, asc, eq, inArray, isNull, sql } from 'drizzle-orm';
 import { AppError, Clock, IdGenerator, notFound } from '../../common';
 import { UPLOAD_LIMIT_BYTES } from '../../common/http/request-id';
 import { TenantDb, type DbTx } from '../../database';
@@ -55,6 +55,26 @@ export class FilesService {
     private readonly ids: IdGenerator,
     private readonly clock: Clock,
   ) {}
+
+  /**
+   * Retention (REQ-PRIV-002): removes the bytes of these files, then marks them deleted. Bytes
+   * first, so a failure halfway leaves rows that the next run finds again; removing is idempotent.
+   */
+  async purge(workspaceId: string, fileIds: string[]): Promise<number> {
+    if (fileIds.length === 0) return 0;
+    for (const id of fileIds) {
+      await this.storage.remove(keyOf('available', workspaceId, id));
+      await this.storage.remove(keyOf('quarantine', workspaceId, id));
+    }
+    const marked = await this.db.inWorkspace(workspaceId, (tx) =>
+      tx
+        .update(files)
+        .set({ deletedAt: this.clock.now() })
+        .where(and(inArray(files.id, fileIds), isNull(files.deletedAt)))
+        .returning({ id: files.id }),
+    );
+    return marked.length;
+  }
 
   async upload(
     ctx: WorkspaceContext,

@@ -52,6 +52,12 @@ export const QUEUES = {
     retryBackoff: true,
     deadLetter: FAILED_JOBS_QUEUE,
   },
+  'retention.run': {
+    retryLimit: 3,
+    retryDelay: 300,
+    retryBackoff: true,
+    deadLetter: FAILED_JOBS_QUEUE,
+  },
   'privacy.anonymize': {
     retryLimit: 3,
     retryDelay: 300,
