@@ -30,6 +30,9 @@ export const options = {
   thresholds: {
     'http_req_duration{name:start}': ['p(95)<500'],
     'http_req_duration{name:save}': ['p(95)<300'],
+    // A threshold over no requests passes; these make sure the run measured something.
+    'http_reqs{name:start}': ['count>0'],
+    'http_reqs{name:save}': ['count>0'],
     lost_acknowledged_answers: ['count==0'],
     http_req_failed: ['rate<0.01'],
     students_exhausted: ['count==0'],
@@ -38,9 +41,13 @@ export const options = {
 
 const base = `${fixture.api}/api/v1/w/${fixture.workspaceId}`;
 
-function params(token, name) {
+/** Request options; a JSON content type only with a body (an empty JSON body is refused). */
+function params(token, name, json = false) {
   return {
-    headers: { 'content-type': 'application/json', cookie: `lms_session=${token}` },
+    headers: {
+      cookie: `lms_session=${token}`,
+      ...(json ? { 'content-type': 'application/json' } : {}),
+    },
     tags: { name },
   };
 }
@@ -78,7 +85,7 @@ export default function () {
       const saved = http.put(
         `${base}/my/attempts/${attemptId}/answers/${q.position}`,
         body,
-        params(token, 'save'),
+        params(token, 'save', true),
       );
       if (check(saved, { saved: (r) => r.status === 200 })) acked[q.position] = seq;
     });
