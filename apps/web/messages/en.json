@@ -170,7 +170,8 @@
     "consent_required": "A guardian’s consent is needed before uploading files.",
     "support_read_only": "Support sessions are read-only.",
     "support_no_export": "Exports aren’t available in a support session.",
-    "support_too_long": "A support session lasts at most 60 minutes."
+    "support_too_long": "A support session lasts at most 60 minutes.",
+    "owner_cannot_delete": "You own a workspace. Contact the platform team to close or hand it over before deleting your account."
   },
   "notifications": {
     "title": "Notifications",
@@ -203,7 +204,8 @@
       "lesson_available": "The lesson “{title}” is now open to you.",
       "lessons_available": "{count, plural, one {A new lesson is open to you.} other {# new lessons are open to you.}}",
       "support_session_started": "Platform support opened your workspace, read-only, for {minutes} minutes. Everything viewed is in your activity log.",
-      "support_session_started_platform": "A colleague started a support session in “{workspace}” for {minutes} minutes."
+      "support_session_started_platform": "A colleague started a support session in “{workspace}” for {minutes} minutes.",
+      "privacy_account_deleted": "A member of your workspace deleted their account. Their records stay, without their name or number."
     }
   },
   "platform": {
@@ -1073,5 +1075,18 @@
       "announcement": "Announcements",
       "data": "Exports and data"
     }
+  },
+  "myData": {
+    "title": "My data",
+    "download": "Download a copy of my data",
+    "name": "Name",
+    "saveName": "Save name",
+    "saved": "Name saved.",
+    "delete": "Delete my account",
+    "confirm": "Your account will be deleted in {days} days, and you can change your mind until then. After that your personal data is removed; your grades, attendance and payments stay with your teachers without your name or number.",
+    "confirmDelete": "Yes, delete my account",
+    "keep": "Keep my account",
+    "pending": "Your account will be deleted on {date}.",
+    "cancel": "Cancel deletion"
   }
 }

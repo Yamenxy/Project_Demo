@@ -258,6 +258,7 @@ function summarize(user: UserRow): UserSummary {
     status: user.status,
     phoneVerified: user.phoneVerifiedAt !== null,
     twoFactorEnabled: user.totpEnabledAt !== null,
+    deletionRequestedAt: user.deletionRequestedAt,
   };
 }
 

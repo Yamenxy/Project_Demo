@@ -30,6 +30,7 @@ export const users = pgTable('users', {
   passwordHash: text('password_hash').notNull(),
   passwordChangedAt: tstz('password_changed_at').notNull(),
   devicesResetAt: tstz('devices_reset_at'),
+  deletionRequestedAt: tstz('deletion_requested_at'),
   totpSecretEncrypted: text('totp_secret_encrypted'),
   totpEnabledAt: tstz('totp_enabled_at'),
   totpLastStep: bigint('totp_last_step', { mode: 'number' }),

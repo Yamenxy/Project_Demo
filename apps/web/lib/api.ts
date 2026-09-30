@@ -66,6 +66,8 @@ export interface UserSummary {
   status: 'pending' | 'active' | 'suspended' | 'archived' | 'anonymized';
   phoneVerified: boolean;
   twoFactorEnabled: boolean;
+  /** ISO time of a pending account deletion request (REQ-PRIV-003). */
+  deletionRequestedAt: string | null;
 }
 
 export interface DeviceSummary {

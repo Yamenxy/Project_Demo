@@ -24,7 +24,7 @@ import { RegradeService } from './regrade.service';
     HomeworkService,
     CommentsService,
   ],
-  exports: [QuestionsService, ExamsService, AttemptsService],
+  exports: [QuestionsService, ExamsService, AttemptsService, HomeworkService],
 })
 export class AssessmentModule implements OnModuleInit {
   constructor(

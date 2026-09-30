@@ -20,6 +20,7 @@ import { WorkspaceController } from './workspace.controller';
 import { WorkspacesService } from './workspaces.service';
 import { AuditLogController } from './audit-log.controller';
 import { AuditLogService } from './audit-log.service';
+import { AccountService } from './account.service';
 
 /**
  * Global: provides the access guard for every route (REQ-RBAC-005) and the role-aware
@@ -42,6 +43,7 @@ import { AuditLogService } from './audit-log.service';
   ],
   providers: [
     MembershipsService,
+    AccountService,
     AuditLogService,
     WorkspacesService,
     PermissionsService,

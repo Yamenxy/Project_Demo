@@ -9,6 +9,7 @@ import { api, ApiError, type DeviceSummary, type UserSummary } from '../../lib/a
 import { Ltr } from '../../lib/bidi';
 import { ErrorMessage, Field, SubmitButton } from '../form';
 import { clearDeviceData } from '../../lib/push';
+import { MyDataSection } from './my-data-section';
 
 interface MyWorkspace {
   workspaceId: string;
@@ -185,6 +186,12 @@ export function AccountView() {
           ))}
         </ul>
       </section>
+
+      <MyDataSection
+        nameAr={me.user.nameAr}
+        deletionRequestedAt={me.user.deletionRequestedAt}
+        onChange={load}
+      />
 
       <div className="flex flex-col gap-3">
         <button

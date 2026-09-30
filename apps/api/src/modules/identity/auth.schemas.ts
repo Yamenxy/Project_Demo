@@ -34,4 +34,6 @@ export interface UserSummary {
   status: string;
   phoneVerified: boolean;
   twoFactorEnabled: boolean;
+  /** When the person asked to delete the account; anonymized 14 days later (REQ-PRIV-003). */
+  deletionRequestedAt: Date | null;
 }

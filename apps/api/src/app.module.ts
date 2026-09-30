@@ -16,6 +16,7 @@ import { IdentityModule } from './modules/identity';
 import { NotifyModule } from './modules/notify';
 import { PaymentsModule } from './modules/payments';
 import { PlatformAdminModule } from './modules/platform-admin';
+import { PrivacyModule } from './modules/privacy';
 import { ReportsModule } from './modules/reports';
 import { TenancyModule } from './modules/tenancy';
 import { VideoModule } from './modules/video';
@@ -39,6 +40,7 @@ import { VideoModule } from './modules/video';
     PaymentsModule,
     AnnouncementsModule,
     ReportsModule,
+    PrivacyModule,
     IdempotencyModule,
     PlatformAdminModule,
   ],

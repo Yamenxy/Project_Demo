@@ -253,6 +253,13 @@
       "when": 1790780397074,
       "tag": "0035_support_sessions",
       "breakpoints": true
+    },
+    {
+      "idx": 36,
+      "version": "7",
+      "when": 1790781211134,
+      "tag": "0036_account_deletion",
+      "breakpoints": true
     }
   ]
 }

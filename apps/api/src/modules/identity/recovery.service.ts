@@ -134,6 +134,7 @@ export class RecoveryService {
       status: user.status,
       phoneVerified: true,
       twoFactorEnabled: user.totpEnabledAt !== null,
+      deletionRequestedAt: user.deletionRequestedAt,
     };
   }
 
