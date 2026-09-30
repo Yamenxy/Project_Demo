@@ -65,3 +65,10 @@ CLAUDE.md requires a written justification for every new dependency. Add a row w
 | postgres:17-alpine | Local database (production uses managed PostgreSQL 16+) | Phase 1, task 2 |
 | chrislusf/seaweedfs | Local S3-compatible storage standing in for R2 or Spaces. MinIO was the first choice, but its Docker image is no longer published | Phase 1, task 2 |
 | axllent/mailpit | Catches outgoing email locally | Phase 1, task 2 |
+
+## Programs installed separately (not npm packages)
+
+| Program | Why | Added in |
+|---|---|---|
+| ffmpeg and ffprobe | Transcoding lesson videos to HLS on the free setup (`FFMPEG_PATH`, `FFPROBE_PATH`; AD-11). CI installs it with apt | Phase 5, task 5.4 |
+| k6 (Grafana Labs, AGPL-3.0, used only as a tool) | The exam load profile in `load/exam.js` (REQ-EXAM-005, which names k6). Run by hand, never shipped or imported by the code | Phase 7, task 7.3 |

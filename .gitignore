@@ -15,3 +15,7 @@ playwright-report/
 
 # Uploaded files on the free setup (STORAGE_DIR)
 apps/api/var/
+
+# Load test fixtures hold session tokens (load/README.md)
+load/*.json
+load/results/

@@ -40,6 +40,13 @@ export default tseslint.config(
     ...tseslint.configs.disableTypeChecked,
   },
   {
+    // k6 load profiles run in k6's runtime, which provides these globals (load/README.md).
+    files: ['load/**/*.js'],
+    languageOptions: {
+      globals: { open: 'readonly', __ENV: 'readonly', __VU: 'readonly', __ITER: 'readonly' },
+    },
+  },
+  {
     // All user-facing text comes from translation files (REQ-I18N-002, CLAUDE.md).
     files: ['apps/web/**/*.tsx'],
     plugins: { react },
