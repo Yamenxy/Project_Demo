@@ -40,6 +40,11 @@ export default tseslint.config(
     ...tseslint.configs.disableTypeChecked,
   },
   {
+    // The service worker runs in the browser's service worker scope.
+    files: ['apps/web/public/**/*.js'],
+    languageOptions: { globals: { ...globals.serviceworker } },
+  },
+  {
     // k6 load profiles run in k6's runtime, which provides these globals (load/README.md).
     files: ['load/**/*.js'],
     languageOptions: {

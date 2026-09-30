@@ -23,6 +23,12 @@ export const QUEUES = {
     retryBackoff: true,
     deadLetter: FAILED_JOBS_QUEUE,
   },
+  'notify.push': {
+    retryLimit: 3,
+    retryDelay: 30,
+    retryBackoff: true,
+    deadLetter: FAILED_JOBS_QUEUE,
+  },
   'notify.email': {
     retryLimit: 5,
     retryDelay: 30,

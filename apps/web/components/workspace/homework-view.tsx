@@ -5,6 +5,7 @@ import { useCallback, useEffect, useState, type FormEvent } from 'react';
 import { Link } from '../../i18n/navigation';
 import { api } from '../../lib/api';
 import { ErrorMessage, Field, Select, SubmitButton, TextArea } from '../form';
+import { PushPrompt } from '../push-prompt';
 import { CommentThread } from './comment-thread';
 import { cairoLocalToIso } from './exams-admin';
 import { FileList } from './file-list';
@@ -317,6 +318,7 @@ export function MyHomeworkView() {
   const base = `/w/${workspace.id}`;
   const [items, setItems] = useState<MyHomework[]>([]);
   const [error, setError] = useState<unknown>(null);
+  const [submitted, setSubmitted] = useState(false);
 
   const load = useCallback(async () => {
     try {
@@ -338,7 +340,10 @@ export function MyHomeworkView() {
       method: 'POST',
       body: { text: typeof text === 'string' && text ? text : undefined },
     })
-      .then(() => load())
+      .then(() => {
+        setSubmitted(true);
+        return load();
+      })
       .catch(setError);
   };
 
@@ -346,6 +351,7 @@ export function MyHomeworkView() {
     <div className="flex flex-col gap-4">
       <h1 className="text-xl font-semibold">{t('title')}</h1>
       <ErrorMessage error={error} />
+      {submitted ? <PushPrompt /> : null}
       {items.length === 0 ? <p className="text-muted">{t('none')}</p> : null}
       <ul className="flex flex-col gap-3">
         {items.map((h) => (

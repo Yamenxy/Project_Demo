@@ -7,3 +7,5 @@ export {
 } from './notifications.service';
 export { NotifyModule } from './notify.module';
 export { notifications } from './schema';
+export { PushSender, type PushMessage, type PushResult, type PushTarget } from './push/push-sender';
+export { PushService } from './push/push.service';

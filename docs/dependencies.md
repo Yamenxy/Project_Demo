@@ -43,6 +43,7 @@ CLAUDE.md requires a written justification for every new dependency. Add a row w
 | @node-rs/argon2 | argon2id password hashing with prebuilt binaries (no install scripts); defaults match OWASP parameters (AD-07) | Phase 1, task 8 |
 | @fastify/cookie | Reads and sets the HttpOnly session cookie | Phase 1, task 8 |
 | nodemailer, @types/nodemailer (dev) | SMTP email: Mailpit locally, any SMTP relay later. An HTTP provider (Resend) can be added as another `EmailSender` without it | Phase 1, task 17 |
+| web-push, @types/web-push (dev) | Sends Web Push (REQ-NOTIF-001): the message encryption (RFC 8291) and VAPID signing (RFC 8292) are easy to get subtly wrong by hand, and this is the standard, widely used implementation. Behind the `PushSender` adapter; off unless `PUSH_PROVIDER=webpush` | Phase 8, task 8.3 |
 | zod | Validates configuration now, and request and response schemas later; shared with the web client through `packages/shared` (architecture §9) | Phase 1, task 2 |
 
 ## Web (`apps/web`)

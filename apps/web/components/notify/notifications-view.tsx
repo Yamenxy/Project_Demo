@@ -5,6 +5,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { Link, useRouter } from '../../i18n/navigation';
 import { api, ApiError } from '../../lib/api';
 import { ErrorMessage } from '../form';
+import { PushPrompt } from '../push-prompt';
 
 interface NotificationItem {
   id: string;
@@ -64,6 +65,7 @@ export function NotificationsView() {
           {t('back')}
         </Link>
       </div>
+      <PushPrompt />
       <ErrorMessage error={error} />
       {items && items.length === 0 ? <p className="text-muted">{t('empty')}</p> : null}
       {items && items.some((item) => !item.read) ? (

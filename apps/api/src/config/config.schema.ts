@@ -37,6 +37,11 @@ const envSchema = z
     // self-hls video (REQ-VIDEO-005): the ffmpeg and ffprobe programs, found on PATH by default.
     FFMPEG_PATH: z.string().min(1).default('ffmpeg'),
     FFPROBE_PATH: z.string().min(1).default('ffprobe'),
+    // Web push (REQ-NOTIF-001). 'webpush' needs a VAPID key pair: `npx web-push generate-vapid-keys`.
+    PUSH_PROVIDER: z.enum(['none', 'webpush']).default('none'),
+    VAPID_PUBLIC_KEY: z.string().min(20).optional(),
+    VAPID_PRIVATE_KEY: z.string().min(20).optional(),
+    VAPID_SUBJECT: z.string().min(3).default('mailto:no-reply@localhost'),
     SMTP_URL: z.url({ protocol: /^smtps?$/ }).optional(),
     EMAIL_FROM: z.string().min(3).default('LMS <no-reply@localhost>'),
     SECRET_ENCRYPTION_KEY: z
@@ -69,6 +74,13 @@ const envSchema = z
         code: 'custom',
         path: ['SMTP_URL'],
         message: 'required when EMAIL_PROVIDER=smtp',
+      });
+    }
+    if (env.PUSH_PROVIDER === 'webpush' && (!env.VAPID_PUBLIC_KEY || !env.VAPID_PRIVATE_KEY)) {
+      ctx.addIssue({
+        code: 'custom',
+        path: ['VAPID_PRIVATE_KEY'],
+        message: 'VAPID_PUBLIC_KEY and VAPID_PRIVATE_KEY are required when PUSH_PROVIDER=webpush',
       });
     }
     if (env.OTP_PROVIDER === 'file' && !env.OTP_OUTBOX_FILE) {
@@ -106,6 +118,9 @@ export interface AppConfig {
   otpOutboxFile?: string;
   secretEncryptionKey: string;
   email: { provider: 'none' } | { provider: 'smtp'; smtpUrl: string; from: string };
+  push:
+    | { provider: 'none' }
+    | { provider: 'webpush'; publicKey: string; privateKey: string; subject: string };
   webOrigins: string[];
   /** Secure cookies everywhere except plain-http local development. */
   cookieSecure: boolean;
@@ -151,6 +166,15 @@ export function loadConfig(env: Record<string, string | undefined>): AppConfig {
     email:
       e.EMAIL_PROVIDER === 'smtp' && e.SMTP_URL
         ? { provider: 'smtp', smtpUrl: e.SMTP_URL, from: e.EMAIL_FROM }
+        : { provider: 'none' },
+    push:
+      e.PUSH_PROVIDER === 'webpush' && e.VAPID_PUBLIC_KEY && e.VAPID_PRIVATE_KEY
+        ? {
+            provider: 'webpush',
+            publicKey: e.VAPID_PUBLIC_KEY,
+            privateKey: e.VAPID_PRIVATE_KEY,
+            subject: e.VAPID_SUBJECT,
+          }
         : { provider: 'none' },
     webOrigins: e.WEB_ORIGINS,
     cookieSecure: e.DEPLOY_TIER !== 'local',

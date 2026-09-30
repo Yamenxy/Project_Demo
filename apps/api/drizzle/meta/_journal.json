@@ -232,6 +232,13 @@
       "when": 1790764724098,
       "tag": "0032_announcements",
       "breakpoints": true
+    },
+    {
+      "idx": 33,
+      "version": "7",
+      "when": 1790766133307,
+      "tag": "0033_push_subscriptions",
+      "breakpoints": true
     }
   ]
 }

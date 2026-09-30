@@ -4,6 +4,7 @@ import { notFound } from 'next/navigation';
 import { hasLocale, NextIntlClientProvider } from 'next-intl';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import type { ReactNode } from 'react';
+import { ServiceWorker } from '../../components/service-worker';
 import { directionOf, routing } from '../../i18n/routing';
 import '../globals.css';
 
@@ -50,6 +51,7 @@ export default async function LocaleLayout({
     <html lang={locale} dir={directionOf(locale)} className={arabicFont.variable}>
       <body className="min-h-dvh font-sans antialiased">
         <NextIntlClientProvider>{children}</NextIntlClientProvider>
+        <ServiceWorker />
       </body>
     </html>
   );

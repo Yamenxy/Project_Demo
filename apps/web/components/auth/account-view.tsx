@@ -8,6 +8,7 @@ import type { ConsentStatus } from './consent-view';
 import { api, ApiError, type DeviceSummary, type UserSummary } from '../../lib/api';
 import { Ltr } from '../../lib/bidi';
 import { ErrorMessage, Field, SubmitButton } from '../form';
+import { clearDeviceData } from '../../lib/push';
 
 interface MyWorkspace {
   workspaceId: string;
@@ -71,6 +72,7 @@ export function AccountView() {
   };
 
   const signOut = async (everywhere: boolean) => {
+    await clearDeviceData();
     await api(everywhere ? '/auth/logout-all' : '/auth/logout', { method: 'POST' }).catch(
       () => undefined,
     );

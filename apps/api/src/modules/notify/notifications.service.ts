@@ -6,6 +6,7 @@ import { JobsRuntime } from '../../jobs';
 import { ContactDirectory } from './contact-directory';
 import { EmailSender } from './email/email-sender';
 import { hasEmailTemplate, renderEmail } from './email/templates';
+import { PushService } from './push/push.service';
 import { notifications } from './schema';
 
 type Params = Record<string, string | number | boolean>;
@@ -55,6 +56,7 @@ export class NotificationsService implements OnModuleInit {
     private readonly jobs: JobsRuntime,
     private readonly email: EmailSender,
     private readonly contacts: ContactDirectory,
+    private readonly push: PushService,
     private readonly ids: IdGenerator,
     private readonly clock: Clock,
   ) {}
@@ -75,6 +77,7 @@ export class NotificationsService implements OnModuleInit {
       params,
       link: input.link ?? null,
     });
+    await this.push.enqueue(tx, [input.recipientUserId], input.link ?? null);
     if (input.email && hasEmailTemplate(input.type)) {
       await this.jobs.enqueue<EmailJob>(tx, 'notify.email', {
         userId: input.recipientUserId,
@@ -102,6 +105,12 @@ export class NotificationsService implements OnModuleInit {
         params: input.params ?? {},
         link: input.link ?? null,
       })),
+    );
+    // One push job for the batch; each recipient's link is the same in a fan-out.
+    await this.push.enqueue(
+      tx,
+      inputs.map((i) => i.recipientUserId),
+      inputs[0]?.link ?? null,
     );
   }
 

@@ -1002,5 +1002,11 @@
     "sending": "{count, plural, =0 {No students to send it to.} one {Sending to 1 student.} other {Sending to # students.}}",
     "delivered": "{count, plural, =0 {no recipients} one {delivered to 1 student} other {delivered to # students}}",
     "inProgress": "sending"
+  },
+  "push": {
+    "offer": "Turn on notifications to hear as soon as a grade, comment or announcement arrives.",
+    "enable": "Turn on notifications",
+    "later": "Later",
+    "on": "Notifications are on for this device."
   }
 }
