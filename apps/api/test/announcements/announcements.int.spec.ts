@@ -119,7 +119,7 @@ describe('announcements (REQ-NOTIF-001)', () => {
          insert into users (id, platform_code, name_ar, phone_e164, status, password_hash,
                             password_changed_at, created_at, updated_at)
          select gen_random_uuid(), translate(upper(substr(md5(random()::text), 1, 8)), '01', 'XY'),
-                'طالب ' || g, '+2010' || lpad(g::text, 8, '0'), 'active', 'x', now(), now(), now()
+                'طالب ' || g, '+2012' || lpad(g::text, 8, '0'), 'active', 'x', now(), now(), now()
            from generate_series(1, $2::int) g
          returning id)
        insert into memberships (workspace_id, id, user_id, role, created_at, updated_at)

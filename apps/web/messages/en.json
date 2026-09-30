@@ -195,7 +195,10 @@
       "grades_released": "Grades for “{title}” are out.",
       "exam_regraded": "The answer key for “{title}” was corrected and your score changed.",
       "homework_comment": "New comment on the homework “{title}”.",
-      "announcement_posted": "New announcement: “{title}”."
+      "announcement_posted": "New announcement: “{title}”.",
+      "lesson_published": "New lesson: “{title}”.",
+      "lesson_available": "The lesson “{title}” is now open to you.",
+      "lessons_available": "{count, plural, one {A new lesson is open to you.} other {# new lessons are open to you.}}"
     }
   },
   "platform": {

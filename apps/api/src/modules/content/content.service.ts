@@ -6,11 +6,8 @@ import { TenantDb, type DbTx } from '../../database';
 import { AuditService } from '../audit';
 import type { WorkspaceContext } from '../tenancy';
 import { courses, lessons } from './schema';
-
-export interface Actor {
-  userId: string;
-  requestId?: string;
-}
+import { AccessService } from './access.service';
+import { courseScope, type Actor } from './scope';
 
 /** Deleted content can be restored for this long (REQ-CONTENT-002). */
 export const RESTORE_WINDOW_MS = 30 * 24 * 3600 * 1000;
@@ -33,25 +30,13 @@ export interface LessonView {
   deleted: boolean;
 }
 
-/**
- * Courses a staff member may act on for a key: all of them for a workspace-wide grant, otherwise
- * the courses linked to classes in scope (Appendix A.2: "courses linked to scoped classes").
- */
-export function courseScope(ctx: WorkspaceContext, key: PermissionKey): SQL | undefined {
-  const scope = ctx.permissions.scopeOf(key);
-  if (scope === 'all') return undefined;
-  const ids = [...scope];
-  if (ids.length === 0) return sql`false`;
-  return sql`${courses.id} in (select c.course_id from classes c
-    where c.id in ${ids} and c.course_id is not null)`;
-}
-
 /** Courses and lessons, edited by staff (REQ-CONTENT-001, REQ-CONTENT-002). */
 @Injectable()
 export class ContentService {
   constructor(
     private readonly db: TenantDb,
     private readonly audit: AuditService,
+    private readonly access: AccessService,
     private readonly ids: IdGenerator,
     private readonly clock: Clock,
   ) {}
@@ -247,10 +232,23 @@ export class ContentService {
   ): Promise<void> {
     await this.db.inWorkspace(ctx.workspaceId, async (tx) => {
       await this.findLesson(tx, ctx, lessonId, 'content.publish');
-      await tx
-        .update(lessons)
-        .set({ publishedAt: published ? this.clock.now() : null, updatedAt: this.clock.now() })
-        .where(eq(lessons.id, lessonId));
+      const write = () =>
+        tx
+          .update(lessons)
+          .set({ publishedAt: published ? this.clock.now() : null, updatedAt: this.clock.now() })
+          .where(eq(lessons.id, lessonId));
+      // Publishing tells the students who can open it now, and only them (REQ-NOTIF-003).
+      if (published) {
+        await this.access.notifyingOpened(
+          tx,
+          ctx.workspaceId,
+          { lessonIds: [lessonId] },
+          'published',
+          write,
+        );
+      } else {
+        await write();
+      }
       await this.record(
         tx,
         ctx,

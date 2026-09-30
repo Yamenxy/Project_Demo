@@ -195,7 +195,10 @@
       "grades_released": "أُعلنت درجات «{title}».",
       "exam_regraded": "صُححت الإجابة النموذجية في «{title}» وتغيرت درجتك.",
       "homework_comment": "تعليق جديد على واجب «{title}».",
-      "announcement_posted": "إعلان جديد: «{title}»."
+      "announcement_posted": "إعلان جديد: «{title}».",
+      "lesson_published": "درس جديد: «{title}».",
+      "lesson_available": "أصبح درس «{title}» متاحًا لك.",
+      "lessons_available": "{count, plural, one {أصبح درس جديد متاحًا لك.} two {أصبح درسان متاحين لك.} few {أصبحت # دروس متاحة لك.} many {أصبح # درسًا متاحًا لك.} other {أصبح # درس متاحًا لك.}}"
     }
   },
   "platform": {

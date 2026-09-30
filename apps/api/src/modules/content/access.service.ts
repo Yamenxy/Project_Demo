@@ -3,10 +3,11 @@ import { and, asc, eq, inArray, isNull, sql } from 'drizzle-orm';
 import { AppError, Clock, IdGenerator, notFound } from '../../common';
 import { TenantDb, type DbTx } from '../../database';
 import { AuditService } from '../audit';
+import { NotificationsService } from '../notify';
 import { users } from '../identity';
 import { memberships, studentScope, type WorkspaceContext } from '../tenancy';
 import { decideAccess, type AccessDecision } from './access-policy';
-import { courseScope, type Actor } from './content.service';
+import { courseScope, type Actor } from './scope';
 import {
   accessGroupLessons,
   accessGroupMembers,
@@ -42,13 +43,30 @@ export class AccessService {
   constructor(
     private readonly db: TenantDb,
     private readonly audit: AuditService,
+    private readonly notifications: NotificationsService,
     private readonly ids: IdGenerator,
     private readonly clock: Clock,
   ) {}
 
-  /** Every published lesson of the workspace, with the decision for one student. */
+  /** Every lesson of the workspace, with the decision for one student. */
   async lessonsFor(tx: DbTx, workspaceId: string, membershipId: string): Promise<StudentLesson[]> {
+    const rows = await this.decisions(tx, workspaceId, { membershipIds: [membershipId] });
+    return rows.map((r) => r.lesson);
+  }
+
+  /**
+   * Decisions for many students and lessons at once: the same facts, read in one query, and the
+   * same `decideAccess`. Without `membershipIds`, every student of the workspace.
+   */
+  async decisions(
+    tx: DbTx,
+    workspaceId: string,
+    filter: { membershipIds?: string[]; lessonIds?: string[] },
+  ): Promise<{ membershipId: string; userId: string | null; lesson: StudentLesson }[]> {
+    if (filter.membershipIds?.length === 0 || filter.lessonIds?.length === 0) return [];
     const rows = await tx.execute<{
+      membership_id: string;
+      user_id: string | null;
       lesson_id: string;
       course_id: string;
       course_title: string;
@@ -61,7 +79,8 @@ export class AccessService {
       rule: 'grant' | 'block' | null;
       groups: string[] | null;
     }>(sql`
-      select l.id as lesson_id, c.id as course_id, c.title as course_title, l.title, l.position,
+      select m.id as membership_id, m.user_id, l.id as lesson_id, c.id as course_id,
+             c.title as course_title, l.title, l.position,
              (l.published_at is not null) as published,
              (m.role = 'student' and m.status = 'active') as active_student,
              (w.suspended_at is not null) as suspended,
@@ -74,26 +93,87 @@ export class AccessService {
                where g.archived_at is null) as groups
         from lessons l
         join courses c on c.id = l.course_id and c.deleted_at is null
-        join memberships m on m.id = ${membershipId}
+        join memberships m on ${
+          filter.membershipIds
+            ? sql`m.id in ${[...new Set(filter.membershipIds)]}`
+            : sql`m.role = 'student'`
+        }
         join workspaces w on w.id = ${workspaceId}
         left join lesson_rules r on r.lesson_id = l.id and r.membership_id = m.id
        where l.deleted_at is null
+         ${filter.lessonIds ? sql`and l.id in ${[...new Set(filter.lessonIds)]}` : sql``}
        order by c.title, l.position`);
     return rows.rows.map((r) => ({
-      lessonId: r.lesson_id,
-      courseId: r.course_id,
-      courseTitle: r.course_title,
-      title: r.title,
-      position: r.position,
-      decision: decideAccess({
-        activeStudent: r.active_student,
-        published: r.published,
-        workspaceSuspended: r.suspended,
-        paused: r.paused,
-        rule: r.rule,
-        groups: r.groups ?? [],
-      }),
+      membershipId: r.membership_id,
+      userId: r.user_id,
+      lesson: {
+        lessonId: r.lesson_id,
+        courseId: r.course_id,
+        courseTitle: r.course_title,
+        title: r.title,
+        position: r.position,
+        decision: decideAccess({
+          activeStudent: r.active_student,
+          published: r.published,
+          workspaceSuspended: r.suspended,
+          paused: r.paused,
+          rule: r.rule,
+          groups: r.groups ?? [],
+        }),
+      },
     }));
+  }
+
+  /**
+   * Runs a change that may open lessons, and tells each student who can open more lessons
+   * afterwards, once, however many lessons it opened (REQ-NOTIF-003). Only effective access
+   * counts, so paused and blocked students, and unpublished lessons, never notify.
+   */
+  async notifyingOpened<T>(
+    tx: DbTx,
+    workspaceId: string,
+    filter: { membershipIds?: string[]; lessonIds?: string[] },
+    kind: 'published' | 'available',
+    change: () => Promise<T>,
+  ): Promise<T> {
+    const open = async () =>
+      new Set(
+        (await this.decisions(tx, workspaceId, filter))
+          .filter((d) => d.lesson.decision.allowed)
+          .map((d) => `${d.membershipId}:${d.lesson.lessonId}`),
+      );
+    const before = await open();
+    const result = await change();
+    const gained = new Map<string, { userId: string; lessons: StudentLesson[] }>();
+    for (const d of await this.decisions(tx, workspaceId, filter)) {
+      if (!d.lesson.decision.allowed || !d.userId) continue;
+      if (before.has(`${d.membershipId}:${d.lesson.lessonId}`)) continue;
+      const entry = gained.get(d.membershipId) ?? { userId: d.userId, lessons: [] };
+      entry.lessons.push(d.lesson);
+      gained.set(d.membershipId, entry);
+    }
+    for (const { userId, lessons: opened } of gained.values()) {
+      const [only] = opened;
+      await this.notifications.notify(
+        tx,
+        opened.length === 1 && only
+          ? {
+              recipientUserId: userId,
+              workspaceId,
+              type: kind === 'published' ? 'lesson.published' : 'lesson.available',
+              params: { title: only.title },
+              link: `/w/${workspaceId}/lessons/${only.lessonId}`,
+            }
+          : {
+              recipientUserId: userId,
+              workspaceId,
+              type: 'lessons.available',
+              params: { count: opened.length },
+              link: `/w/${workspaceId}/lessons`,
+            },
+      );
+    }
+    return result;
   }
 
   /** The student's own lessons: what they can open (published lessons only are listed). */
@@ -246,16 +326,29 @@ export class AccessService {
     actor: Actor,
   ): Promise<void> {
     await this.db.inWorkspace(workspaceId, async (tx) => {
+      const members = await tx
+        .select({ id: accessGroupMembers.membershipId })
+        .from(accessGroupMembers)
+        .where(eq(accessGroupMembers.groupId, groupId));
       const now = this.clock.now();
-      const updated = await tx
-        .update(accessGroups)
-        .set({
-          ...(change.name === undefined ? {} : { name: change.name.trim() }),
-          ...(change.archived === undefined ? {} : { archivedAt: change.archived ? now : null }),
-          updatedAt: now,
-        })
-        .where(eq(accessGroups.id, groupId))
-        .returning({ id: accessGroups.id });
+      const updated = await this.notifyingOpened(
+        tx,
+        workspaceId,
+        { membershipIds: members.map((m) => m.id) },
+        'available',
+        () =>
+          tx
+            .update(accessGroups)
+            .set({
+              ...(change.name === undefined ? {} : { name: change.name.trim() }),
+              ...(change.archived === undefined
+                ? {}
+                : { archivedAt: change.archived ? now : null }),
+              updatedAt: now,
+            })
+            .where(eq(accessGroups.id, groupId))
+            .returning({ id: accessGroups.id }),
+      );
       if (updated.length === 0) throw notFound('Group not found');
       await this.record(
         tx,
@@ -280,10 +373,12 @@ export class AccessService {
       await this.findGroup(tx, groupId);
       await this.existing(tx, 'lessons', change.add);
       if (change.add.length > 0) {
-        await tx
-          .insert(accessGroupLessons)
-          .values(change.add.map((lessonId) => ({ workspaceId, groupId, lessonId })))
-          .onConflictDoNothing();
+        await this.notifyingOpened(tx, workspaceId, { lessonIds: change.add }, 'available', () =>
+          tx
+            .insert(accessGroupLessons)
+            .values(change.add.map((lessonId) => ({ workspaceId, groupId, lessonId })))
+            .onConflictDoNothing(),
+        );
       }
       if (change.remove.length > 0) {
         await tx
@@ -317,7 +412,9 @@ export class AccessService {
     await this.db.inWorkspace(workspaceId, async (tx) => {
       await this.findGroup(tx, groupId);
       await this.students(tx, change.add);
-      await this.addMembers(tx, workspaceId, groupId, change.add, actor);
+      await this.notifyingOpened(tx, workspaceId, { membershipIds: change.add }, 'available', () =>
+        this.addMembers(tx, workspaceId, groupId, change.add, actor),
+      );
       if (change.remove.length > 0) {
         await tx
           .delete(accessGroupMembers)
@@ -360,7 +457,13 @@ export class AccessService {
       ).rows;
       if (!cls) throw notFound('Class not found');
       const ids = rows.rows.map((r) => r.membership_id);
-      const added = await this.addMembers(tx, workspaceId, groupId, ids, actor);
+      const added = await this.notifyingOpened(
+        tx,
+        workspaceId,
+        { membershipIds: ids },
+        'available',
+        () => this.addMembers(tx, workspaceId, groupId, ids, actor),
+      );
       await this.record(
         tx,
         workspaceId,
@@ -393,37 +496,43 @@ export class AccessService {
       await this.scopedLessons(tx, ctx, input.lessonIds);
       const now = this.clock.now();
       let changed = 0;
-      for (const membershipId of new Set(input.membershipIds)) {
-        for (const lessonId of new Set(input.lessonIds)) {
-          if (input.rule === 'none') {
-            const removed = await tx
-              .delete(lessonRules)
-              .where(
-                and(eq(lessonRules.membershipId, membershipId), eq(lessonRules.lessonId, lessonId)),
-              )
-              .returning({ id: lessonRules.lessonId });
-            changed += removed.length;
-          } else {
-            const written = await tx
-              .insert(lessonRules)
-              .values({
-                workspaceId: ctx.workspaceId,
-                membershipId,
-                lessonId,
-                kind: input.rule,
-                setBy: actor.userId,
-                setAt: now,
-              })
-              .onConflictDoUpdate({
-                target: [lessonRules.membershipId, lessonRules.lessonId],
-                set: { kind: input.rule, setBy: actor.userId, setAt: now },
-                setWhere: sql`${lessonRules.kind} <> ${input.rule}`,
-              })
-              .returning({ id: lessonRules.lessonId });
-            changed += written.length;
+      const filter = { membershipIds: input.membershipIds, lessonIds: input.lessonIds };
+      await this.notifyingOpened(tx, ctx.workspaceId, filter, 'available', async () => {
+        for (const membershipId of new Set(input.membershipIds)) {
+          for (const lessonId of new Set(input.lessonIds)) {
+            if (input.rule === 'none') {
+              const removed = await tx
+                .delete(lessonRules)
+                .where(
+                  and(
+                    eq(lessonRules.membershipId, membershipId),
+                    eq(lessonRules.lessonId, lessonId),
+                  ),
+                )
+                .returning({ id: lessonRules.lessonId });
+              changed += removed.length;
+            } else {
+              const written = await tx
+                .insert(lessonRules)
+                .values({
+                  workspaceId: ctx.workspaceId,
+                  membershipId,
+                  lessonId,
+                  kind: input.rule,
+                  setBy: actor.userId,
+                  setAt: now,
+                })
+                .onConflictDoUpdate({
+                  target: [lessonRules.membershipId, lessonRules.lessonId],
+                  set: { kind: input.rule, setBy: actor.userId, setAt: now },
+                  setWhere: sql`${lessonRules.kind} <> ${input.rule}`,
+                })
+                .returning({ id: lessonRules.lessonId });
+              changed += written.length;
+            }
           }
         }
-      }
+      });
       await this.audit.record(tx, {
         action: `access.rules_${input.rule === 'none' ? 'cleared' : input.rule === 'grant' ? 'granted' : 'blocked'}`,
         workspaceId: ctx.workspaceId,
