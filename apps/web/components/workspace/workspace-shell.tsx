@@ -135,6 +135,11 @@ export function WorkspaceShell({
     },
     { href: `${base}/staff`, label: t('nav.staff'), visible: (c) => c.membership.role === 'owner' },
     {
+      href: `${base}/audit-log`,
+      label: t('nav.auditLog'),
+      visible: (c) => c.membership.role === 'owner',
+    },
+    {
       href: `${base}/comments`,
       label: t('nav.comments'),
       visible: (c) => c.membership.role === 'owner',

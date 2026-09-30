@@ -18,6 +18,8 @@ import { StudentImportService } from './student-import.service';
 import { StudentsService } from './students.service';
 import { WorkspaceController } from './workspace.controller';
 import { WorkspacesService } from './workspaces.service';
+import { AuditLogController } from './audit-log.controller';
+import { AuditLogService } from './audit-log.service';
 
 /**
  * Global: provides the access guard for every route (REQ-RBAC-005) and the role-aware
@@ -28,6 +30,7 @@ import { WorkspacesService } from './workspaces.service';
   imports: [IdentityModule],
   controllers: [
     WorkspaceController,
+    AuditLogController,
     MembersController,
     MeController,
     StaffController,
@@ -39,6 +42,7 @@ import { WorkspacesService } from './workspaces.service';
   ],
   providers: [
     MembershipsService,
+    AuditLogService,
     WorkspacesService,
     PermissionsService,
     MembersService,

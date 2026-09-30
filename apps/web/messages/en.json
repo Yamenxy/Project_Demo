@@ -287,7 +287,8 @@
       "courses": "Content",
       "groups": "Access groups",
       "comments": "Comments",
-      "announcements": "Announcements"
+      "announcements": "Announcements",
+      "auditLog": "Activity log"
     },
     "suspended": "This workspace is temporarily unavailable. You can still see your grades and attendance.",
     "suspendedOwner": "Your workspace is paused. You can see your subscription and renew it with the platform.",
@@ -1020,5 +1021,40 @@
   },
   "exports": {
     "csv": "Download {what} (CSV)"
+  },
+  "auditLog": {
+    "title": "Activity log",
+    "explain": "Everything that happened in your workspace and who did it, including any access by platform support. This log can’t be changed.",
+    "area": "Area",
+    "allAreas": "All areas",
+    "otherArea": "Other",
+    "none": "No events.",
+    "system": "System",
+    "unknown": "User",
+    "actor": {
+      "platform_owner": "Platform team ({name})",
+      "support": "Platform support ({name})"
+    },
+    "reason": "Reason: {reason}",
+    "older": "Older events",
+    "areas": {
+      "support": "Platform support",
+      "grade": "Grades",
+      "grade_item": "Grade items",
+      "exam": "Exams",
+      "homework": "Homework",
+      "attendance": "Attendance",
+      "access": "Lesson access",
+      "lesson": "Lessons",
+      "course": "Courses",
+      "payment": "Payments",
+      "payment_request": "Payment requests",
+      "cash": "Cash",
+      "student": "Students",
+      "membership": "Memberships",
+      "staff": "Staff",
+      "announcement": "Announcements",
+      "data": "Exports and data"
+    }
   }
 }
