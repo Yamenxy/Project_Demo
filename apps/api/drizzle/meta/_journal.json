@@ -239,6 +239,20 @@
       "when": 1790766133307,
       "tag": "0033_push_subscriptions",
       "breakpoints": true
+    },
+    {
+      "idx": 34,
+      "version": "7",
+      "when": 1790780369797,
+      "tag": "0034_platform_job_queue",
+      "breakpoints": true
+    },
+    {
+      "idx": 35,
+      "version": "7",
+      "when": 1790780397074,
+      "tag": "0035_support_sessions",
+      "breakpoints": true
     }
   ]
 }

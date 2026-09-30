@@ -167,7 +167,10 @@
     "homework_unavailable": "هذا الواجب غير متاح.",
     "own_comment": "لا يمكنك الإبلاغ عن تعليقك.",
     "empty_comment": "اكتب تعليقًا أولًا.",
-    "consent_required": "يلزم موافقة ولي الأمر قبل رفع الملفات."
+    "consent_required": "يلزم موافقة ولي الأمر قبل رفع الملفات.",
+    "support_read_only": "جلسة الدعم للقراءة فقط.",
+    "support_no_export": "التصدير غير متاح في جلسة الدعم.",
+    "support_too_long": "جلسة الدعم لا تتجاوز 60 دقيقة."
   },
   "notifications": {
     "title": "الإشعارات",
@@ -198,7 +201,9 @@
       "announcement_posted": "إعلان جديد: «{title}».",
       "lesson_published": "درس جديد: «{title}».",
       "lesson_available": "أصبح درس «{title}» متاحًا لك.",
-      "lessons_available": "{count, plural, one {أصبح درس جديد متاحًا لك.} two {أصبح درسان متاحين لك.} few {أصبحت # دروس متاحة لك.} many {أصبح # درسًا متاحًا لك.} other {أصبح # درس متاحًا لك.}}"
+      "lessons_available": "{count, plural, one {أصبح درس جديد متاحًا لك.} two {أصبح درسان متاحين لك.} few {أصبحت # دروس متاحة لك.} many {أصبح # درسًا متاحًا لك.} other {أصبح # درس متاحًا لك.}}",
+      "support_session_started": "فتح دعم المنصة مساحتك للقراءة فقط لمدة {minutes} دقيقة. كل ما يُطّلع عليه في سجل النشاط.",
+      "support_session_started_platform": "بدأ زميل جلسة دعم في «{workspace}» لمدة {minutes} دقيقة."
     }
   },
   "platform": {
@@ -263,6 +268,17 @@
       "reportedBy": "أبلغ {name}: {reason}",
       "dismiss": "رفض البلاغ",
       "hide": "إخفاء التعليق"
+    },
+    "support": {
+      "title": "جلسة دعم",
+      "explain": "اطّلاع للقراءة فقط على هذه المساحة، بسبب ورقم تذكرة، لمدة أقصاها 60 دقيقة. يُبلَّغ المعلم ويرى كل ما تفتحه في سجل النشاط.",
+      "reason": "سبب جلسة الدعم",
+      "ticket": "رقم التذكرة",
+      "minutes": "المدة بالدقائق (حتى 60)",
+      "start": "بدء جلسة الدعم",
+      "activeUntil": "جلسة دعم مفتوحة حتى {time}",
+      "open": "فتح المساحة",
+      "end": "إنهاء الجلسة"
     }
   },
   "workspace": {
@@ -323,7 +339,8 @@
     "myGrades": "درجاتي",
     "myExams": "امتحاناتي",
     "myHomework": "واجباتي",
-    "myAnnouncements": "الإعلانات"
+    "myAnnouncements": "الإعلانات",
+    "supportBanner": "جلسة دعم للقراءة فقط: لا يمكن تغيير أي شيء، وكل ما تفتحه يُسجَّل في سجل نشاط المعلم."
   },
   "staff": {
     "title": "الفريق",

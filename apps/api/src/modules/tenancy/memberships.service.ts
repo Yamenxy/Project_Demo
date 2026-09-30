@@ -1,9 +1,10 @@
 import { Injectable } from '@nestjs/common';
-import { and, eq, ne } from 'drizzle-orm';
+import { and, desc, eq, gt, isNull, lte, ne } from 'drizzle-orm';
 import { TenantDb, type DbTx } from '../../database';
 import {
   memberships,
   platformOwners,
+  supportSessions,
   workspaces,
   type MembershipRole,
   type MembershipStatus,
@@ -17,7 +18,15 @@ export interface MembershipContext {
   status: MembershipStatus;
   paused: boolean;
   workspaceSuspended: boolean;
+  /**
+   * Set when a platform owner reads the workspace through a support session (REQ-RBAC-003): an
+   * owner's view, read-only, with no membership of its own.
+   */
+  supportSessionId?: string;
 }
+
+/** Stands in for the membership id of a support session, which has none. */
+export const SUPPORT_MEMBERSHIP_ID = '00000000-0000-0000-0000-000000000000';
 
 export interface MyWorkspace {
   workspaceId: string;
@@ -62,6 +71,45 @@ export class MembershipsService {
       status: row.status,
       paused: row.pausedAt !== null,
       workspaceSuspended: row.suspendedAt !== null,
+    };
+  }
+
+  /**
+   * An open support session of this platform owner in this workspace, as a read-only owner's
+   * context, or null. The caller must already be in the workspace's scope.
+   */
+  async resolveSupport(
+    tx: DbTx,
+    workspaceId: string,
+    userId: string,
+    now: Date,
+  ): Promise<MembershipContext | null> {
+    const [row] = await tx
+      .select({ id: supportSessions.id, suspendedAt: workspaces.suspendedAt })
+      .from(supportSessions)
+      .innerJoin(workspaces, eq(workspaces.id, supportSessions.workspaceId))
+      .innerJoin(platformOwners, eq(platformOwners.userId, supportSessions.platformUserId))
+      .where(
+        and(
+          eq(supportSessions.workspaceId, workspaceId),
+          eq(supportSessions.platformUserId, userId),
+          isNull(supportSessions.endedAt),
+          lte(supportSessions.startedAt, now),
+          gt(supportSessions.expiresAt, now),
+        ),
+      )
+      .orderBy(desc(supportSessions.startedAt))
+      .limit(1);
+    if (!row) return null;
+    return {
+      membershipId: SUPPORT_MEMBERSHIP_ID,
+      workspaceId,
+      userId,
+      role: 'owner',
+      status: 'active',
+      paused: false,
+      workspaceSuspended: row.suspendedAt !== null,
+      supportSessionId: row.id,
     };
   }
 

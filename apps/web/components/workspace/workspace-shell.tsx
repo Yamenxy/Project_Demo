@@ -13,6 +13,8 @@ export interface WorkspaceContextValue {
   workspace: { id: string; slug: string; name: string; suspended: boolean };
   membership: { id: string; role: Role; paused: boolean };
   permissions: string[];
+  /** Platform support reading the workspace: read-only (REQ-RBAC-003). */
+  support: boolean;
   reload: () => Promise<void>;
 }
 
@@ -187,6 +189,14 @@ export function WorkspaceShell({
             </nav>
           ) : null}
         </header>
+        {value.support ? (
+          <p
+            role="status"
+            className="mx-auto mt-4 max-w-3xl rounded-lg bg-amber-100 px-4 py-3 font-semibold text-amber-900"
+          >
+            {t('supportBanner')}
+          </p>
+        ) : null}
         {value.workspace.suspended ? (
           <p
             role="status"

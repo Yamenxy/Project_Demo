@@ -25,6 +25,13 @@ const TEMPLATES: Record<string, Template> = {
       en: "Your password was changed and you were signed out everywhere. If this wasn't you, contact support now.",
     }),
   },
+  'support.session_started': {
+    subject: { ar: 'دخول من دعم المنصة إلى مساحتك', en: 'Platform support opened your workspace' },
+    body: (p) => ({
+      ar: `فتح فريق دعم المنصة مساحتك للقراءة فقط لمدة ${String(p.minutes)} دقيقة. كل ما يطّلع عليه يظهر في سجل النشاط.`,
+      en: `Platform support opened your workspace, read-only, for ${String(p.minutes)} minutes. Everything they view appears in your activity log.`,
+    }),
+  },
 };
 
 export function hasEmailTemplate(type: string): boolean {

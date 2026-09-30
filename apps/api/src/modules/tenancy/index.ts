@@ -11,6 +11,7 @@ export {
   memberships,
   permissionGrants,
   platformOwners,
+  supportSessions,
   workspaceInvitations,
   workspaces,
   type MembershipRole,

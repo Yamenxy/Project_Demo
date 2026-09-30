@@ -5,10 +5,12 @@ import { PlatformController } from './platform.controller';
 import { PlatformService } from './platform.service';
 import { CommentReportsController } from './reports.controller';
 import { CommentReportsService } from './reports.service';
+import { SupportController } from './support.controller';
+import { SupportService } from './support.service';
 
 @Module({
-  controllers: [PlatformController, BillingController, CommentReportsController],
-  providers: [PlatformService, CommentReportsService],
+  controllers: [PlatformController, BillingController, CommentReportsController, SupportController],
+  providers: [PlatformService, CommentReportsService, SupportService],
   exports: [PlatformService],
 })
 export class PlatformAdminModule implements OnModuleInit {

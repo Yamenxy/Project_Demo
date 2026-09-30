@@ -8,6 +8,7 @@ import type { Locale } from '../../i18n/routing';
 import { api, ApiError } from '../../lib/api';
 import { formatNumber } from '../../lib/format';
 import { ErrorMessage, Field, Select, SubmitButton } from '../form';
+import { SupportSessions } from './support-sessions';
 import {
   PAYMENT_METHODS,
   PLANS,
@@ -184,6 +185,7 @@ export function WorkspaceDetail({ workspaceId }: { workspaceId: string }) {
           </button>
         </form>
       </section>
+      <SupportSessions workspaceId={workspaceId} />
     </main>
   );
 }

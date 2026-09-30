@@ -1,6 +1,7 @@
 import type { NestFastifyApplication } from '@nestjs/platform-fastify';
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import { TenantDb } from '../../src/database';
+import { PlatformDb } from '../../src/database/platform-db';
 import {
   NotificationsService,
   PushSender,
@@ -143,5 +144,21 @@ describe('web push (REQ-NOTIF-001)', () => {
       }),
     ).rejects.toThrow('roll back');
     expect(await count()).toBe('1');
+  });
+
+  it('notifications written through the platform handle queue their push too', async () => {
+    const user = await insertUser();
+    await app
+      .get(PlatformDb)
+      .run('test: platform notification', (tx) =>
+        app
+          .get(NotificationsService)
+          .notify(tx, { recipientUserId: user, workspaceId: null, type: 'test.platform' }),
+      );
+    const [row] = await adminQuery<{ n: string }>(
+      `select count(*) as n from pgboss.job where name = 'notify.push' and data->'userIds' ? $1`,
+      [user],
+    );
+    expect(row?.n).toBe('1');
   });
 });

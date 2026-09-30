@@ -82,3 +82,15 @@ export const workspaceSettings = pgTable('workspace_settings', {
   publicSubjects: text('public_subjects'),
   updatedAt: tstz('updated_at').notNull(),
 });
+
+/** Mirrors drizzle/0035_support_sessions.sql (REQ-RBAC-003). */
+export const supportSessions = pgTable('support_sessions', {
+  workspaceId: uuid('workspace_id').notNull(),
+  id: uuid('id').primaryKey(),
+  platformUserId: uuid('platform_user_id').notNull(),
+  reason: text('reason').notNull(),
+  ticket: text('ticket').notNull(),
+  startedAt: tstz('started_at').notNull(),
+  expiresAt: tstz('expires_at').notNull(),
+  endedAt: tstz('ended_at'),
+});

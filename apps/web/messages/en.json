@@ -167,7 +167,10 @@
     "homework_unavailable": "This homework is not available.",
     "own_comment": "You can’t report your own comment.",
     "empty_comment": "Write a comment first.",
-    "consent_required": "A guardian’s consent is needed before uploading files."
+    "consent_required": "A guardian’s consent is needed before uploading files.",
+    "support_read_only": "Support sessions are read-only.",
+    "support_no_export": "Exports aren’t available in a support session.",
+    "support_too_long": "A support session lasts at most 60 minutes."
   },
   "notifications": {
     "title": "Notifications",
@@ -198,7 +201,9 @@
       "announcement_posted": "New announcement: “{title}”.",
       "lesson_published": "New lesson: “{title}”.",
       "lesson_available": "The lesson “{title}” is now open to you.",
-      "lessons_available": "{count, plural, one {A new lesson is open to you.} other {# new lessons are open to you.}}"
+      "lessons_available": "{count, plural, one {A new lesson is open to you.} other {# new lessons are open to you.}}",
+      "support_session_started": "Platform support opened your workspace, read-only, for {minutes} minutes. Everything viewed is in your activity log.",
+      "support_session_started_platform": "A colleague started a support session in “{workspace}” for {minutes} minutes."
     }
   },
   "platform": {
@@ -263,6 +268,17 @@
       "reportedBy": "Reported by {name}: {reason}",
       "dismiss": "Dismiss",
       "hide": "Hide comment"
+    },
+    "support": {
+      "title": "Support session",
+      "explain": "Read-only access to this workspace, with a reason and a ticket number, for at most 60 minutes. The teacher is told and sees everything you open in their activity log.",
+      "reason": "Reason for support",
+      "ticket": "Ticket number",
+      "minutes": "Length in minutes (up to 60)",
+      "start": "Start support session",
+      "activeUntil": "Support session open until {time}",
+      "open": "Open the workspace",
+      "end": "End session"
     }
   },
   "workspace": {
@@ -323,7 +339,8 @@
     "myGrades": "My grades",
     "myExams": "My exams",
     "myHomework": "My homework",
-    "myAnnouncements": "Announcements"
+    "myAnnouncements": "Announcements",
+    "supportBanner": "Read-only support session: nothing can be changed, and everything you open is recorded in the teacher’s activity log."
   },
   "staff": {
     "title": "Staff",

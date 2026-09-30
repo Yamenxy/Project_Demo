@@ -1,9 +1,10 @@
 import { Injectable, type CanActivate, type ExecutionContext } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import type { FastifyRequest } from 'fastify';
-import { AppError, notFound } from '../../common';
+import { AppError, Clock, notFound } from '../../common';
 import { ROUTE_POLICY, type RoutePolicy } from '../../common/policy';
 import { isUuid, TenantDb } from '../../database';
+import { AuditService } from '../audit';
 import { SESSION_COOKIE, SessionsService } from '../identity';
 import { MembershipsService, type MembershipContext } from './memberships.service';
 import { PermissionsService, type PermissionSet } from './permissions.service';
@@ -41,6 +42,8 @@ export class AccessGuard implements CanActivate {
     private readonly memberships: MembershipsService,
     private readonly permissions: PermissionsService,
     private readonly db: TenantDb,
+    private readonly audit: AuditService,
+    private readonly clock: Clock,
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
@@ -79,7 +82,10 @@ export class AccessGuard implements CanActivate {
     const workspaceId = params.workspaceId;
     if (!workspaceId || !isUuid(workspaceId)) throw notFound();
     const resolved = await this.db.inWorkspace(workspaceId, async (tx) => {
-      const membership = await this.memberships.resolve(tx, workspaceId, session.userId);
+      // A member, or else a platform owner with an open support session (REQ-RBAC-003).
+      const membership =
+        (await this.memberships.resolve(tx, workspaceId, session.userId)) ??
+        (await this.memberships.resolveSupport(tx, workspaceId, session.userId, this.clock.now()));
       if (!membership) return null;
       const permissions = await this.permissions.forMembership(
         tx,
@@ -89,6 +95,10 @@ export class AccessGuard implements CanActivate {
       return { ...membership, permissions };
     });
     if (!resolved) throw notFound();
+    if (resolved.supportSessionId) {
+      await this.admitSupport(request, resolved, policy, session.twoFactorEnabled);
+      return true;
+    }
     if (resolved.status !== 'active') {
       throw new AppError(403, 'membership_not_active', 'Membership is not active');
     }
@@ -111,6 +121,47 @@ export class AccessGuard implements CanActivate {
 
     request.workspace = resolved;
     return true;
+  }
+
+  /**
+   * A support session: an owner's view, read-only and audited. Only safe methods pass; each
+   * request is recorded in the workspace's audit log with the route and its ids (never the query
+   * string, which can hold a searched name or phone), so the owner sees what was viewed.
+   */
+  private async admitSupport(
+    request: FastifyRequest,
+    context: WorkspaceContext,
+    policy: Extract<RoutePolicy, { kind: 'workspace' }>,
+    twoFactorEnabled: boolean,
+  ): Promise<void> {
+    if (!twoFactorEnabled) throw twoFactorSetupRequired();
+    if (request.method !== 'GET' && request.method !== 'HEAD') {
+      throw new AppError(403, 'support_read_only', 'Support access is read-only');
+    }
+    // Looking is support; bulk downloads are not.
+    if ((request.routeOptions.url ?? '').includes('/exports/')) {
+      throw new AppError(403, 'support_no_export', 'Exports are not available to support');
+    }
+    const { requirement } = policy;
+    const allowed =
+      'permission' in requirement
+        ? context.permissions.has(requirement.permission)
+        : requirement.roles.includes(context.role);
+    if (!allowed) throw new AppError(403, 'forbidden', 'Not allowed');
+    await this.db.inWorkspace(context.workspaceId, (tx) =>
+      this.audit.record(tx, {
+        action: 'support.viewed',
+        workspaceId: context.workspaceId,
+        actor: { type: 'support', userId: context.userId },
+        entity: { type: 'support_session', id: context.supportSessionId },
+        newValue: {
+          route: request.routeOptions.url ?? null,
+          params: request.params as Record<string, string>,
+        },
+        requestId: String(request.id),
+      }),
+    );
+    request.workspace = context;
   }
 }
 

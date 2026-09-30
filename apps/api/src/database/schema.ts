@@ -64,6 +64,7 @@ export {
   permissionGrantClasses,
   permissionGrants,
   platformOwners,
+  supportSessions,
   workspaceInvitations,
   workspaces,
   workspaceSettings,

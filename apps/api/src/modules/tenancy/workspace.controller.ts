@@ -44,6 +44,8 @@ export interface WorkspaceContextResponse {
   workspace: { id: string; slug: string; name: string; suspended: boolean };
   membership: { id: string; role: MembershipRole; paused: boolean };
   permissions: PermissionKey[];
+  /** A platform owner reading through a support session (REQ-RBAC-003): read-only. */
+  support: boolean;
 }
 
 @Controller('v1/w/:workspaceId')
@@ -71,6 +73,7 @@ export class WorkspaceController {
       workspace: { ...workspace, suspended: ctx.workspaceSuspended },
       membership: { id: ctx.membershipId, role: ctx.role, paused: ctx.paused },
       permissions: ctx.permissions.list(),
+      support: ctx.supportSessionId !== undefined,
     };
   }
 
