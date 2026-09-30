@@ -1,9 +1,11 @@
 import { Injectable } from '@nestjs/common';
-import { and, eq, isNotNull, sql } from 'drizzle-orm';
+import { and, eq, inArray, isNotNull, sql } from 'drizzle-orm';
 import { AppError, Clock, IdGenerator, notFound } from '../../common';
 import { TenantDb, type DbTx } from '../../database';
 import { AuditService } from '../audit';
 import { GradingService } from '../grading';
+import { NotificationsService } from '../notify';
+import { memberships } from '../tenancy';
 import type { WorkspaceContext } from '../tenancy';
 import { AttemptsService } from './attempts.service';
 import { countedScore, isCorrect } from './exam-rules';
@@ -41,6 +43,7 @@ export class RegradeService {
     private readonly examsService: ExamsService,
     private readonly attempts: AttemptsService,
     private readonly grading: GradingService,
+    private readonly notifications: NotificationsService,
     private readonly audit: AuditService,
     private readonly ids: IdGenerator,
     private readonly clock: Clock,
@@ -109,7 +112,28 @@ export class RegradeService {
           .set({ scoreCenti: score })
           .where(eq(examAttempts.id, attempt.id));
       }
-      if (exam.resultsReleasedAt) await this.updateGradebook(tx, ctx, exam, actor);
+      if (exam.resultsReleasedAt) {
+        await this.updateGradebook(tx, ctx, exam, actor);
+        // Students only see released scores, so only then is a changed score news.
+        const changed = outcome.changes.map((c) => c.membershipId);
+        const recipients =
+          changed.length === 0
+            ? []
+            : await tx
+                .select({ userId: memberships.userId })
+                .from(memberships)
+                .where(inArray(memberships.id, changed));
+        for (const r of recipients) {
+          if (!r.userId) continue;
+          await this.notifications.notify(tx, {
+            recipientUserId: r.userId,
+            workspaceId: ctx.workspaceId,
+            type: 'exam.regraded',
+            params: { title: exam.title },
+            link: `/w/${ctx.workspaceId}/exams`,
+          });
+        }
+      }
       await this.audit.record(tx, {
         action: 'exam.key_corrected',
         workspaceId: ctx.workspaceId,

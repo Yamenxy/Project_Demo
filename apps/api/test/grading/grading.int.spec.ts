@@ -48,7 +48,7 @@ async function setup() {
     membershipIds: [student, other],
   });
   const studentToken = await signIn(app, studentUser);
-  return { owner, workspaceId, ownerToken, w, classId, student, other, studentToken };
+  return { owner, workspaceId, ownerToken, w, classId, student, studentUser, other, studentToken };
 }
 
 beforeAll(async () => {
@@ -98,6 +98,16 @@ describe('gradebook (REQ-GRADE-001 to -003)', () => {
       expect.objectContaining({ title: 'امتحان ورقي 1', score: 17.5 }),
     ]);
     expect(JSON.stringify(mine)).not.toContain(s.other);
+    // One notification per student with a score; releasing again sends nothing more.
+    await call('POST', `${s.w}/grade-items/${item}/release`, s.ownerToken, { released: true });
+    const notes = await adminQuery<{ recipient_user_id: string; params: { title: string } }>(
+      `select recipient_user_id, params from notifications
+        where workspace_id = $1 and type = 'grades.released'`,
+      [s.workspaceId],
+    );
+    expect(notes).toEqual([
+      { recipient_user_id: s.studentUser, params: { title: 'امتحان ورقي 1' } },
+    ]);
   });
 
   it('after release, a change needs a reason and every change keeps old and new values', async () => {

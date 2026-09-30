@@ -240,8 +240,7 @@ export class HomeworkService {
             tx,
           );
         }
-        await tx.execute(sql`update grade_items set released_at = coalesce(released_at, ${this.clock.now()}),
-          updated_at = ${this.clock.now()} where id = ${itemId}`);
+        await this.grading.releaseItem(tx, ctx, itemId, actor);
       }
       await tx
         .update(homework)

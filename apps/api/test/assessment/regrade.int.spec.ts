@@ -127,5 +127,12 @@ describe('answer-key correction (REQ-EXAM-003)', () => {
       [q.id],
     );
     expect(versions?.n).toBe('2');
+    // Both counted scores changed after release: one regrade notification each.
+    const notes = await adminQuery<{ recipient_user_id: string; type: string }>(
+      `select recipient_user_id, type from notifications where workspace_id = $1
+        and type = 'exam.regraded'`,
+      [workspaceId],
+    );
+    expect(notes.map((n) => n.recipient_user_id).sort()).toEqual([...users].sort());
   });
 });

@@ -188,7 +188,9 @@
       "payment_reversed": "A payment was reversed.",
       "payment_request_submitted": "A new payment request is waiting for review.",
       "payment_request_rejected": "Your payment request was rejected. See the reason.",
-      "cash_handed_over": "A staff member handed you cash. Confirm you received it."
+      "cash_handed_over": "A staff member handed you cash. Confirm you received it.",
+      "grades_released": "Grades for “{title}” are out.",
+      "exam_regraded": "The answer key for “{title}” was corrected and your score changed."
     }
   },
   "platform": {

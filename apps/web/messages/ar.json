@@ -188,7 +188,9 @@
       "payment_reversed": "تم إلغاء دفعة بقيد عكسي.",
       "payment_request_submitted": "طلب دفع جديد بانتظار المراجعة.",
       "payment_request_rejected": "تم رفض طلب الدفع. راجع السبب.",
-      "cash_handed_over": "سلّمك أحد الفريق نقدية. أكد الاستلام."
+      "cash_handed_over": "سلّمك أحد الفريق نقدية. أكد الاستلام.",
+      "grades_released": "أُعلنت درجات «{title}».",
+      "exam_regraded": "صُححت الإجابة النموذجية في «{title}» وتغيرت درجتك."
     }
   },
   "platform": {

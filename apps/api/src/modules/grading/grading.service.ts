@@ -6,6 +6,7 @@ import { TenantDb, type DbTx } from '../../database';
 import { AuditService } from '../audit';
 import { classes, classScope } from '../classes';
 import { users } from '../identity';
+import { NotificationsService } from '../notify';
 import { memberships, type WorkspaceContext } from '../tenancy';
 import { gradeChanges, gradeEntries, gradeItems } from './schema';
 
@@ -66,6 +67,7 @@ export class GradingService {
     private readonly audit: AuditService,
     private readonly ids: IdGenerator,
     private readonly clock: Clock,
+    private readonly notifications: NotificationsService,
   ) {}
 
   /** Items, and every student enrolled now or with a score in the class, with averages. */
@@ -295,6 +297,42 @@ export class GradingService {
     return tx ? work(tx) : this.db.inWorkspace(ctx.workspaceId, work);
   }
 
+  /**
+   * Releases an item inside the caller's transaction. The first release notifies each student who
+   * has a score, once; releasing again changes nothing (REQ-GRADE-001).
+   */
+  async releaseItem(tx: DbTx, ctx: WorkspaceContext, itemId: string, actor: Actor): Promise<void> {
+    const item = await this.item(tx, ctx, itemId, 'grading.release');
+    if (item.releasedAt) return;
+    const now = this.clock.now();
+    await tx
+      .update(gradeItems)
+      .set({ releasedAt: now, updatedAt: now })
+      .where(eq(gradeItems.id, itemId));
+    await this.audit.record(tx, {
+      action: 'grade_item.released',
+      workspaceId: ctx.workspaceId,
+      actor: { type: 'user', userId: actor.userId },
+      entity: { type: 'grade_item', id: itemId },
+      requestId: actor.requestId,
+    });
+    const recipients = await tx
+      .select({ userId: memberships.userId })
+      .from(gradeEntries)
+      .innerJoin(memberships, eq(memberships.id, gradeEntries.membershipId))
+      .where(and(eq(gradeEntries.itemId, itemId), sql`${gradeEntries.scoreCenti} is not null`));
+    for (const r of recipients) {
+      if (!r.userId) continue; // a managed record nobody has taken over yet
+      await this.notifications.notify(tx, {
+        recipientUserId: r.userId,
+        workspaceId: ctx.workspaceId,
+        type: 'grades.released',
+        params: { title: item.title },
+        link: `/w/${ctx.workspaceId}/grades`,
+      });
+    }
+  }
+
   /** Release control (`grading.release`): unreleased grades are invisible to students. */
   async setReleased(
     ctx: WorkspaceContext,
@@ -303,13 +341,17 @@ export class GradingService {
     actor: Actor,
   ): Promise<void> {
     await this.db.inWorkspace(ctx.workspaceId, async (tx) => {
+      if (released) {
+        await this.releaseItem(tx, ctx, itemId, actor);
+        return;
+      }
       await this.item(tx, ctx, itemId, 'grading.release');
       await tx
         .update(gradeItems)
-        .set({ releasedAt: released ? this.clock.now() : null, updatedAt: this.clock.now() })
+        .set({ releasedAt: null, updatedAt: this.clock.now() })
         .where(eq(gradeItems.id, itemId));
       await this.audit.record(tx, {
-        action: released ? 'grade_item.released' : 'grade_item.unreleased',
+        action: 'grade_item.unreleased',
         workspaceId: ctx.workspaceId,
         actor: { type: 'user', userId: actor.userId },
         entity: { type: 'grade_item', id: itemId },

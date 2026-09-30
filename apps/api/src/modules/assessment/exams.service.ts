@@ -314,8 +314,7 @@ export class ExamsService {
         if (scores.length > 0) {
           await this.grading.setScores(ctx, itemId, { scores, reason: 'exam results' }, actor, tx);
         }
-        await tx.execute(sql`update grade_items set released_at = coalesce(released_at, ${this.clock.now()}),
-          updated_at = ${this.clock.now()} where id = ${itemId}`);
+        await this.grading.releaseItem(tx, ctx, itemId, actor);
       }
       await tx
         .update(exams)
