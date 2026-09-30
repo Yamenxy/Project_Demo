@@ -12,12 +12,14 @@ import { absoluteUrl, ShareLink } from './share-link';
 import { PublicPageSettings } from './public-page-settings';
 import { StudentImport } from './student-import';
 import { useWorkspace } from './workspace-shell';
+import { whatsAppLink } from '../../lib/whatsapp';
 
 interface Student {
   membershipId: string;
   userId: string | null;
   name: string;
   phoneE164?: string;
+  guardianPhoneE164?: string;
   platformCode: string | null;
   internalCode: string | null;
   status: 'active' | 'pending' | 'suspended';
@@ -268,6 +270,7 @@ export function StudentsView() {
                         </>
                       ) : null}
                     </p>
+                    <WhatsAppLinks student={student} workspaceName={workspace.name} />
                   </div>
                   <div className="flex flex-wrap gap-1">
                     <span
@@ -399,5 +402,53 @@ export function StudentsView() {
         </section>
       ) : null}
     </div>
+  );
+}
+
+/**
+ * "Message via WhatsApp" for the student and the guardian (REQ-NOTIF-002). The API sends the
+ * numbers only to staff allowed to see them, so without them there are no links.
+ */
+function WhatsAppLinks({ student, workspaceName }: { student: Student; workspaceName: string }) {
+  const t = useTranslations('students');
+  const links = [
+    student.phoneE164
+      ? {
+          key: 'student',
+          label: t('whatsappStudent'),
+          href: whatsAppLink(
+            student.phoneE164,
+            t('whatsappStudentText', { name: student.name, workspace: workspaceName }),
+          ),
+        }
+      : null,
+    student.guardianPhoneE164
+      ? {
+          key: 'guardian',
+          label: t('whatsappGuardian'),
+          href: whatsAppLink(
+            student.guardianPhoneE164,
+            t('whatsappGuardianText', { name: student.name, workspace: workspaceName }),
+          ),
+        }
+      : null,
+  ].filter((l) => l?.href);
+  if (links.length === 0) return null;
+  return (
+    <p className="mt-1 flex flex-wrap gap-3 text-xs">
+      {links.map((l) =>
+        l?.href ? (
+          <a
+            key={l.key}
+            href={l.href}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-brand underline"
+          >
+            {l.label}
+          </a>
+        ) : null,
+      )}
+    </p>
   );
 }

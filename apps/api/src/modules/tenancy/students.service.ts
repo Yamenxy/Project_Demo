@@ -39,6 +39,8 @@ export interface StudentRow {
   name: string;
   /** Present only for viewers allowed to see phone numbers (REQ-PRIV-005). */
   phoneE164?: string;
+  /** The guardian's number, for contact only (REQ-NOTIF-002); same visibility as the phone. */
+  guardianPhoneE164?: string;
   platformCode: string | null;
   internalCode: string | null;
   status: MembershipStatus;
@@ -277,6 +279,7 @@ export class StudentsService {
           dateOfBirth: users.dateOfBirth,
           userCreatedAt: users.createdAt,
           guardianConsentAt: users.guardianConsentAt,
+          guardianPhoneE164: users.guardianPhoneE164,
         })
         .from(memberships)
         .leftJoin(users, eq(users.id, memberships.userId))
@@ -304,6 +307,9 @@ export class StudentsService {
           userId: row.userId,
           name: row.name,
           ...(options.showPhones ? { phoneE164: row.phoneE164 } : {}),
+          ...(options.showPhones && row.guardianPhoneE164
+            ? { guardianPhoneE164: row.guardianPhoneE164 }
+            : {}),
           platformCode: row.platformCode,
           internalCode: row.internalCode,
           status: row.status,

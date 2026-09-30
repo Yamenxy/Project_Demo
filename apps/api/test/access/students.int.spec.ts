@@ -14,6 +14,7 @@ type ListJson = {
     status: string;
     managed: boolean;
     phoneE164?: string;
+    guardianPhoneE164?: string;
   }[];
   pendingCount: number;
 };
@@ -173,6 +174,9 @@ describe('the student list', () => {
        values ($1, gen_random_uuid(), $2, 'enrollment.manage', $3, now())`,
       [w.workspaceId, helperMembership, w.owner],
     );
+    await adminQuery(`update users set guardian_phone_e164 = '+201055550000' where id = $1`, [
+      student,
+    ]);
     const phone = await phoneOf(student);
     const byPhone = (
       await call(
@@ -183,6 +187,8 @@ describe('the student list', () => {
     ).json<ListJson>();
     expect(byPhone.students).toHaveLength(1);
     expect(byPhone.students[0]?.phoneE164).toBe(phone);
+    // The guardian's number, for the WhatsApp link (REQ-NOTIF-002), under the same rule.
+    expect(byPhone.students[0]?.guardianPhoneE164).toBe('+201055550000');
     const byName = (
       await call(
         'GET',

@@ -12,6 +12,11 @@ app, and the reports teachers take away. Everything free; paid items stay in
 | 8.4 | CSV exports (UTF-8 with BOM, formula-looking cells neutralised, every export audited, `data.export`) and the cash report per collector and day with handover status (`finance.view`) | REQ-REPORT-001, REQ-REPORT-002 | reports (new), payments, web |
 | 8.5 | "Message via WhatsApp" links (`wa.me`, prefilled Arabic) for student and guardian phones, only for viewers allowed to see them | REQ-NOTIF-002 | web, tenancy |
 
+**Status (2026-09-30):** tasks 8.1 to 8.5 are done on branch `phase-8/engagement`. Not built:
+per-type push preferences, the owner's full workspace export, and push delivery checked on a real
+phone (the browser tests use a fake push sender; turning push on needs a VAPID key pair in the
+API's environment).
+
 Each task ships with tests (integration against Postgres, cross-tenant suite, browser flow where
 there's UI), audit events, translations in Arabic and English, and doc updates.
 

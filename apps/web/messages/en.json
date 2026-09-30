@@ -428,7 +428,11 @@
     "paperConsent": "Record paper consent",
     "paperConsentNote": "Did you receive a consent form signed by {name}'s guardian? Add a note (optional), then press OK:",
     "paperConsentSaved": "Consent for {name} recorded.",
-    "access": "Lesson access"
+    "access": "Lesson access",
+    "whatsappStudent": "WhatsApp student",
+    "whatsappGuardian": "WhatsApp guardian",
+    "whatsappStudentText": "Hello {name}, this is {workspace}.",
+    "whatsappGuardianText": "Hello, this is {workspace} about {name}."
   },
   "joinTeacher": {
     "title": "Join a teacher",

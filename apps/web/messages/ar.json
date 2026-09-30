@@ -428,7 +428,11 @@
     "paperConsent": "تسجيل موافقة ورقية",
     "paperConsentNote": "استلمت نموذج موافقة موقعًا من ولي أمر {name}؟ اكتب ملاحظة (اختياري) ثم اضغط موافق:",
     "paperConsentSaved": "تم تسجيل موافقة ولي أمر {name}.",
-    "access": "الوصول للدروس"
+    "access": "الوصول للدروس",
+    "whatsappStudent": "واتساب الطالب",
+    "whatsappGuardian": "واتساب ولي الأمر",
+    "whatsappStudentText": "السلام عليكم يا {name}، معك {workspace}.",
+    "whatsappGuardianText": "السلام عليكم، معك {workspace} بخصوص الطالب {name}."
   },
   "joinTeacher": {
     "title": "الانضمام إلى معلّم",
