@@ -11,6 +11,6 @@ import { PriceListService } from './price-list.service';
 @Module({
   controllers: [PriceListController, LedgerController, PaymentRequestsController, CashController],
   providers: [PriceListService, LedgerService, PaymentRequestsService, CashService],
-  exports: [PriceListService, LedgerService],
+  exports: [PriceListService, LedgerService, CashService],
 })
 export class PaymentsModule {}

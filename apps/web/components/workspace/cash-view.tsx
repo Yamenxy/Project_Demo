@@ -8,6 +8,7 @@ import { formatMoney, parseMoney } from '../../lib/format';
 import { ErrorMessage, SubmitButton } from '../form';
 import { cairoToday } from './class-schedule';
 import { useWorkspace } from './workspace-shell';
+import { ExportLink } from './export-link';
 
 interface Balance {
   userId: string;
@@ -29,6 +30,8 @@ interface CollectorDay {
   name: string;
   collectedPiastres: number;
   payments: number;
+  handedConfirmedPiastres: number;
+  handedPendingPiastres: number;
 }
 
 interface Income {
@@ -202,11 +205,22 @@ export function CashView() {
       {finance ? (
         <section className="flex flex-col gap-2">
           <h2 className="font-semibold">{t('today')}</h2>
+          <ExportLink path={`cash-day.csv?date=${cairoToday()}`} label={t('exportDay')} />
           <ul className="flex flex-col gap-1 text-sm">
             {day.map((d) => (
-              <li key={d.userId} className="flex justify-between">
-                <span>{t('dayLine', { name: d.name, count: d.payments })}</span>
-                <span className="font-semibold">{money(d.collectedPiastres)}</span>
+              <li key={d.userId} className="flex flex-col">
+                <span className="flex justify-between">
+                  <span>{t('dayLine', { name: d.name, count: d.payments })}</span>
+                  <span className="font-semibold">{money(d.collectedPiastres)}</span>
+                </span>
+                {d.handedConfirmedPiastres > 0 || d.handedPendingPiastres > 0 ? (
+                  <span className="text-xs text-muted">
+                    {t('dayHandovers', {
+                      confirmed: money(d.handedConfirmedPiastres),
+                      pending: money(d.handedPendingPiastres),
+                    })}
+                  </span>
+                ) : null}
               </li>
             ))}
           </ul>

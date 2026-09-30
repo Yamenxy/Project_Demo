@@ -13,6 +13,8 @@ import { TIME_ZONE } from './class-schedule';
 import { MyPaymentRequests, PendingRequests } from './payment-requests';
 import type { PriceItem } from './price-list-view';
 import { useWorkspace } from './workspace-shell';
+import { cairoToday } from './class-schedule';
+import { ExportLink } from './export-link';
 
 export interface LedgerEntry {
   id: string;
@@ -146,6 +148,10 @@ export function PaymentsView() {
   return (
     <div className="flex flex-col gap-6">
       <h1 className="text-xl font-semibold">{t('title')}</h1>
+      <ExportLink
+        path={`payments.csv?from=${cairoToday().slice(0, 8)}01&to=${cairoToday()}`}
+        label={t('exportMonth')}
+      />
       <ErrorMessage error={error} />
 
       {canRecord ? (

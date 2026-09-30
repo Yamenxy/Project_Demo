@@ -15,6 +15,10 @@ export interface CollectorDay {
   /** Cash taken that day, net of cash given back (reversals). */
   collectedPiastres: number;
   payments: number;
+  /** Handovers made that day, by their status now (REQ-REPORT-002). */
+  handedConfirmedPiastres: number;
+  handedPendingPiastres: number;
+  handedRejectedPiastres: number;
 }
 
 export interface CashBalance {
@@ -52,19 +56,42 @@ export class CashService {
     private readonly clock: Clock,
   ) {}
 
-  /** Per-collector cash on one Cairo calendar day. */
+  /** Per-collector cash on one Cairo calendar day, with that day's handovers and their status. */
   async day(workspaceId: string, date: string): Promise<CollectorDay[]> {
     const rows = await this.db.inWorkspace(workspaceId, (tx) =>
-      tx.execute<{ user_id: string; name: string; collected: string; payments: number }>(sql`
-        select p.collected_by as user_id, u.name_ar as name,
-               sum(case when p.kind = 'payment' then p.amount_piastres else -p.amount_piastres end)
-                 as collected,
-               count(*) filter (where p.kind = 'payment')::int as payments
-          from payment_entries p
-          join users u on u.id = p.collected_by
-         where p.method = 'cash'
-           and (p.recorded_at at time zone 'Africa/Cairo')::date = ${date}::date
-         group by p.collected_by, u.name_ar
+      tx.execute<{
+        user_id: string;
+        name: string;
+        collected: string;
+        payments: number;
+        confirmed: string;
+        pending: string;
+        rejected: string;
+      }>(sql`
+        with collected as (
+          select collected_by as user_id,
+                 sum(case when kind = 'payment' then amount_piastres else -amount_piastres end)
+                   as total,
+                 count(*) filter (where kind = 'payment')::int as payments
+            from payment_entries
+           where method = 'cash'
+             and (recorded_at at time zone 'Africa/Cairo')::date = ${date}::date
+           group by collected_by
+        ), handed as (
+          select handed_by as user_id,
+                 sum(amount_piastres) filter (where status = 'confirmed') as confirmed,
+                 sum(amount_piastres) filter (where status = 'pending') as pending,
+                 sum(amount_piastres) filter (where status = 'rejected') as rejected
+            from cash_handovers
+           where (created_at at time zone 'Africa/Cairo')::date = ${date}::date
+           group by handed_by
+        )
+        select u.id as user_id, u.name_ar as name, coalesce(c.total, 0) as collected,
+               coalesce(c.payments, 0) as payments, coalesce(h.confirmed, 0) as confirmed,
+               coalesce(h.pending, 0) as pending, coalesce(h.rejected, 0) as rejected
+          from collected c
+          full join handed h on h.user_id = c.user_id
+          join users u on u.id = coalesce(c.user_id, h.user_id)
          order by u.name_ar`),
     );
     return rows.rows.map((r) => ({
@@ -72,6 +99,9 @@ export class CashService {
       name: r.name,
       collectedPiastres: Number(r.collected),
       payments: r.payments,
+      handedConfirmedPiastres: Number(r.confirmed),
+      handedPendingPiastres: Number(r.pending),
+      handedRejectedPiastres: Number(r.rejected),
     }));
   }
 

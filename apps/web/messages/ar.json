@@ -529,7 +529,9 @@
     "add": "إضافة",
     "course": "المقرر:",
     "noCourse": "بدون مقرر",
-    "gradebook": "الدرجات"
+    "gradebook": "الدرجات",
+    "exportGrades": "الدرجات",
+    "exportAttendance": "الحضور"
   },
   "schedule": {
     "title": "المواعيد",
@@ -659,7 +661,8 @@
       "other": "أخرى"
     },
     "itemOption": "{name} — {price}",
-    "resumeAccess": "استئناف وصول الطالب"
+    "resumeAccess": "استئناف وصول الطالب",
+    "exportMonth": "مدفوعات هذا الشهر"
   },
   "paymentRequests": {
     "title": "أبلغ عن دفعة حوّلتها",
@@ -703,7 +706,9 @@
     "today": "تحصيل اليوم",
     "dayLine": "{name} ({count, plural, one {دفعة واحدة} two {دفعتان} few {# دفعات} other {# دفعة}})",
     "month": "دخل هذا الشهر",
-    "net": "الصافي بعد القيود العكسية"
+    "net": "الصافي بعد القيود العكسية",
+    "exportDay": "تقرير نقدية اليوم",
+    "dayHandovers": "سُلِّم اليوم: {confirmed} مؤكد، {pending} بانتظار التأكيد"
   },
   "courses": {
     "title": "المقررات",
@@ -1008,5 +1013,8 @@
     "enable": "تفعيل الإشعارات",
     "later": "لاحقًا",
     "on": "تم تفعيل الإشعارات على هذا الجهاز."
+  },
+  "exports": {
+    "csv": "تنزيل {what} (CSV)"
   }
 }

@@ -9,6 +9,7 @@ import { Ltr } from '../../lib/bidi';
 import { ErrorMessage, Field, SubmitButton } from '../form';
 import { ClassSchedule } from './class-schedule';
 import { useWorkspace } from './workspace-shell';
+import { ExportLink } from './export-link';
 
 interface ClassSummary {
   id: string;
@@ -225,6 +226,10 @@ export function ClassView({ classId }: { classId: string }) {
             {t('gradebook')}
           </Link>
         ) : null}
+        <div className="mt-2 flex flex-wrap gap-3">
+          <ExportLink path={`classes/${classId}/gradebook.csv`} label={t('exportGrades')} />
+          <ExportLink path={`classes/${classId}/attendance.csv`} label={t('exportAttendance')} />
+        </div>
         {isOwner && courses.length > 0 ? (
           <label className="mt-2 flex items-center gap-2 text-sm">
             {t('course')}

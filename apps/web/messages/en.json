@@ -529,7 +529,9 @@
     "add": "Add",
     "course": "Course:",
     "noCourse": "No course",
-    "gradebook": "Grades"
+    "gradebook": "Grades",
+    "exportGrades": "grades",
+    "exportAttendance": "attendance"
   },
   "schedule": {
     "title": "Schedule",
@@ -659,7 +661,8 @@
       "other": "Other"
     },
     "itemOption": "{name} — {price}",
-    "resumeAccess": "Resume the student's access"
+    "resumeAccess": "Resume the student's access",
+    "exportMonth": "this month’s payments"
   },
   "paymentRequests": {
     "title": "Report a payment you sent",
@@ -703,7 +706,9 @@
     "today": "Collected today",
     "dayLine": "{name} ({count, plural, one {1 payment} other {# payments}})",
     "month": "Income this month",
-    "net": "Net of reversals"
+    "net": "Net of reversals",
+    "exportDay": "today’s cash report",
+    "dayHandovers": "Handed over today: {confirmed} confirmed, {pending} pending"
   },
   "courses": {
     "title": "Courses",
@@ -1008,5 +1013,8 @@
     "enable": "Turn on notifications",
     "later": "Later",
     "on": "Notifications are on for this device."
+  },
+  "exports": {
+    "csv": "Download {what} (CSV)"
   }
 }

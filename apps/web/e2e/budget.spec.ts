@@ -6,6 +6,11 @@ import { expect, test } from '@playwright/test';
  */
 const BUDGET_BYTES = 170 * 1024;
 
+// Measure a first visit over the network. Once the service worker controls the page it serves
+// cached scripts, and the browser then reports their decoded size, which isn't what a phone
+// downloads.
+test.use({ serviceWorkers: 'block' });
+
 for (const path of ['/ar', '/ar/login', '/ar/register', '/ar/account']) {
   test(`JavaScript on ${path} stays under the budget`, async ({ page }) => {
     await page.goto(path, { waitUntil: 'networkidle' });
