@@ -40,6 +40,12 @@ export const QUEUES = {
     retryBackoff: true,
     deadLetter: FAILED_JOBS_QUEUE,
   },
+  'announce.fanout': {
+    retryLimit: 5,
+    retryDelay: 10,
+    retryBackoff: true,
+    deadLetter: FAILED_JOBS_QUEUE,
+  },
   'files.scan': {
     retryLimit: 3,
     retryDelay: 30,

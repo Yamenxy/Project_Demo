@@ -194,7 +194,8 @@
       "cash_handed_over": "A staff member handed you cash. Confirm you received it.",
       "grades_released": "Grades for “{title}” are out.",
       "exam_regraded": "The answer key for “{title}” was corrected and your score changed.",
-      "homework_comment": "New comment on the homework “{title}”."
+      "homework_comment": "New comment on the homework “{title}”.",
+      "announcement_posted": "New announcement: “{title}”."
     }
   },
   "platform": {
@@ -282,7 +283,8 @@
       "cash": "Cash",
       "courses": "Content",
       "groups": "Access groups",
-      "comments": "Comments"
+      "comments": "Comments",
+      "announcements": "Announcements"
     },
     "suspended": "This workspace is temporarily unavailable. You can still see your grades and attendance.",
     "suspendedOwner": "Your workspace is paused. You can see your subscription and renew it with the platform.",
@@ -316,7 +318,8 @@
     "myLessons": "My lessons",
     "myGrades": "My grades",
     "myExams": "My exams",
-    "myHomework": "My homework"
+    "myHomework": "My homework",
+    "myAnnouncements": "Announcements"
   },
   "staff": {
     "title": "Staff",
@@ -983,5 +986,18 @@
     "reviewExplain": "Everything staff and students write to each other, in one place. Comments can’t be edited or deleted.",
     "reportCount": "{count, plural, one {1 report} other {# reports}}",
     "older": "Older comments"
+  },
+  "announcements": {
+    "title": "Announcements",
+    "none": "No announcements.",
+    "newTitle": "New announcement",
+    "audience": "To",
+    "everyone": "All students",
+    "announcementTitle": "Title",
+    "body": "Message",
+    "post": "Post announcement",
+    "sending": "{count, plural, =0 {No students to send it to.} one {Sending to 1 student.} other {Sending to # students.}}",
+    "delivered": "{count, plural, =0 {no recipients} one {delivered to 1 student} other {delivered to # students}}",
+    "inProgress": "sending"
   }
 }

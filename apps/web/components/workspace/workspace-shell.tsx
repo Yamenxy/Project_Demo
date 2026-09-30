@@ -100,6 +100,11 @@ export function WorkspaceShell({
     },
     { href: `${base}/schedule`, label: t('nav.schedule'), visible: () => true },
     {
+      href: `${base}/announcements`,
+      label: t('nav.announcements'),
+      visible: (c) => c.membership.role === 'owner' || c.permissions.includes('announcements.post'),
+    },
+    {
       href: `${base}/students`,
       label: t('nav.students'),
       visible: (c) =>

@@ -5,6 +5,7 @@ import { DatabaseModule } from './database';
 import { HealthController } from './health/health.controller';
 import { IdempotencyModule } from './idempotency';
 import { JobsModule } from './jobs';
+import { AnnouncementsModule } from './modules/announcements';
 import { AssessmentModule } from './modules/assessment';
 import { AuditModule } from './modules/audit';
 import { ClassesModule } from './modules/classes';
@@ -35,6 +36,7 @@ import { VideoModule } from './modules/video';
     GradingModule,
     AssessmentModule,
     PaymentsModule,
+    AnnouncementsModule,
     IdempotencyModule,
     PlatformAdminModule,
   ],

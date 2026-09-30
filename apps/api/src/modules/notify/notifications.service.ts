@@ -85,6 +85,26 @@ export class NotificationsService implements OnModuleInit {
     return id;
   }
 
+  /**
+   * Many in-app notifications in one insert, for fan-outs (announcements). No email: bulk
+   * messages are in-app (and push) only.
+   */
+  async notifyMany(tx: DbTx, inputs: Omit<NotifyInput, 'email'>[]): Promise<void> {
+    if (inputs.length === 0) return;
+    const now = this.clock.now();
+    await tx.insert(notifications).values(
+      inputs.map((input) => ({
+        id: this.ids.newId(),
+        createdAt: now,
+        recipientUserId: input.recipientUserId,
+        workspaceId: input.workspaceId,
+        type: input.type,
+        params: input.params ?? {},
+        link: input.link ?? null,
+      })),
+    );
+  }
+
   /** The recipient's notifications, newest first, with keyset pagination (review PERF-07). */
   async list(
     userId: string,

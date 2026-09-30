@@ -225,6 +225,13 @@
       "when": 1790729014925,
       "tag": "0031_homework_comments",
       "breakpoints": true
+    },
+    {
+      "idx": 32,
+      "version": "7",
+      "when": 1790764724098,
+      "tag": "0032_announcements",
+      "breakpoints": true
     }
   ]
 }
