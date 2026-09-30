@@ -130,6 +130,11 @@ export function WorkspaceShell({
     },
     { href: `${base}/staff`, label: t('nav.staff'), visible: (c) => c.membership.role === 'owner' },
     {
+      href: `${base}/comments`,
+      label: t('nav.comments'),
+      visible: (c) => c.membership.role === 'owner',
+    },
+    {
       href: `${base}/billing`,
       label: t('nav.billing'),
       visible: (c) => c.membership.role === 'owner',

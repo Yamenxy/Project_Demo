@@ -3,10 +3,12 @@ import { JobsRuntime } from '../../jobs';
 import { BillingController } from './billing.controller';
 import { PlatformController } from './platform.controller';
 import { PlatformService } from './platform.service';
+import { CommentReportsController } from './reports.controller';
+import { CommentReportsService } from './reports.service';
 
 @Module({
-  controllers: [PlatformController, BillingController],
-  providers: [PlatformService],
+  controllers: [PlatformController, BillingController, CommentReportsController],
+  providers: [PlatformService, CommentReportsService],
   exports: [PlatformService],
 })
 export class PlatformAdminModule implements OnModuleInit {

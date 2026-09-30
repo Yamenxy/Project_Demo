@@ -39,6 +39,7 @@ const victim = {
   attemptId: '',
   homeworkId: '',
   submissionId: '',
+  commentId: '',
 };
 const attacker = { workspaceId: '', token: '', studentToken: '' };
 
@@ -90,6 +91,8 @@ const SAMPLE_BODIES: Record<string, object> = {
   'POST /api/v1/w/:workspaceId/homework/:homeworkId/publish': { published: true },
   'POST /api/v1/w/:workspaceId/my/homework/:homeworkId/submissions': { text: 'حل' },
   'POST /api/v1/w/:workspaceId/homework-submissions/:submissionId/grade': { score: 5 },
+  'POST /api/v1/w/:workspaceId/homework-submissions/:submissionId/comments': { body: 'تعليق' },
+  'POST /api/v1/w/:workspaceId/homework-comments/:commentId/report': { reason: 'سبب البلاغ' },
   'POST /api/v1/w/:workspaceId/courses/:courseId/questions': {
     kind: 'true_false',
     body: 'سؤال',
@@ -152,6 +155,7 @@ function victimParams(): Record<string, string> {
     attemptId: victim.attemptId,
     homeworkId: victim.homeworkId,
     submissionId: victim.submissionId,
+    commentId: victim.commentId,
     position: '0',
     fileId: victim.fileId,
     videoId: victim.videoId,
@@ -267,6 +271,13 @@ beforeAll(async () => {
                                        submitted_at, late)
      values ($1, $2, $3, $4, 1, now(), false)`,
     [victim.workspaceId, victim.submissionId, victim.homeworkId, victim.membershipId],
+  );
+  victim.commentId = randomUUID();
+  await adminQuery(
+    `insert into homework_comments (workspace_id, id, submission_id, author_user_id, author_side,
+                                    body, created_at)
+     values ($1, $2, $3, $4, 'staff', 'تعليق الضحية', now())`,
+    [victim.workspaceId, victim.commentId, victim.submissionId, victimOwner],
   );
   victim.seriesId = randomUUID();
   await adminQuery(

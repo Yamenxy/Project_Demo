@@ -45,7 +45,7 @@ export class FilesController {
       ctx,
       { type: ownerType(owner), id: ownerId },
       { name: query.name, data: body },
-      { userId: session.userId, requestId: String(request.id) },
+      { userId: session.userId, requestId: String(request.id), consent: session.consent },
     );
   }
 

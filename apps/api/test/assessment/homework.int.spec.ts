@@ -2,7 +2,13 @@ import type { NestFastifyApplication } from '@nestjs/platform-fastify';
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import { Clock, FixedClock } from '../../src/common';
 import { FilesService } from '../../src/modules/files';
-import { adminQuery, insertMembership, insertUser, insertWorkspace } from '../support/fixtures';
+import {
+  adminQuery,
+  grantConsent,
+  insertMembership,
+  insertUser,
+  insertWorkspace,
+} from '../support/fixtures';
 import { createIntegrationApp } from '../support/integration-app';
 import { signIn } from '../support/sessions';
 
@@ -53,6 +59,7 @@ async function setup(extra: Record<string, unknown> = {}) {
   ).json<{ id: string }>().id;
   const studentUser = await insertUser();
   const student = await insertMembership(workspaceId, studentUser, 'student');
+  await grantConsent(studentUser);
   const outsiderUser = await insertUser();
   await insertMembership(workspaceId, outsiderUser, 'student');
   await call('POST', `${w}/classes/${classId}/students`, ownerToken, { membershipIds: [student] });

@@ -33,6 +33,11 @@ export async function insertUser(status = 'active'): Promise<string> {
   return id;
 }
 
+/** Records guardian consent, so a (minor) test student isn't a limited account (REQ-PRIV-001). */
+export async function grantConsent(userId: string): Promise<void> {
+  await adminQuery('update users set guardian_consent_at = now() where id = $1', [userId]);
+}
+
 /** Inserts a workspace owned by the given user, with its owner membership. */
 export async function insertWorkspace(ownerUserId: string): Promise<string> {
   const id = randomUUID();

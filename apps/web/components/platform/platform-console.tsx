@@ -7,6 +7,7 @@ import { Link, useRouter } from '../../i18n/navigation';
 import { api, ApiError } from '../../lib/api';
 import { Ltr } from '../../lib/bidi';
 import { ErrorMessage, Field, Select, SubmitButton } from '../form';
+import { CommentReports } from './comment-reports';
 import { PLANS, STATUS_STYLE, type WorkspaceSummary } from './types';
 
 const publicPath = (slug: string) => `/t/${slug}`;
@@ -139,6 +140,8 @@ export function PlatformConsole() {
           <SubmitButton busy={busy}>{t('create')}</SubmitButton>
         </form>
       </section>
+
+      <CommentReports />
     </main>
   );
 }

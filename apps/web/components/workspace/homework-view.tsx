@@ -5,6 +5,7 @@ import { useCallback, useEffect, useState, type FormEvent } from 'react';
 import { Link } from '../../i18n/navigation';
 import { api } from '../../lib/api';
 import { ErrorMessage, Field, Select, SubmitButton, TextArea } from '../form';
+import { CommentThread } from './comment-thread';
 import { cairoLocalToIso } from './exams-admin';
 import { FileList } from './file-list';
 import { useWorkspace } from './workspace-shell';
@@ -256,6 +257,7 @@ function Submissions({ homeworkId }: { homeworkId: string }) {
             canUpload={false}
             accept={ACCEPT}
           />
+          <CommentThread base={base} submissionId={s.id} />
           <form onSubmit={grade(s.id)} className="flex flex-wrap items-end gap-2">
             <label className="flex flex-col">
               {t('score')}
@@ -373,6 +375,7 @@ export function MyHomeworkView() {
                   canUpload={s.score === null}
                   accept={ACCEPT}
                 />
+                <CommentThread base={base} submissionId={s.id} />
                 {s.score !== null ? (
                   <p className="mt-1 font-semibold">
                     {t('score', { score: s.score, max: h.maxScore })}

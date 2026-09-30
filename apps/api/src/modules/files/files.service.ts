@@ -6,6 +6,7 @@ import { UPLOAD_LIMIT_BYTES } from '../../common/http/request-id';
 import { TenantDb, type DbTx } from '../../database';
 import { JobsRuntime } from '../../jobs';
 import { AuditService } from '../audit';
+import { isLimited, type ConsentState } from '../identity';
 import { AccessService, courseScope, courses, lessons } from '../content';
 import { memberships, studentScope, type WorkspaceContext } from '../tenancy';
 import { isImage, sniff, type KnownType } from './magic';
@@ -15,6 +16,8 @@ import { FileStorage } from './storage';
 export interface Actor {
   userId: string;
   requestId?: string;
+  /** The uploader's guardian consent state (REQ-PRIV-001). */
+  consent?: ConsentState;
 }
 
 export type OwnerType = 'lesson' | 'payment_request' | 'homework_submission';
@@ -61,6 +64,10 @@ export class FilesService {
   ): Promise<FileView> {
     // The owner check comes first, so another workspace's ids always answer 404.
     await this.db.inWorkspace(ctx.workspaceId, (tx) => this.assertCanUpload(tx, ctx, owner));
+    // A student without guardian consent yet can't upload personal content (REQ-PRIV-001).
+    if (ctx.role === 'student' && actor.consent && isLimited(actor.consent)) {
+      throw new AppError(403, 'consent_required', 'Guardian consent is needed before uploading');
+    }
     if (!Buffer.isBuffer(input.data)) {
       throw new AppError(
         415,

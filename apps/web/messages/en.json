@@ -164,7 +164,10 @@
     "invalid_key": "This key doesn't fit the question.",
     "no_resubmission": "You can’t submit again.",
     "homework_closed": "The due date for this homework has passed.",
-    "homework_unavailable": "This homework is not available."
+    "homework_unavailable": "This homework is not available.",
+    "own_comment": "You can’t report your own comment.",
+    "empty_comment": "Write a comment first.",
+    "consent_required": "A guardian’s consent is needed before uploading files."
   },
   "notifications": {
     "title": "Notifications",
@@ -190,7 +193,8 @@
       "payment_request_rejected": "Your payment request was rejected. See the reason.",
       "cash_handed_over": "A staff member handed you cash. Confirm you received it.",
       "grades_released": "Grades for “{title}” are out.",
-      "exam_regraded": "The answer key for “{title}” was corrected and your score changed."
+      "exam_regraded": "The answer key for “{title}” was corrected and your score changed.",
+      "homework_comment": "New comment on the homework “{title}”."
     }
   },
   "platform": {
@@ -246,6 +250,15 @@
       "wallet": "Mobile wallet",
       "bank_transfer": "Bank transfer",
       "fawry": "Fawry"
+    },
+    "reports": {
+      "title": "Reported comments",
+      "none": "No open reports.",
+      "staff": "staff",
+      "student": "student",
+      "reportedBy": "Reported by {name}: {reason}",
+      "dismiss": "Dismiss",
+      "hide": "Hide comment"
     }
   },
   "workspace": {
@@ -268,7 +281,8 @@
       "payments": "Payments",
       "cash": "Cash",
       "courses": "Content",
-      "groups": "Access groups"
+      "groups": "Access groups",
+      "comments": "Comments"
     },
     "suspended": "This workspace is temporarily unavailable. You can still see your grades and attendance.",
     "suspendedOwner": "Your workspace is paused. You can see your subscription and renew it with the platform.",
@@ -952,5 +966,22 @@
     "filesAfter": "After submitting you can attach PDF files or images.",
     "submit": "Submit",
     "resubmit": "Resubmit"
+  },
+  "comments": {
+    "title": "Comments",
+    "none": "No comments.",
+    "staff": "Teacher",
+    "student": "Student",
+    "hidden": "The platform team hid this comment.",
+    "report": "Report",
+    "reason": "Reason for the report",
+    "sendReport": "Send report",
+    "reported": "Report sent to the platform team.",
+    "write": "Write a comment",
+    "send": "Send",
+    "reviewTitle": "Homework comments",
+    "reviewExplain": "Everything staff and students write to each other, in one place. Comments can’t be edited or deleted.",
+    "reportCount": "{count, plural, one {1 report} other {# reports}}",
+    "older": "Older comments"
   }
 }

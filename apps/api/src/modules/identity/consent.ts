@@ -42,7 +42,7 @@ export function consentState(facts: ConsentFacts, now: Date): ConsentState {
   return now < consentDueAt(facts.createdAt) ? 'needed' : 'overdue';
 }
 
-/** Limited accounts can't upload files (REQ-PRIV-001). Uploads arrive in a later phase. */
+/** Limited accounts can't upload files (REQ-PRIV-001); checked by the files module. */
 export function isLimited(state: ConsentState): boolean {
   return state === 'needed' || state === 'overdue';
 }

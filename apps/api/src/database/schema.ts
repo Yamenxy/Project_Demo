@@ -3,6 +3,7 @@
 // queries, and test/database/schema-drift.int.spec.ts checks that they match.
 export { idempotencyKeys } from '../idempotency/schema';
 export {
+  commentReports,
   examAccommodations,
   examAnswers,
   examAttempts,
@@ -10,6 +11,7 @@ export {
   exams,
   examTargets,
   homework,
+  homeworkComments,
   homeworkSubmissions,
   homeworkTargets,
   questions,

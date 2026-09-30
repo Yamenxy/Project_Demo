@@ -1,7 +1,13 @@
 import type { NestFastifyApplication } from '@nestjs/platform-fastify';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { FilesService } from '../../src/modules/files';
-import { adminQuery, insertMembership, insertUser, insertWorkspace } from '../support/fixtures';
+import {
+  adminQuery,
+  grantConsent,
+  insertMembership,
+  insertUser,
+  insertWorkspace,
+} from '../support/fixtures';
 import { createIntegrationApp } from '../support/integration-app';
 import { signIn } from '../support/sessions';
 
@@ -47,6 +53,7 @@ async function setup() {
   );
   const studentUser = await insertUser();
   const student = await insertMembership(workspaceId, studentUser, 'student');
+  await grantConsent(studentUser);
   const studentToken = await signIn(app, studentUser);
   return { owner, workspaceId, ownerToken, w, lessonId: lesson?.id ?? '', student, studentToken };
 }
@@ -153,5 +160,28 @@ describe('files (REQ-FILE-001)', () => {
       pdfProof.id,
     ]);
     expect(row?.status).toBe('rejected');
+  });
+
+  it('a student without guardian consent yet cannot upload (REQ-PRIV-001)', async () => {
+    const s = await setup();
+    const minorUser = await insertUser();
+    await insertMembership(s.workspaceId, minorUser, 'student');
+    const token = await signIn(app, minorUser);
+    const request = (
+      await app.inject({
+        method: 'POST',
+        url: `${s.w}/my/payment-requests`,
+        cookies: { lms_session: token },
+        payload: { amountPiastres: 10000, method: 'wallet', reference: 'VF-2' },
+      })
+    ).json<{ id: string }>().id;
+    const refused = await upload(`${s.w}/payment-requests/${request}/files?name=p.png`, token, PNG);
+    expect(refused.statusCode).toBe(403);
+    expect(refused.json<{ error: { code: string } }>().error.code).toBe('consent_required');
+    const [n] = await adminQuery<{ n: string }>(
+      'select count(*) as n from files where owner_id = $1',
+      [request],
+    );
+    expect(n?.n).toBe('0');
   });
 });

@@ -182,3 +182,26 @@ export const homeworkSubmissions = pgTable('homework_submissions', {
   gradedBy: uuid('graded_by'),
   gradedAt: tstz('graded_at'),
 });
+
+export const homeworkComments = pgTable('homework_comments', {
+  workspaceId: uuid('workspace_id').notNull(),
+  id: uuid('id').primaryKey(),
+  submissionId: uuid('submission_id').notNull(),
+  authorUserId: uuid('author_user_id').notNull(),
+  authorSide: text('author_side', { enum: ['student', 'staff'] }).notNull(),
+  body: text('body').notNull(),
+  createdAt: tstz('created_at').notNull(),
+  hiddenAt: tstz('hidden_at'),
+});
+
+export const commentReports = pgTable('comment_reports', {
+  workspaceId: uuid('workspace_id').notNull(),
+  id: uuid('id').primaryKey(),
+  commentId: uuid('comment_id').notNull(),
+  reportedBy: uuid('reported_by').notNull(),
+  reason: text('reason').notNull(),
+  createdAt: tstz('created_at').notNull(),
+  resolvedAt: tstz('resolved_at'),
+  resolvedBy: uuid('resolved_by'),
+  resolution: text('resolution', { enum: ['dismissed', 'hidden'] }),
+});

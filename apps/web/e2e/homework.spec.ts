@@ -47,12 +47,24 @@ test('a student submits homework, the teacher grades and releases it, and the st
   await teacherPage.getByLabel('ملاحظات', { exact: true }).fill('ممتاز');
   await teacherPage.getByRole('button', { name: 'حفظ الدرجة' }).click();
   await expect(teacherPage.getByLabel('الدرجة', { exact: true })).toHaveValue('9');
+  await teacherPage.getByLabel('اكتب تعليقًا').fill('راجع توزيع الإلكترونات');
+  await teacherPage.getByRole('button', { name: 'إرسال', exact: true }).click();
+  await expect(teacherPage.getByText('راجع توزيع الإلكترونات')).toBeVisible();
   await teacherPage.getByRole('button', { name: 'إعلان النتائج' }).click();
   await expect(teacherPage.getByText(/النتائج معلنة/)).toBeVisible();
 
   await page.reload();
   await expect(page.getByText('الدرجة: 9 من 10')).toBeVisible();
   await expect(page.getByText('ملاحظات المعلم: ممتاز')).toBeVisible();
+  await expect(page.getByText('راجع توزيع الإلكترونات')).toBeVisible();
+  await page.getByLabel('اكتب تعليقًا').fill('شكرًا، سأراجعها');
+  await page.getByRole('button', { name: 'إرسال', exact: true }).click();
+  await expect(page.getByText('شكرًا، سأراجعها')).toBeVisible();
+
+  // The owner sees both sides of every thread.
+  await teacherPage.goto(`/ar/w/${workspaceId}/comments`);
+  await expect(teacherPage.getByText('شكرًا، سأراجعها')).toBeVisible();
+  await expect(teacherPage.getByText('راجع توزيع الإلكترونات')).toBeVisible();
   await teacherContext.close();
   await studentContext.close();
 });

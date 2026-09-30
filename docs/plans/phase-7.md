@@ -10,6 +10,10 @@ Everything free; paid items stay in [paid-services.md](../paid-services.md).
 | 7.2 | Homework comments: a thread on each submission between the student and the staff who grade them, the only staff–student channel; the owner can review every thread; a comment can be reported to the platform owners' queue | REQ-MSG-001 | assessment, platform, web |
 | 7.3 | Exam load profiles (k6): exam start at 200 per minute and autosave, with p95 thresholds and a check that no acknowledged answer is lost; a seed script that prepares an exam with many students | REQ-EXAM-005 | tooling, docs |
 
+Found while doing 7.2: uploads never applied the limited-account rule of REQ-PRIV-001 (a
+student without guardian consent can't upload). Fixed in 7.2: the files module refuses them with
+`consent_required`.
+
 Each task ships with tests (integration against Postgres, cross-tenant suite, browser flow where
 there's UI), audit events, translations in Arabic and English, and doc updates.
 
